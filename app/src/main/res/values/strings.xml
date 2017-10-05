@@ -4,9 +4,11 @@
     <string name="hint_email">Email</string>
     <string name="hint_password">Password</string>
 
-    <string name="button_login">Login</string>
+    <string name="button_sign_in">Sign in</string>
 
     <string name="error_empty_field">Field(s) is(are) empty</string>
     <string name="error_login">Log In Problem</string>
+
+    <string name="text_hello_user">Let\'s chat</string>
 
 </resources>

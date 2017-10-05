@@ -6,20 +6,25 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.shmeli.surakat.ui.MainActivity"
-    android:padding="@dimen/content_padding">
+    android:padding="10dp">
 
-    <TextView
-        android:id="@+id/userListTextView"
+    <EditText
+        android:id="@+id/messageEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/text_size_medium"
-        android:text="User list:"/>
+        android:ems="10"/>
+
+    <Button
+        android:id="@+id/sendButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/messageEditText"
+        android:text="Send"/>
 
     <ListView
-        android:id="@+id/userListView"
+        android:id="@+id/messageListView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/userListTextView"
-        android:layout_marginTop="@dimen/field_margin"/>
+        android:layout_below="@+id/sendButton"/>
 
 </RelativeLayout>

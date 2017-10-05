@@ -3,5 +3,16 @@
     <dimen name="content_padding">20dp</dimen>
 
     <dimen name="field_margin">20dp</dimen>
+    <dimen name="field_margin_1.5x">30dp</dimen>
+
+    <dimen name="logo_size">125dp</dimen>
+
+    <dimen name="field_padding">15dp</dimen>
+
+    <dimen name="text_size_small">10dp</dimen>
+    <dimen name="text_size_medium">20dp</dimen>
+    <dimen name="text_size_big">30dp</dimen>
+
+    <dimen name="input_field_radius">5dp</dimen>
 
 </resources>
