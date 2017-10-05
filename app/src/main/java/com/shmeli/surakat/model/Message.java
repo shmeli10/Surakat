@@ -8,56 +8,65 @@ import java.util.Date;
 
 public class Message {
 
-    private String textMessage;
-    private String author;
+    private int messageId;
+    private int messageAuthorId;
+    private int messageRecipientId;
 
-    private long timeMessage;
+    private long messageDateAndTime;
 
-    private boolean isUnread;
+    private String messageText;
 
-    //public Message(String textMessage, String author) {
-    public Message(String textMessage, String author, boolean isUnread) {
-        this.textMessage    = textMessage;
-        this.author         = author;
-        this.isUnread       = isUnread;
+    private boolean isMessageUnread;
 
-        timeMessage = new Date().getTime();
+    public Message(int      messageId,
+                   int      messageAuthorId,
+                   int      messageRecipientId,
+                   String   messageText,
+                   boolean  isMessageUnread) {
 
-        // isUnread = true;
+        this.messageId          = messageId;
+        this.messageAuthorId    = messageAuthorId;
+        this.messageRecipientId = messageRecipientId;
+
+        this.messageText        = messageText;
+        this.isMessageUnread    = isMessageUnread;
+
+        this.messageDateAndTime = new Date().getTime();
     }
 
-    public Message() {
+    public int getMessageId() {
+        return messageId;
     }
 
-    public String getTextMessage() {
-        return textMessage;
+    public int getMessageAuthorId() {
+        return messageAuthorId;
     }
 
-    public void setTextMessage(String textMessage) {
-        this.textMessage = textMessage;
+    public int getMessageRecipientId() {
+        return messageRecipientId;
     }
 
-    public String getAuthor() {
-        return author;
+    public long getMessageDateAndTime() {
+        return messageDateAndTime;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
+    public void setMessageDateAndTime(long messageDateAndTime) {
+        this.messageDateAndTime = messageDateAndTime;
     }
 
-    public long getTimeMessage() {
-        return timeMessage;
+    public String getMessageText() {
+        return messageText;
     }
 
-    public void setTimeMessage(long timeMessage) {
-        this.timeMessage = timeMessage;
+    public void setMessageText(String messageText) {
+        this.messageText = messageText;
     }
 
-    public boolean isUnread() {
-        return isUnread;
+    public boolean isMessageUnread() {
+        return isMessageUnread;
     }
 
-    public void setUnread(boolean unread) {
-        isUnread = unread;
+    public void setMessageUnread(boolean messageUnread) {
+        isMessageUnread = messageUnread;
     }
 }

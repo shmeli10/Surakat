@@ -1,0 +1,7 @@
+<resources>
+
+    <dimen name="content_padding">20dp</dimen>
+
+    <dimen name="field_margin">20dp</dimen>
+
+</resources>

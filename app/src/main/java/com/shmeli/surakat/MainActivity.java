@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         messageListView = (ListView) findViewById(R.id.messageListView);
 
         //final ArrayAdapter<Message> adapter = new ArrayAdapter<>(  this,
-        final ArrayAdapter<String> adapter = new ArrayAdapter<>(  this,
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(    this,
                                                                     android.R.layout.simple_list_item_1,
                                                                     messageList);
 
