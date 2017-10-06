@@ -26,6 +26,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText    passwordEditText;
 
     private Button      singnInButton;
+    private Button      registerButton;
 
     private FirebaseAuth fbAuth;
 
@@ -43,8 +44,12 @@ public class LoginActivity extends AppCompatActivity {
         loginContainer      = UiUtils.findView(this, R.id.loginContainer);
         emailEditText       = UiUtils.findView(this, R.id.emailEditText);
         passwordEditText    = UiUtils.findView(this, R.id.passwordEditText);
+
         singnInButton       = UiUtils.findView(this, R.id.signInButton);
         singnInButton.setOnClickListener(loginClickListener);
+
+        registerButton      = UiUtils.findView(this, R.id.registerButton);
+        registerButton.setOnClickListener(registerClickListener);
     }
 
     @Override
@@ -80,6 +85,15 @@ public class LoginActivity extends AppCompatActivity {
         public void onClick(View v) {
 
             startSignIn();
+        }
+    };
+
+    View.OnClickListener registerClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
+            startActivity(new Intent(   LoginActivity.this,
+                                        RegisterActivity.class));
         }
     };
 

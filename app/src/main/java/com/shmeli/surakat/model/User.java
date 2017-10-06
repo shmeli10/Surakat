@@ -6,28 +6,41 @@ package com.shmeli.surakat.model;
 
 public class User {
 
-    private int userId;
+    // private int userId;
+//    private String userId;
 
     private String userName;
 
-    private String userEmail;
+    //private String userEmail;
 
-    private boolean isUserOnline;
+    // private boolean isUserOnline;
+//    private String isUserOnline;
 
-    public User(int     userId,
-                String  userName,
-                String  userEmail,
-                boolean isUserOnline) {
+    public User() { }
 
-        this.userId         = userId;
-        this.userName       = userName;
-        this.userEmail      = userEmail;
-        this.isUserOnline   = isUserOnline;
-    }
+    //    public User(int     userId,
+//                String  userName,
+//                String  userEmail,
+//                boolean isUserOnline) {
 
-    public int getUserId() {
-        return userId;
-    }
+//    public User(String  userId,
+//                String  userName,
+//                String  userEmail,
+//                String  isUserOnline) {
+
+//        this.userId         = userId;
+//        this.userName       = userName;
+//        //this.userEmail      = userEmail;
+//        this.isUserOnline   = isUserOnline;
+//    }
+
+//    public int getUserId() {
+//        return userId;
+//    }
+
+//   public String getUserId() {
+//        return userId;
+//    }
 
     public String getUserName() {
         return userName;
@@ -37,19 +50,27 @@ public class User {
         this.userName = userName;
     }
 
-    public String getUserEmail() {
-        return userEmail;
-    }
+//    public String getUserEmail() {
+//        return userEmail;
+//    }
+//
+//    public void setUserEmail(String userEmail) {
+//        this.userEmail = userEmail;
+//    }
 
-    public void setUserEmail(String userEmail) {
-        this.userEmail = userEmail;
-    }
+//    public String isUserOnline() {
+//        return isUserOnline;
+//    }
+//
+//    public void setUserOnline(String userOnline) {
+//        isUserOnline = userOnline;
+//    }
 
-    public boolean isUserOnline() {
-        return isUserOnline;
-    }
+    //    public boolean isUserOnline() {
+//        return isUserOnline;
+//    }
 
-    public void setUserOnline(boolean userOnline) {
-        isUserOnline = userOnline;
-    }
+//    public void setUserOnline(boolean userOnline) {
+//        isUserOnline = userOnline;
+//    }
 }

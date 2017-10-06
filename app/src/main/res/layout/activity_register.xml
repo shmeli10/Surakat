@@ -3,37 +3,44 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/loginContainer"
+    android:id="@+id/registerContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="@dimen/spacing_2x"
-    tools:context="com.shmeli.surakat.ui.LoginActivity"
+    tools:context="com.shmeli.surakat.ui.RegisterActivity"
     android:background="@color/colorPrimary">
 
-    <ImageView
-        android:id="@+id/logoImageView"
-        android:layout_width="@dimen/logo_size"
-        android:layout_height="@dimen/logo_size"
-        android:layout_marginTop="@dimen/spacing_4x"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:src="@drawable/hello_user"/>
-
     <TextView
-        android:id="@+id/helloUserTextView"
-        style="@style/MW"
-        android:layout_below="@+id/logoImageView"
+        android:id="@+id/createUserTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing_2x"
         android:gravity="center"
         android:textSize="@dimen/text_size_2.5x"
         android:textColor="@color/white"
-        android:text="@string/text_hello_user"/>
+        android:text="@string/button_register"/>
+
+    <EditText
+        android:id="@+id/nameEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/createUserTextView"
+        android:layout_marginTop="@dimen/spacing_6x"
+        android:padding="@dimen/spacing_3x"
+        android:ems="10"
+        android:inputType="text"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="@dimen/text_size_1.5x"
+        android:textColorHint="@color/colorPrimary"
+        android:hint="@string/hint_name"
+        android:background="@drawable/input_background"/>
 
     <EditText
         android:id="@+id/emailEditText"
-        style="@style/MW"
-        android:layout_below="@+id/helloUserTextView"
-        android:layout_marginTop="@dimen/spacing_6x"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/nameEditText"
+        android:layout_marginTop="@dimen/spacing_2x"
         android:padding="@dimen/spacing_3x"
         android:ems="10"
         android:inputType="textEmailAddress"
@@ -45,7 +52,8 @@
 
     <EditText
         android:id="@+id/passwordEditText"
-        style="@style/MW"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/emailEditText"
         android:layout_marginTop="@dimen/spacing_2x"
         android:padding="@dimen/spacing_3x"
@@ -58,24 +66,26 @@
         android:background="@drawable/input_background"/>
 
     <Button
-        android:id="@+id/signInButton"
-        style="@style/MW"
+        android:id="@+id/createButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/passwordEditText"
         android:layout_marginTop="@dimen/spacing_2x"
         android:background="@drawable/button_background"
         android:textColor="@color/colorPrimary"
         android:textSize="@dimen/text_size_1.5x"
-        android:text="@string/button_sign_in"/>
+        android:text="@string/button_create"/>
 
     <Button
-        android:id="@+id/registerButton"
-        style="@style/MW"
-        android:layout_below="@+id/signInButton"
+        android:id="@+id/backButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/createButton"
         android:layout_marginTop="@dimen/spacing_6x"
         android:background="@drawable/button_register_background"
         android:textColor="@color/colorPrimary"
         android:textSize="@dimen/text_size_1.5x"
-        android:text="@string/button_register"/>
+        android:text="@string/button_back"/>
 
 
 </RelativeLayout>

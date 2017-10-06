@@ -1,17 +1,21 @@
 <resources>
 
-    <dimen name="content_padding">20dp</dimen>
+    <dimen name="spacing_1x">5dp</dimen>
+    <dimen name="spacing_2x">10dp</dimen>
+    <dimen name="spacing_3x">15dp</dimen>
+    <dimen name="spacing_4x">20dp</dimen>
+    <dimen name="spacing_5x">25dp</dimen>
+    <dimen name="spacing_6x">30dp</dimen>
 
-    <dimen name="field_margin">20dp</dimen>
-    <dimen name="field_margin_1.5x">30dp</dimen>
+    <dimen name="text_size_1x">8dp</dimen>
+    <dimen name="text_size_1.5x">12dp</dimen>
+    <dimen name="text_size_2.0x">16dp</dimen>
+    <dimen name="text_size_2.5x">20dp</dimen>
+    <dimen name="text_size_3.5x">28dp</dimen>
 
     <dimen name="logo_size">125dp</dimen>
 
-    <dimen name="field_padding">15dp</dimen>
-
-    <dimen name="text_size_small">10dp</dimen>
-    <dimen name="text_size_medium">20dp</dimen>
-    <dimen name="text_size_big">30dp</dimen>
+    <dimen name="input_outline_size">1dp</dimen>
 
     <dimen name="input_field_radius">5dp</dimen>
 

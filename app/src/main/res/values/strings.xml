@@ -1,14 +1,27 @@
 <resources>
     <string name="app_name">Surakat</string>
 
+    <string name="hint_name">Name</string>
     <string name="hint_email">Email</string>
     <string name="hint_password">Password</string>
+    <string name="hint_type_message">Type a message here...</string>
 
     <string name="button_sign_in">Sign in</string>
+    <string name="button_register">Create account</string>
+    <string name="button_send">Send</string>
+    <string name="button_create">Create</string>
+    <string name="button_back">Back</string>
+
+    <string name="message_creating_account">Creating account...</string>
 
     <string name="error_empty_field">Field(s) is(are) empty</string>
     <string name="error_login">Log In Problem</string>
 
     <string name="text_hello_user">Let\'s chat</string>
+
+    <string name="text_left_characters_head">Left</string>
+    <string name="text_left_characters_tail">symbols</string>
+    <string name="text_user_list">User list:</string>
+    <string name="text_message">Message</string>
 
 </resources>
