@@ -1,5 +1,6 @@
 package com.shmeli.surakat.ui;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 
 import android.support.v7.app.AppCompatActivity;
@@ -23,9 +24,12 @@ import com.firebase.client.FirebaseError;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import com.google.firebase.database.ValueEventListener;
 import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
 import com.shmeli.surakat.model.Message;
@@ -40,25 +44,35 @@ import java.util.Date;
 
 public class ChatActivity extends AppCompatActivity {
 
-    private EditText            messageEditText;
-    private Button              sendButton;
-    private RecyclerView        messagesRecyclerView;
+    private EditText                messageEditText;
+    private Button                  sendButton;
+    private RecyclerView            messagesRecyclerView;
 
-    private Firebase            mRef;
+    private Firebase                fbRef;
+    private FirebaseAuth            fbAuth;
+    private FirebaseUser            fbCurrentUser;
+    private DatabaseReference       messagesDatabaseRef;
+    private DatabaseReference       usersFBDatabaseRef;
 
-    private DatabaseReference   databaseReference;
+    private ArrayList<String>       messageList = new ArrayList<>();
 
-    private ArrayList<String>   messageList = new ArrayList<>();
+    private ProgressDialog          progressDialog;
+
+    private ArrayAdapter<String>    adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
-        //mRef = new Firebase("https://surakat-80b2e.firebaseio.com/Messages");
-        mRef = new Firebase(CONST.FIREBASE_MESSAGES_LINK);
+        fbRef               = new Firebase(CONST.FIREBASE_MESSAGES_LINK);
+        fbAuth              = FirebaseAuth.getInstance();
+        fbCurrentUser       = fbAuth.getCurrentUser();
 
-        databaseReference = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_MESSAGES_CHILD);
+        progressDialog      = new ProgressDialog(this);
+
+        messagesDatabaseRef = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_MESSAGES_CHILD);
+        usersFBDatabaseRef  = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_USERS_CHILD).child(fbCurrentUser.getUid());
 
         messageEditText = UiUtils.findView(this, R.id.messageEditText);
         sendButton      = UiUtils.findView(this, R.id.sendButton);
@@ -70,13 +84,15 @@ public class ChatActivity extends AppCompatActivity {
 
         // messageListView = UiUtils.findView(this, R.id.messageListView);
 
-        final ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                                                                android.R.layout.simple_list_item_1,
-                                                                messageList);
+        adapter = new ArrayAdapter<>(   this,
+                                        android.R.layout.simple_list_item_1,
+                                        messageList);
 
         //messageListView.setAdapter(adapter);
 
-        mRef.addChildEventListener(new ChildEventListener() {
+        fbRef.addChildEventListener(childEventListener);
+
+        /*fbRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
@@ -111,17 +127,17 @@ public class ChatActivity extends AppCompatActivity {
             public void onCancelled(FirebaseError firebaseError) {
 
             }
-        });
+        });*/
     }
 
     @Override
     protected void onStart() {
         super.onStart();
 
-        FirebaseRecyclerAdapter<Message, MessageViewHolder> fbAdapter = new FirebaseRecyclerAdapter<Message, MessageViewHolder>(Message.class,
-                                                                                                                                R.layout.message_row,
-                                                                                                                                MessageViewHolder.class,
-                                                                                                                                databaseReference) {
+        FirebaseRecyclerAdapter<Message, MessageViewHolder> fbAdapter = new FirebaseRecyclerAdapter<Message, MessageViewHolder>( Message.class,
+                                                                                                        R.layout.message_row,
+                                                                                                        MessageViewHolder.class,
+                                                                                                        messagesDatabaseRef) {
 
             @Override
             protected void populateViewHolder(MessageViewHolder viewHolder, Message model, int position) {
@@ -152,24 +168,83 @@ public class ChatActivity extends AppCompatActivity {
 
     // ------------------------------ LISTENERS ----------------------------------------- //
 
+    ChildEventListener childEventListener = new ChildEventListener() {
+
+        @Override
+        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
+            //String messageText = dataSnapshot.getValue(String.class);
+
+            Message message = dataSnapshot.getValue(Message.class);
+
+//                Message newMessage = new Message(messageText, "author", false);
+//                messageList.add(newMessage);
+
+            messageList.add(message.getMessageText());
+
+            adapter.notifyDataSetChanged();
+        }
+
+        @Override
+        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+        }
+
+        @Override
+        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onCancelled(FirebaseError firebaseError) {
+
+        }
+    };
+
     View.OnClickListener sendClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            startSendMessage();
+        }
 
-            String messageText = messageEditText.getText().toString();
+        private void startSendMessage() {
+
+            final String messageText = messageEditText.getText().toString();
 
             if(!TextUtils.isEmpty(messageText.trim())) {
 
-                DatabaseReference newMessage = databaseReference.push();
+                progressDialog.setMessage(getResources().getString(R.string.message_setting_account));
+                progressDialog.show();
 
-                newMessage.child("messageId").setValue("" +1);
-                newMessage.child("messageAuthorId").setValue("" +FirebaseAuth.getInstance().getCurrentUser().getUid());
-                newMessage.child("messageRecipientId").setValue("" +2);
-                newMessage.child("messageDateAndTime").setValue("" +new Date().getTime());
-                newMessage.child("messageText").setValue(messageText);
-                newMessage.child("isMessageUnread").setValue("" +true);
+                final DatabaseReference newMessage = messagesDatabaseRef.push();
+
+                usersFBDatabaseRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
+
+                        newMessage.child("messageId").setValue("" +1);
+                        newMessage.child("messageAuthorId").setValue("" +fbAuth.getCurrentUser().getUid());
+                        newMessage.child("messageAuthorName").setValue(dataSnapshot.child("userName").getValue()); //"" +fbAuth.getCurrentUser().getUid());
+                        newMessage.child("messageRecipientId").setValue("" +2);
+                        newMessage.child("messageDateAndTime").setValue("" +new Date().getTime());
+                        newMessage.child("messageText").setValue(messageText);
+                        newMessage.child("isMessageUnread").setValue("" +true);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
 
                 messageEditText.setText("");
+
+                progressDialog.dismiss();
 
 //                newMessage.child("id").setValue(1);
 //                newMessage.child("text").setValue(messageText);

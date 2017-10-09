@@ -22,17 +22,17 @@ import com.shmeli.surakat.utils.UiUtils;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private EditText        nameEditText;
-    private EditText        emailEditText;
-    private EditText        passwordEditText;
+    private EditText            nameEditText;
+    private EditText            emailEditText;
+    private EditText            passwordEditText;
 
-    private Button          createButton;
-    private Button          backButton;
+    private Button              createButton;
+    private Button              backButton;
 
     private FirebaseAuth        fbAuth;
     private DatabaseReference   databaseReference;
 
-    private ProgressDialog  progressDialog;
+    private ProgressDialog      progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +76,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                         DatabaseReference createUser = databaseReference.child(userId);
 
+                        //createUser.child("userId").setValue();
                         createUser.child("userName").setValue(name);
 
                         progressDialog.dismiss();

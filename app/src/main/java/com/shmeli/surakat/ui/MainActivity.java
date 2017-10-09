@@ -1,59 +1,81 @@
 package com.shmeli.surakat.ui;
 
 import android.content.Intent;
+
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+
 import android.os.Bundle;
 
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+
 import android.util.Log;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 
-import com.firebase.ui.auth.AuthUI;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
+
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
+import com.shmeli.surakat.model.Message;
+import com.shmeli.surakat.model.User;
 import com.shmeli.surakat.utils.UiUtils;
 
 import java.util.ArrayList;
 
+
 public class MainActivity extends AppCompatActivity {
 
-    private ListView                        userListView;
+    private RecyclerView                    userRecyclerView;
     private RelativeLayout                  mainContainer;
 
     private Firebase                        fbRef;
     private FirebaseAuth                    fbAuth;
     private FirebaseAuth.AuthStateListener  fbAuthListener;
+    private DatabaseReference               usersFBDatabaseRef;
 
-    private ArrayAdapter<String> adapter;
+    private FirebaseRecyclerAdapter<User, MainActivity.UserViewHolder> fbAdapter;
 
     private ArrayList<String> userList = new ArrayList<>();
+
+    private String userId = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        fbRef           = new Firebase(CONST.FIREBASE_USERS_LINK);
-        fbAuth          = FirebaseAuth.getInstance();
+        fbRef               = new Firebase(CONST.FIREBASE_USERS_LINK);
+        fbAuth              = FirebaseAuth.getInstance();
 
-        fbAuthListener  = new FirebaseAuth.AuthStateListener() {
+        usersFBDatabaseRef = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_USERS_CHILD);
+        usersFBDatabaseRef.keepSynced(true);
+
+        fbAuthListener      = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+
+                Log.e("LOG", "MainActivity: onAuthStateChanged(): currentUser is null: " +(firebaseAuth.getCurrentUser() == null));
 
                 if(firebaseAuth.getCurrentUser() == null) {
 
@@ -62,19 +84,21 @@ public class MainActivity extends AppCompatActivity {
                     loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(loginIntent);
                 }
+                else {
+
+                    String currentUser = firebaseAuth.getCurrentUser().getDisplayName();
+
+                    Log.e("LOG", "MainActivity: onAuthStateChanged(): currentUser: " +currentUser);
+                }
             }
         };
 
-        adapter = new ArrayAdapter<>(   this,
-                                        android.R.layout.simple_list_item_1,
-                                        userList);
+        mainContainer       = UiUtils.findView(this, R.id.mainContainer);
 
-        mainContainer = UiUtils.findView(this, R.id.mainContainer);
-
-        userListView = UiUtils.findView(this, R.id.userListView);
-        userListView.setOnItemClickListener(onItemClickListener);
-        userListView.setAdapter(adapter);
-
+        userRecyclerView    = UiUtils.findView(this, R.id.userRecyclerView);
+        userRecyclerView.setHasFixedSize(true);
+        userRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        userRecyclerView.setOnClickListener(onClickListener);
 
         fbRef.addChildEventListener(childEventListener);
     }
@@ -83,7 +107,44 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+        checkUserExists();
+
         fbAuth.addAuthStateListener(fbAuthListener);
+
+        fbAdapter = new FirebaseRecyclerAdapter<User, MainActivity.UserViewHolder>( User.class,
+                                                                                    R.layout.message_row,
+                                                                                    MainActivity.UserViewHolder.class,
+                                                                                    usersFBDatabaseRef) {
+            @Override
+            protected void populateViewHolder(MainActivity.UserViewHolder   viewHolder,
+                                              User                          model,
+                                              final int                     position) {
+
+                viewHolder.setUserName(model.getUserName());
+
+                viewHolder.view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        User clickedUser = fbAdapter.getItem(position);
+                        String clickedUserId    = clickedUser.getUserId();
+                        String clickedUserName  = clickedUser.getUserName();
+
+                        //Log.e("LOG", "Clicked on " +position);
+                        Log.e("LOG", "Clicked on " +clickedUserId);
+                        Log.e("LOG", "Clicked on " +clickedUserName);
+
+                        Intent chatIntent = new Intent( MainActivity.this,
+                                                        ChatActivity.class);
+                        chatIntent.putExtra("userId", clickedUserId);
+
+                        startActivity(chatIntent);
+                    }
+                });
+            }
+        };
+
+        userRecyclerView.setAdapter(fbAdapter);
     }
 
     @Override
@@ -98,26 +159,43 @@ public class MainActivity extends AppCompatActivity {
         Log.e("LOG", "MainActivity: onOptionsItemSelected()");
 
         if(item.getItemId() == R.id.menu_signout) {
-
             logout();
         }
 
         return true;
     }
 
-    private void logout() {
+    private void checkUserExists() {
+        Log.e("LOG", "MainActivity: checkUserExists()");
 
+        usersFBDatabaseRef.addValueEventListener(valueEventListener);
+    }
+
+    private void logout() {
         fbAuth.signOut();
+    }
+
+
+    public static class UserViewHolder extends RecyclerView.ViewHolder{
+
+        View view;
+
+        public UserViewHolder(View itemView) {
+            super(itemView);
+            view = itemView;
+        }
+
+        public void setUserName(String userName) {
+            TextView userNameTextView = UiUtils.findView(view, R.id.messageTextView);
+            userNameTextView.setText(userName);
+        }
     }
 
     // ------------------------------ LISTENERS ----------------------------------------- //
 
-
-
-    ListView.OnItemClickListener onItemClickListener = new ListView.OnItemClickListener() {
-
+    View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        public void onClick(View v) {
 
             startActivity(new Intent(   MainActivity.this,
                                         ChatActivity.class));
@@ -128,17 +206,13 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
-            String userName = dataSnapshot.getValue(String.class);
+            User user = dataSnapshot.getValue(User.class);
 
-            userList.add(userName);
-
-            adapter.notifyDataSetChanged();
+            userList.add(user.getUserName());
         }
 
         @Override
         public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-
 
         }
 
@@ -154,6 +228,23 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onCancelled(FirebaseError firebaseError) {
+
+        }
+    };
+
+    ValueEventListener valueEventListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
+
+            Log.e("LOG", "LoginActivity: valueEventListener: (dataSnapshot.hasChild(" +userId+ ")): " +(dataSnapshot.hasChild(userId)));
+
+            if(!dataSnapshot.hasChild(userId)) {
+                startActivity(new Intent(MainActivity.this, SetAccountActivity.class));
+            }
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
 
         }
     };

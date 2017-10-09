@@ -21,6 +21,7 @@ public class Message {
 
     private String messageId;
     private String messageAuthorId;
+    private String messageAuthorName;
     private String messageRecipientId;
 
     private String messageDateAndTime;
@@ -38,21 +39,21 @@ public class Message {
 
     public Message() {}
 
-    public Message(String   messageId,
-                   String   messageAuthorId,
-                   String   messageRecipientId,
-                   String   messageText,
-                   String   isMessageUnread) {
-
-        this.messageId          = messageId;
-        this.messageAuthorId    = messageAuthorId;
-        this.messageRecipientId = messageRecipientId;
-
-        this.messageText        = messageText;
-        this.isMessageUnread    = isMessageUnread;
-
-        this.messageDateAndTime = "" +new Date().getTime();
-    }
+//    public Message(String   messageId,
+//                   String   messageAuthorId,
+//                   String   messageRecipientId,
+//                   String   messageText,
+//                   String   isMessageUnread) {
+//
+//        this.messageId          = messageId;
+//        this.messageAuthorId    = messageAuthorId;
+//        this.messageRecipientId = messageRecipientId;
+//
+//        this.messageText        = messageText;
+//        this.isMessageUnread    = isMessageUnread;
+//
+//        this.messageDateAndTime = "" +new Date().getTime();
+//    }
 
 //    public int getMessageId() {
 //        return messageId;
@@ -90,7 +91,6 @@ public class Message {
 //        isMessageUnread = messageUnread;
 //    }
 
-
     public String getMessageId() {
         return messageId;
     }
@@ -107,6 +107,11 @@ public class Message {
 //        this.messageAuthorId = messageAuthorId;
 //    }
 
+
+    public String getMessageAuthorName() {
+        return messageAuthorName;
+    }
+    
     public String getMessageRecipientId() {
         return messageRecipientId;
     }
