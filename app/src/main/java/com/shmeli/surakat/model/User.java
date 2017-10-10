@@ -7,7 +7,7 @@ package com.shmeli.surakat.model;
 public class User {
 
     // private int userId;
-    private String userId;
+    //private String userId;
 
     private String userName;
 
@@ -38,9 +38,9 @@ public class User {
 //        return userId;
 //    }
 
-   public String getUserId() {
-        return userId;
-    }
+//   public String getUserId() {
+//        return userId;
+//    }
 
     public String getUserName() {
         return userName;

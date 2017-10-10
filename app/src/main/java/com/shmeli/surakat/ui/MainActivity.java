@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -120,27 +121,37 @@ public class MainActivity extends AppCompatActivity {
                                               User                          model,
                                               final int                     position) {
 
-                viewHolder.setUserName(model.getUserName());
+                if(!getRef(position).getKey().equals(fbAuth.getCurrentUser().getUid())) {
+                    Log.e("LOG", "MainActivity: onStart(): populateViewHolder: show user: " +model.getUserName());
 
-                viewHolder.view.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
+                    viewHolder.setUserName(model.getUserName());
 
-                        User clickedUser = fbAdapter.getItem(position);
-                        String clickedUserId    = clickedUser.getUserId();
-                        String clickedUserName  = clickedUser.getUserName();
+                    viewHolder.view.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
 
-                        //Log.e("LOG", "Clicked on " +position);
-                        Log.e("LOG", "Clicked on " +clickedUserId);
-                        Log.e("LOG", "Clicked on " +clickedUserName);
+                            String userKey = getRef(position).getKey();
 
-                        Intent chatIntent = new Intent( MainActivity.this,
-                                                        ChatActivity.class);
-                        chatIntent.putExtra("userId", clickedUserId);
+                            User clickedUser = fbAdapter.getItem(position);
 
-                        startActivity(chatIntent);
-                    }
-                });
+                            String clickedUserName  = clickedUser.getUserName();
+
+                            Log.e("LOG", "Clicked on " +userKey);
+                            Log.e("LOG", "Clicked on " +clickedUserName);
+
+                            Intent chatIntent = new Intent( MainActivity.this,
+                                    ChatActivity.class);
+                            chatIntent.putExtra("userKey", userKey);
+
+                            startActivity(chatIntent);
+                        }
+                    });
+                }
+                else {
+                    Log.e("LOG", "MainActivity: onStart(): populateViewHolder: hide user: " +model.getUserName());
+
+                    viewHolder.hideItem();
+                }
             }
         };
 
@@ -178,16 +189,26 @@ public class MainActivity extends AppCompatActivity {
 
     public static class UserViewHolder extends RecyclerView.ViewHolder{
 
-        View view;
+        View            view;
+        TextView        userNameTextView;
+        LinearLayout    userContainer;
 
         public UserViewHolder(View itemView) {
             super(itemView);
-            view = itemView;
+
+            view                = itemView;
+            userContainer       = UiUtils.findView(view, R.id.userContainer);
+            userNameTextView    = UiUtils.findView(view, R.id.userNameTextView);
         }
 
         public void setUserName(String userName) {
-            TextView userNameTextView = UiUtils.findView(view, R.id.userNameTextView);
             userNameTextView.setText(userName);
+        }
+
+        public void hideItem() {
+            view.setVisibility(View.GONE);
+            userContainer.setVisibility(View.GONE);
+            userNameTextView.setVisibility(View.GONE);
         }
     }
 
