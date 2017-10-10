@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        //checkUserExists();
+        checkUserExists();
 
         fbAuth.addAuthStateListener(fbAuthListener);
 
@@ -266,7 +266,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
 
-            Log.e("LOG", "LoginActivity: valueEventListener: (dataSnapshot.hasChild(" +userId+ ")): " +(dataSnapshot.hasChild(userId)));
+            Log.e("LOG", "LoginActivity: valueEventListener: (dataSnapshot.hasChild(" +userId+ "): " +(dataSnapshot.hasChild(userId)));
 
             if(!dataSnapshot.hasChild(userId)) {
                 startActivity(new Intent(MainActivity.this, SetAccountActivity.class));
