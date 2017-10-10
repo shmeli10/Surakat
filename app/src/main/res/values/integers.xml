@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <item type="integer" name="message_length">300</item>
+    <item type="integer" name="message_length">400</item>
 </resources>

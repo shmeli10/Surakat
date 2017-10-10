@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
         fbAuth.addAuthStateListener(fbAuthListener);
 
         fbAdapter = new FirebaseRecyclerAdapter<User, MainActivity.UserViewHolder>( User.class,
-                                                                                    R.layout.message_row,
+                                                                                    R.layout.user_row,
                                                                                     MainActivity.UserViewHolder.class,
                                                                                     usersFBDatabaseRef) {
             @Override
@@ -186,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         public void setUserName(String userName) {
-            TextView userNameTextView = UiUtils.findView(view, R.id.messageTextView);
+            TextView userNameTextView = UiUtils.findView(view, R.id.userNameTextView);
             userNameTextView.setText(userName);
         }
     }

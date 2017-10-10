@@ -59,14 +59,17 @@
         android:textColor="@color/colorPrimary"
         android:text="@string/button_send"/>
 
+    <View
+        android:id="@+id/chatTopDividerView"
+        style="@style/HLine"
+        android:layout_below="@+id/sendButton"
+        android:layout_marginTop="5dp"
+        android:background="@color/colorPrimary"
+        android:visibility="gone"/>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/messagesRecyclerView"
         style="@style/MM"
-        android:layout_below="@+id/sendButton"/>
-
-    <!--<ListView-->
-        <!--android:id="@+id/messageListView"-->
-        <!--style="@style/MM"-->
-        <!--android:layout_below="@+id/sendButton"/>-->
+        android:layout_below="@+id/chatTopDividerView"/>
 
 </RelativeLayout>

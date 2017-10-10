@@ -4,14 +4,17 @@ import android.app.ProgressDialog;
 import android.os.Bundle;
 
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import android.text.Editable;
 import android.text.TextUtils;
 
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -45,12 +48,18 @@ import java.util.Date;
 public class ChatActivity extends AppCompatActivity {
 
     private EditText                messageEditText;
+    private TextView                messageLeftCharsBodyTextView;
+    private View                    chatTopDividerView;
+
     private Button                  sendButton;
     private RecyclerView            messagesRecyclerView;
 
     private Firebase                fbRef;
     private FirebaseAuth            fbAuth;
     private FirebaseUser            fbCurrentUser;
+
+    private FirebaseRecyclerAdapter<Message, MessageViewHolder> fbAdapter;
+
     private DatabaseReference       messagesDatabaseRef;
     private DatabaseReference       usersFBDatabaseRef;
 
@@ -58,90 +67,60 @@ public class ChatActivity extends AppCompatActivity {
 
     private ProgressDialog          progressDialog;
 
-    private ArrayAdapter<String>    adapter;
+    private boolean chatTopDividerIsVisible;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
-        fbRef               = new Firebase(CONST.FIREBASE_MESSAGES_LINK);
-        fbAuth              = FirebaseAuth.getInstance();
-        fbCurrentUser       = fbAuth.getCurrentUser();
+        fbRef                           = new Firebase(CONST.FIREBASE_MESSAGES_LINK);
+        fbAuth                          = FirebaseAuth.getInstance();
+        fbCurrentUser                   = fbAuth.getCurrentUser();
 
-        progressDialog      = new ProgressDialog(this);
+        progressDialog                  = new ProgressDialog(this);
 
-        messagesDatabaseRef = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_MESSAGES_CHILD);
-        usersFBDatabaseRef  = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_USERS_CHILD).child(fbCurrentUser.getUid());
+        messagesDatabaseRef             = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_MESSAGES_CHILD);
+        usersFBDatabaseRef              = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_USERS_CHILD).child(fbCurrentUser.getUid());
 
-        messageEditText = UiUtils.findView(this, R.id.messageEditText);
-        sendButton      = UiUtils.findView(this, R.id.sendButton);
+        messageEditText                 = UiUtils.findView(this, R.id.messageEditText);
+        messageEditText.addTextChangedListener(onTextChangedListener);
+
+        messageLeftCharsBodyTextView    = UiUtils.findView(this, R.id.messageLeftCharsBodyTextView);
+        messageLeftCharsBodyTextView.setText("" +CONST.PUBLICATION_MAX_LENGTH);
+
+        chatTopDividerView              = UiUtils.findView(this, R.id.chatTopDividerView);
+
+        sendButton                      = UiUtils.findView(this, R.id.sendButton);
         sendButton.setOnClickListener(sendClickListener);
 
-        messagesRecyclerView = UiUtils.findView(this, R.id.messagesRecyclerView);
+        messagesRecyclerView            = UiUtils.findView(this, R.id.messagesRecyclerView);
         messagesRecyclerView.setHasFixedSize(true);
         messagesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // messageListView = UiUtils.findView(this, R.id.messageListView);
-
-        adapter = new ArrayAdapter<>(   this,
-                                        android.R.layout.simple_list_item_1,
-                                        messageList);
-
-        //messageListView.setAdapter(adapter);
-
         fbRef.addChildEventListener(childEventListener);
-
-        /*fbRef.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-
-                //String messageText = dataSnapshot.getValue(String.class);
-
-                Message message = dataSnapshot.getValue(Message.class);
-
-//                Message newMessage = new Message(messageText, "author", false);
-//                messageList.add(newMessage);
-
-                messageList.add(message.getMessageText());
-
-                adapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-
-            }
-        });*/
     }
 
     @Override
     protected void onStart() {
         super.onStart();
 
-        FirebaseRecyclerAdapter<Message, MessageViewHolder> fbAdapter = new FirebaseRecyclerAdapter<Message, MessageViewHolder>( Message.class,
-                                                                                                        R.layout.message_row,
-                                                                                                        MessageViewHolder.class,
-                                                                                                        messagesDatabaseRef) {
-
+        fbAdapter = new FirebaseRecyclerAdapter<Message, MessageViewHolder>(Message.class,
+                                                                            R.layout.message_row,
+                                                                            MessageViewHolder.class,
+                                                                            messagesDatabaseRef) {
             @Override
             protected void populateViewHolder(MessageViewHolder viewHolder, Message model, int position) {
 
+                if(!chatTopDividerIsVisible) {
+
+                    Log.e("LOG", "ChatActivity: onStart(): populateViewHolder(): SHOW DIVIDER");
+
+                    chatTopDividerView.setVisibility(View.VISIBLE);
+                    chatTopDividerIsVisible = true;
+                }
+
+                viewHolder.setMessageAuthorName(model.getMessageAuthorName());
                 viewHolder.setMessageText(model.getMessageText());
             }
         };
@@ -157,6 +136,15 @@ public class ChatActivity extends AppCompatActivity {
             super(itemView);
 
             view = itemView;
+
+            CardView messageCardView = UiUtils.findView(view, R.id.messageCardView);
+            messageCardView.setBackgroundResource(R.drawable.input_outline);
+        }
+
+        public void setMessageAuthorName(String messageAuthorName) {
+
+            TextView messageAuthorNameTextView = UiUtils.findView(view, R.id.messageAuthorNameTextView);
+            messageAuthorNameTextView.setText(messageAuthorName);
         }
 
         public void setMessageText(String messageText) {
@@ -173,16 +161,11 @@ public class ChatActivity extends AppCompatActivity {
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
-            //String messageText = dataSnapshot.getValue(String.class);
-
             Message message = dataSnapshot.getValue(Message.class);
-
-//                Message newMessage = new Message(messageText, "author", false);
-//                messageList.add(newMessage);
 
             messageList.add(message.getMessageText());
 
-            adapter.notifyDataSetChanged();
+            fbAdapter.notifyDataSetChanged();
         }
 
         @Override
@@ -257,4 +240,17 @@ public class ChatActivity extends AppCompatActivity {
         }
     };
 
+    TextWatcher onTextChangedListener = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            // set available amount of characters
+            messageLeftCharsBodyTextView.setText("" + (CONST.PUBLICATION_MAX_LENGTH - messageEditText.length()));
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) { }
+    };
 }

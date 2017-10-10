@@ -20,14 +20,6 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/userRecyclerView"
         style="@style/MM"
-        android:layout_below="@+id/userListTextView"
-        android:layout_marginTop="@dimen/spacing_4x"/>
-
-    <!--<ListView-->
-        <!--android:id="@+id/userListView"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:layout_below="@+id/userListTextView"-->
-        <!--android:layout_marginTop="@dimen/spacing_4x"/>-->
+        android:layout_below="@+id/userListTextView"/>
 
 </RelativeLayout>

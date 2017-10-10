@@ -14,4 +14,5 @@ public class CONST {
     public static String FIREBASE_USERS_CHILD       = "Users";
     public static String FIREBASE_USERS_LINK        = FIREBASE_BASE_LINK + "/" + FIREBASE_USERS_CHILD;
 
+    public static final int PUBLICATION_MAX_LENGTH  = 400;
 }

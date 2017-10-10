@@ -111,7 +111,7 @@ public class Message {
     public String getMessageAuthorName() {
         return messageAuthorName;
     }
-    
+
     public String getMessageRecipientId() {
         return messageRecipientId;
     }
