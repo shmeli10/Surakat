@@ -69,8 +69,8 @@ public class MainActivity extends AppCompatActivity {
         fbRef               = new Firebase(CONST.FIREBASE_USERS_LINK);
         fbAuth              = FirebaseAuth.getInstance();
 
-        usersFBDatabaseRef = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_USERS_CHILD);
-        usersFBDatabaseRef.keepSynced(true);
+        usersFBDatabaseRef  = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_USERS_CHILD);
+        //usersFBDatabaseRef.keepSynced(true);
 
         fbAuthListener      = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -80,10 +80,13 @@ public class MainActivity extends AppCompatActivity {
 
                 if(firebaseAuth.getCurrentUser() == null) {
 
-                    Intent loginIntent = new Intent(MainActivity.this,
+                    /*Intent loginIntent = new Intent(MainActivity.this,
                                                     LoginActivity.class);
-                    loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(loginIntent);
+                    //loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(loginIntent);*/
+
+                    startActivity(new Intent(   MainActivity.this,
+                                                LoginActivity.class));
                 }
                 else {
 
@@ -99,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
         userRecyclerView    = UiUtils.findView(this, R.id.userRecyclerView);
         userRecyclerView.setHasFixedSize(true);
         userRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        userRecyclerView.setOnClickListener(onClickListener);
+        //userRecyclerView.setOnClickListener(onClickListener);
 
         fbRef.addChildEventListener(childEventListener);
     }
@@ -108,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        checkUserExists();
+        //checkUserExists();
 
         fbAuth.addAuthStateListener(fbAuthListener);
 
@@ -121,8 +124,14 @@ public class MainActivity extends AppCompatActivity {
                                               User                          model,
                                               final int                     position) {
 
-                if(!getRef(position).getKey().equals(fbAuth.getCurrentUser().getUid())) {
-                    Log.e("LOG", "MainActivity: onStart(): populateViewHolder: show user: " +model.getUserName());
+                String currentUserKey   = fbAuth.getCurrentUser().getUid();
+                String listUserKey      = getRef(position).getKey();
+
+                Log.e("LOG", "MainActivity: onStart(): populateViewHolder(): currentUserKey= " +currentUserKey);
+                Log.e("LOG", "MainActivity: onStart(): populateViewHolder(): listUserKey= " +listUserKey);
+
+                if(!listUserKey.equals(currentUserKey)) {
+                    Log.e("LOG", "MainActivity: onStart(): populateViewHolder(): show user: " +model.getUserName());
 
                     viewHolder.setUserName(model.getUserName());
 
@@ -214,14 +223,14 @@ public class MainActivity extends AppCompatActivity {
 
     // ------------------------------ LISTENERS ----------------------------------------- //
 
-    View.OnClickListener onClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-
-            startActivity(new Intent(   MainActivity.this,
-                                        ChatActivity.class));
-        }
-    };
+//    View.OnClickListener onClickListener = new View.OnClickListener() {
+//        @Override
+//        public void onClick(View v) {
+//
+//            startActivity(new Intent(   MainActivity.this,
+//                                        ChatActivity.class));
+//        }
+//    };
 
     ChildEventListener childEventListener = new ChildEventListener() {
         @Override

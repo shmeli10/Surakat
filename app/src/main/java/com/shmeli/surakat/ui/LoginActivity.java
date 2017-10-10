@@ -53,7 +53,7 @@ public class LoginActivity extends AppCompatActivity {
         fbAuth              = FirebaseAuth.getInstance();
 
         usersFBDatabaseRef  = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_USERS_CHILD);
-        usersFBDatabaseRef.keepSynced(true);
+        //usersFBDatabaseRef.keepSynced(true);
 
 //        fbAuthListener      = authStateListener;
 

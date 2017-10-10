@@ -20,9 +20,9 @@ public class Message {
 
 
     private String messageId;
-    private String messageAuthorId;
+    private String messageAuthorKey;
     private String messageAuthorName;
-    private String messageRecipientId;
+    private String messageRecipientKey;
 
     private String messageDateAndTime;
 
@@ -99,8 +99,8 @@ public class Message {
 //        this.messageId = messageId;
 //    }
 
-    public String getMessageAuthorId() {
-        return messageAuthorId;
+    public String getMessageAuthorKey() {
+        return messageAuthorKey;
     }
 
 //    public void setMessageAuthorId(String messageAuthorId) {
@@ -112,8 +112,8 @@ public class Message {
         return messageAuthorName;
     }
 
-    public String getMessageRecipientId() {
-        return messageRecipientId;
+    public String getMessageRecipientKey() {
+        return messageRecipientKey;
     }
 
 //    public void setMessageRecipientId(String messageRecipientId) {

@@ -9,6 +9,7 @@
     <string name="button_back">Back</string>
 
     <string name="error_empty_field">Field(s) is(are) empty</string>
+    <string name="error_send_message">Send message problem occur</string>
     <string name="error_sign_in">Sign In Problem</string>
     <string name="error_account">You need to setup your account</string>
 
