@@ -3,7 +3,7 @@ package com.shmeli.surakat.ui;
 import android.content.Intent;
 
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
+
 import android.support.v7.app.AppCompatActivity;
 
 import android.os.Bundle;
@@ -16,11 +16,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -36,9 +33,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
 import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
-import com.shmeli.surakat.model.Message;
 import com.shmeli.surakat.model.User;
 import com.shmeli.surakat.utils.UiUtils;
 
@@ -79,21 +76,15 @@ public class MainActivity extends AppCompatActivity {
                 Log.e("LOG", "MainActivity: onAuthStateChanged(): currentUser is null: " +(firebaseAuth.getCurrentUser() == null));
 
                 if(firebaseAuth.getCurrentUser() == null) {
-
-                    /*Intent loginIntent = new Intent(MainActivity.this,
-                                                    LoginActivity.class);
-                    //loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(loginIntent);*/
-
                     startActivity(new Intent(   MainActivity.this,
                                                 LoginActivity.class));
                 }
-                else {
+                /*else {
 
                     String currentUser = firebaseAuth.getCurrentUser().getDisplayName();
 
                     Log.e("LOG", "MainActivity: onAuthStateChanged(): currentUser: " +currentUser);
-                }
+                }*/
             }
         };
 
@@ -102,7 +93,6 @@ public class MainActivity extends AppCompatActivity {
         userRecyclerView    = UiUtils.findView(this, R.id.userRecyclerView);
         userRecyclerView.setHasFixedSize(true);
         userRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        //userRecyclerView.setOnClickListener(onClickListener);
 
         fbRef.addChildEventListener(childEventListener);
     }
@@ -127,8 +117,8 @@ public class MainActivity extends AppCompatActivity {
                 String currentUserKey   = fbAuth.getCurrentUser().getUid();
                 String listUserKey      = getRef(position).getKey();
 
-                Log.e("LOG", "MainActivity: onStart(): populateViewHolder(): currentUserKey= " +currentUserKey);
-                Log.e("LOG", "MainActivity: onStart(): populateViewHolder(): listUserKey= " +listUserKey);
+                //Log.e("LOG", "MainActivity: onStart(): populateViewHolder(): currentUserKey= " +currentUserKey);
+                //Log.e("LOG", "MainActivity: onStart(): populateViewHolder(): listUserKey= " +listUserKey);
 
                 if(!listUserKey.equals(currentUserKey)) {
                     Log.e("LOG", "MainActivity: onStart(): populateViewHolder(): show user: " +model.getUserName());
@@ -141,15 +131,13 @@ public class MainActivity extends AppCompatActivity {
 
                             String userKey = getRef(position).getKey();
 
-                            User clickedUser = fbAdapter.getItem(position);
-
-                            String clickedUserName  = clickedUser.getUserName();
-
-                            Log.e("LOG", "Clicked on " +userKey);
-                            Log.e("LOG", "Clicked on " +clickedUserName);
+                            //User clickedUser = fbAdapter.getItem(position);
+                            //String clickedUserName  = clickedUser.getUserName();
+                            //Log.e("LOG", "Clicked on " +userKey);
+                            //Log.e("LOG", "Clicked on " +clickedUserName);
 
                             Intent chatIntent = new Intent( MainActivity.this,
-                                    ChatActivity.class);
+                                                            ChatActivity.class);
                             chatIntent.putExtra("userKey", userKey);
 
                             startActivity(chatIntent);
@@ -195,7 +183,6 @@ public class MainActivity extends AppCompatActivity {
         fbAuth.signOut();
     }
 
-
     public static class UserViewHolder extends RecyclerView.ViewHolder{
 
         View            view;
@@ -222,15 +209,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // ------------------------------ LISTENERS ----------------------------------------- //
-
-//    View.OnClickListener onClickListener = new View.OnClickListener() {
-//        @Override
-//        public void onClick(View v) {
-//
-//            startActivity(new Intent(   MainActivity.this,
-//                                        ChatActivity.class));
-//        }
-//    };
 
     ChildEventListener childEventListener = new ChildEventListener() {
         @Override
