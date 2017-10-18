@@ -5,8 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/registerContainer"
     style="@style/MM"
-    tools:context="com.shmeli.surakat.ui.RegisterActivity"
-    android:background="@color/colorPrimary">
+    android:background="@color/colorPrimary"
+    tools:context="com.shmeli.surakat.ui.RegisterActivity">
 
     <include
         layout="@layout/app_bar"
@@ -18,20 +18,9 @@
         android:layout_below="@+id/registerPageToolbar"
         android:padding="@dimen/spacing_2x">
 
-        <TextView
-            android:id="@+id/createUserTextView"
-            style="@style/MW"
-            android:layout_marginTop="@dimen/spacing_2x"
-            android:gravity="center"
-            android:visibility="gone"
-            android:textSize="@dimen/text_size_2.5x"
-            android:textColor="@color/white"
-            android:text="@string/button_register"/>
-
         <EditText
             android:id="@+id/nameEditText"
             style="@style/MW"
-            android:layout_below="@+id/createUserTextView"
             android:layout_marginTop="@dimen/spacing_6x"
             android:padding="@dimen/spacing_3x"
             android:ems="10"
@@ -45,7 +34,6 @@
         <EditText
             android:id="@+id/emailEditText"
             style="@style/MW"
-            android:layout_below="@+id/nameEditText"
             android:layout_marginTop="@dimen/spacing_2x"
             android:padding="@dimen/spacing_3x"
             android:ems="10"
@@ -59,7 +47,6 @@
         <EditText
             android:id="@+id/passwordEditText"
             style="@style/MW"
-            android:layout_below="@+id/emailEditText"
             android:layout_marginTop="@dimen/spacing_2x"
             android:padding="@dimen/spacing_3x"
             android:ems="10"
@@ -73,22 +60,11 @@
         <Button
             android:id="@+id/createButton"
             style="@style/MW"
-            android:layout_below="@+id/passwordEditText"
             android:layout_marginTop="@dimen/spacing_2x"
             android:background="@drawable/button_green"
             android:textColor="@color/colorPrimary"
             android:textSize="@dimen/text_size_1.5x"
             android:text="@string/button_create"/>
-
-        <Button
-            android:id="@+id/backButton"
-            style="@style/MW"
-            android:layout_below="@+id/createButton"
-            android:layout_marginTop="@dimen/spacing_6x"
-            android:background="@drawable/button_yellow"
-            android:textColor="@color/colorPrimary"
-            android:textSize="@dimen/text_size_1.5x"
-            android:text="@string/button_back"/>
 
     </LinearLayout>
 

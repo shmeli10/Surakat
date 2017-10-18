@@ -8,7 +8,7 @@
     android:padding="@dimen/spacing_2x"
     android:theme="@style/Base.ThemeOverlay.AppCompat.Dark.ActionBar"
     android:background="@color/colorPrimary"
-    tools:context="com.shmeli.surakat.ui.SettingsActivity">
+    tools:context="com.shmeli.surakat.ui.settings.SettingsActivity">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/settingPageAvatar"

@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 
+import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -33,7 +34,7 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText            passwordEditText;
 
     private Button              createButton;
-    private Button              backButton;
+//    private Button              backButton;
 
     private RelativeLayout      registerContainer;
 
@@ -43,6 +44,10 @@ public class RegisterActivity extends AppCompatActivity {
     private DatabaseReference   databaseReference;
 
     private ProgressDialog      progressDialog;
+
+    private String              name        = "";
+    private String              email       = "";
+    private String              password    = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,21 +66,21 @@ public class RegisterActivity extends AppCompatActivity {
         createButton        = UiUtils.findView(this, R.id.createButton);
         createButton.setOnClickListener(createClickListener);
 
-        backButton          = UiUtils.findView(this, R.id.backButton);
-        backButton.setOnClickListener(backClickListener);
+//        backButton          = UiUtils.findView(this, R.id.backButton);
+//        backButton.setOnClickListener(backClickListener);
 
         registerContainer   = UiUtils.findView(this, R.id.registerContainer);
         registerPageToolbar = UiUtils.findView(this, R.id.registerPageToolbar);
         setSupportActionBar(registerPageToolbar);
-        getSupportActionBar().setTitle(R.string.create_account_title);
+        getSupportActionBar().setTitle(R.string.text_create_account);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private void startRegister() {
 
-        final String name   = nameEditText.getText().toString();
-        String email        = emailEditText.getText().toString();
-        String password     = passwordEditText.getText().toString();
+        name         = nameEditText.getText().toString();
+        email        = emailEditText.getText().toString();
+        password     = passwordEditText.getText().toString();
 
         if(!TextUtils.isEmpty(name) && !TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
 
@@ -84,49 +89,7 @@ public class RegisterActivity extends AppCompatActivity {
             progressDialog.setCanceledOnTouchOutside(false);
             progressDialog.show();
 
-            fbAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-
-                    if(task.isSuccessful()) {
-
-                        progressDialog.dismiss();
-
-                        String userId = fbAuth.getCurrentUser().getUid();
-
-                        databaseReference = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_USERS_CHILD).child(userId);
-
-                        HashMap<String, String> userMap = new HashMap<>();
-                        userMap.put("userName",     name);
-                        userMap.put("userStatus",   CONST.USER_ONLINE_STATUS);
-                        userMap.put("userImage",    CONST.DEFAULT_VALUE);
-                        userMap.put("thumbImage",   CONST.DEFAULT_VALUE);
-
-                        databaseReference.setValue(userMap).addOnCompleteListener(onCompleteListener);
-
-
-                        /*DatabaseReference createUser = databaseReference.child(userId);
-
-                        //createUser.child("userId").setValue();
-                        createUser.child("userName").setValue(name);*/
-
-                        /*Intent mainIntent = new Intent( RegisterActivity.this,
-                                                        MainActivity.class);
-                        mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(mainIntent);
-
-                        finish();*/
-                    }
-                    else {
-
-                        progressDialog.hide();
-
-                        Snackbar.make(  registerContainer,
-                                        R.string.error_register_user,
-                                        Snackbar.LENGTH_LONG).show();
-                    }
-                }
-            });
+            fbAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(onCreateUserCompleteListener);
         }
     }
 
@@ -140,7 +103,7 @@ public class RegisterActivity extends AppCompatActivity {
         }
     };
 
-    View.OnClickListener backClickListener = new View.OnClickListener() {
+    /*View.OnClickListener backClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
 
@@ -149,9 +112,53 @@ public class RegisterActivity extends AppCompatActivity {
             loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(loginIntent);
         }
+    };*/
+
+    OnCompleteListener<AuthResult> onCreateUserCompleteListener = new OnCompleteListener<AuthResult>() {
+        @Override
+        public void onComplete(@NonNull Task<AuthResult> task) {
+
+            if(task.isSuccessful()) {
+
+                progressDialog.dismiss();
+
+                String userId = fbAuth.getCurrentUser().getUid();
+
+                databaseReference = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_USERS_CHILD).child(userId);
+
+                HashMap<String, String> userMap = new HashMap<>();
+                userMap.put("userName",     name);
+                userMap.put("userStatus",   CONST.USER_ONLINE_STATUS);
+                userMap.put("userImage",    CONST.DEFAULT_VALUE);
+                userMap.put("thumbImage",   CONST.DEFAULT_VALUE);
+
+                databaseReference.setValue(userMap).addOnCompleteListener(onCreateUserInDBCompleteListener);
+
+
+                        /*DatabaseReference createUser = databaseReference.child(userId);
+
+                        //createUser.child("userId").setValue();
+                        createUser.child("userName").setValue(name);*/
+
+                        /*Intent mainIntent = new Intent( RegisterActivity.this,
+                                                        MainActivity.class);
+                        mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(mainIntent);
+
+                        finish();*/
+            }
+            else {
+
+                progressDialog.hide();
+
+                Snackbar.make(  registerContainer,
+                        R.string.error_register_user,
+                        Snackbar.LENGTH_LONG).show();
+            }
+        }
     };
 
-    OnCompleteListener<Void> onCompleteListener = new OnCompleteListener<Void>() {
+    OnCompleteListener<Void> onCreateUserInDBCompleteListener = new OnCompleteListener<Void>() {
         @Override
         public void onComplete(@NonNull Task<Void> task) {
 

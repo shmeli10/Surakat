@@ -10,7 +10,6 @@ import android.support.v7.app.AppCompatActivity;
 
 import android.os.Bundle;
 
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import android.support.v7.widget.Toolbar;
@@ -41,6 +40,7 @@ import com.shmeli.surakat.R;
 import com.shmeli.surakat.adapters.MainPageViewPagerAdapter;
 import com.shmeli.surakat.data.CONST;
 import com.shmeli.surakat.model.User;
+import com.shmeli.surakat.ui.settings.SettingsActivity;
 import com.shmeli.surakat.utils.UiUtils;
 
 import java.util.ArrayList;

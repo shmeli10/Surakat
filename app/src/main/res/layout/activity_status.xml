@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/MM"
+    android:id="@+id/statusContainer"
+    android:background="@color/colorPrimary"
+    tools:context="com.shmeli.surakat.ui.settings.StatusActivity">
+
+    <include
+        layout="@layout/app_bar"
+        android:id="@+id/statusPageToolbar"/>
+
+    <LinearLayout
+        style="@style/MW"
+        android:orientation="vertical"
+        android:layout_below="@+id/statusPageToolbar"
+        android:padding="@dimen/spacing_2x">
+
+        <EditText
+            android:id="@+id/statusEditText"
+            style="@style/MW"
+            android:layout_marginTop="@dimen/spacing_6x"
+            android:padding="@dimen/spacing_3x"
+            android:ems="10"
+            android:inputType="text"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="@dimen/text_size_1.5x"
+            android:textColorHint="@color/colorPrimary"
+            android:hint="@string/hint_status"
+            android:background="@drawable/input_background"/>
+
+        <Button
+            android:id="@+id/setStatusButton"
+            style="@style/MW"
+            android:layout_marginTop="@dimen/spacing_2x"
+            android:background="@drawable/button_green"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/text_size_1.5x"
+            android:text="@string/button_set"/>
+
+    </LinearLayout>
+
+</RelativeLayout>
