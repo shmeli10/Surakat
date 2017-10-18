@@ -55,7 +55,7 @@
         style="@style/MW"
         android:layout_below="@+id/messageLeftCharsHeadTextView"
         android:layout_marginTop="@dimen/spacing_1x"
-        android:background="@drawable/button_background"
+        android:background="@drawable/button_green"
         android:textSize="@dimen/text_size_1.5x"
         android:textColor="@color/colorPrimary"
         android:text="@string/button_send"/>

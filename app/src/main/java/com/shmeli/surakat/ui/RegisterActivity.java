@@ -3,12 +3,16 @@ package com.shmeli.surakat.ui;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -20,6 +24,8 @@ import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
 import com.shmeli.surakat.utils.UiUtils;
 
+import java.util.HashMap;
+
 public class RegisterActivity extends AppCompatActivity {
 
     private EditText            nameEditText;
@@ -28,6 +34,10 @@ public class RegisterActivity extends AppCompatActivity {
 
     private Button              createButton;
     private Button              backButton;
+
+    private RelativeLayout      registerContainer;
+
+    private Toolbar             registerPageToolbar;
 
     private FirebaseAuth        fbAuth;
     private DatabaseReference   databaseReference;
@@ -40,7 +50,7 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
 
         fbAuth              = FirebaseAuth.getInstance();
-        databaseReference   = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_USERS_CHILD);
+        //databaseReference   = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_USERS_CHILD);
 
         progressDialog      = new ProgressDialog(this);
 
@@ -53,6 +63,12 @@ public class RegisterActivity extends AppCompatActivity {
 
         backButton          = UiUtils.findView(this, R.id.backButton);
         backButton.setOnClickListener(backClickListener);
+
+        registerContainer   = UiUtils.findView(this, R.id.registerContainer);
+        registerPageToolbar = UiUtils.findView(this, R.id.registerPageToolbar);
+        setSupportActionBar(registerPageToolbar);
+        getSupportActionBar().setTitle(R.string.create_account_title);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private void startRegister() {
@@ -63,7 +79,9 @@ public class RegisterActivity extends AppCompatActivity {
 
         if(!TextUtils.isEmpty(name) && !TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
 
-            progressDialog.setMessage(getResources().getString(R.string.message_creating_account));
+            progressDialog.setTitle(getResources().getString(R.string.message_creating_account));
+            progressDialog.setMessage(getResources().getString(R.string.message_create_account_wait));
+            progressDialog.setCanceledOnTouchOutside(false);
             progressDialog.show();
 
             fbAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -72,17 +90,40 @@ public class RegisterActivity extends AppCompatActivity {
 
                     if(task.isSuccessful()) {
 
-                        String userId = fbAuth.getCurrentUser().getUid();
-
-                        DatabaseReference createUser = databaseReference.child(userId);
-
-                        //createUser.child("userId").setValue();
-                        createUser.child("userName").setValue(name);
-
                         progressDialog.dismiss();
 
-                        startActivity(new Intent(   RegisterActivity.this,
-                                                    MainActivity.class));
+                        String userId = fbAuth.getCurrentUser().getUid();
+
+                        databaseReference = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_USERS_CHILD).child(userId);
+
+                        HashMap<String, String> userMap = new HashMap<>();
+                        userMap.put("userName",     name);
+                        userMap.put("userStatus",   CONST.USER_ONLINE_STATUS);
+                        userMap.put("userImage",    CONST.DEFAULT_VALUE);
+                        userMap.put("thumbImage",   CONST.DEFAULT_VALUE);
+
+                        databaseReference.setValue(userMap).addOnCompleteListener(onCompleteListener);
+
+
+                        /*DatabaseReference createUser = databaseReference.child(userId);
+
+                        //createUser.child("userId").setValue();
+                        createUser.child("userName").setValue(name);*/
+
+                        /*Intent mainIntent = new Intent( RegisterActivity.this,
+                                                        MainActivity.class);
+                        mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(mainIntent);
+
+                        finish();*/
+                    }
+                    else {
+
+                        progressDialog.hide();
+
+                        Snackbar.make(  registerContainer,
+                                        R.string.error_register_user,
+                                        Snackbar.LENGTH_LONG).show();
                     }
                 }
             });
@@ -107,6 +148,33 @@ public class RegisterActivity extends AppCompatActivity {
                                             LoginActivity.class);
             loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(loginIntent);
+        }
+    };
+
+    OnCompleteListener<Void> onCompleteListener = new OnCompleteListener<Void>() {
+        @Override
+        public void onComplete(@NonNull Task<Void> task) {
+
+            Log.e("LOG", "RegisterActivity: onCompleteListener: task.isSuccessful(): " +task.isSuccessful());
+
+            if(task.isSuccessful()) {
+
+                progressDialog.dismiss();
+
+                Intent mainIntent = new Intent( RegisterActivity.this,
+                                                MainActivity.class);
+                mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(mainIntent);
+
+                finish();
+            }
+            else {
+                progressDialog.hide();
+
+                Snackbar.make(  registerContainer,
+                                R.string.error_register_user,
+                                Snackbar.LENGTH_LONG).show();
+            }
         }
     };
 }

@@ -4,6 +4,8 @@ import android.content.Intent;
 
 import android.support.annotation.NonNull;
 
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 
 import android.os.Bundle;
@@ -11,6 +13,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 
 import android.view.Menu;
@@ -35,6 +38,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import com.shmeli.surakat.R;
+import com.shmeli.surakat.adapters.MainPageViewPagerAdapter;
 import com.shmeli.surakat.data.CONST;
 import com.shmeli.surakat.model.User;
 import com.shmeli.surakat.utils.UiUtils;
@@ -44,19 +48,25 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    private RecyclerView                    userRecyclerView;
+//    private RecyclerView                    userRecyclerView;
     private RelativeLayout                  mainContainer;
+
+    private TabLayout                       mainPageTabLayout;
+    private Toolbar                         mainPageToolbar;
+    private ViewPager                       mainPageViewPager;
 
     private Firebase                        fbRef;
     private FirebaseAuth                    fbAuth;
-    private FirebaseAuth.AuthStateListener  fbAuthListener;
     private DatabaseReference               usersFBDatabaseRef;
 
     private FirebaseRecyclerAdapter<User, MainActivity.UserViewHolder> fbAdapter;
 
+    private MainPageViewPagerAdapter        mainPageViewPagerAdapter;
+
     private ArrayList<String> userList = new ArrayList<>();
 
-    private String userId = "";
+    private String userId           = "";
+    private String currentUserKey   = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,30 +79,23 @@ public class MainActivity extends AppCompatActivity {
         usersFBDatabaseRef  = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_USERS_CHILD);
         //usersFBDatabaseRef.keepSynced(true);
 
-        fbAuthListener      = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-
-                Log.e("LOG", "MainActivity: onAuthStateChanged(): currentUser is null: " +(firebaseAuth.getCurrentUser() == null));
-
-                if(firebaseAuth.getCurrentUser() == null) {
-                    startActivity(new Intent(   MainActivity.this,
-                                                LoginActivity.class));
-                }
-                /*else {
-
-                    String currentUser = firebaseAuth.getCurrentUser().getDisplayName();
-
-                    Log.e("LOG", "MainActivity: onAuthStateChanged(): currentUser: " +currentUser);
-                }*/
-            }
-        };
-
         mainContainer       = UiUtils.findView(this, R.id.mainContainer);
+        mainPageToolbar     = UiUtils.findView(this, R.id.mainPageToolbar);
+        setSupportActionBar(mainPageToolbar);
+        getSupportActionBar().setTitle(R.string.app_name);
 
-        userRecyclerView    = UiUtils.findView(this, R.id.userRecyclerView);
-        userRecyclerView.setHasFixedSize(true);
-        userRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mainPageViewPagerAdapter    = new MainPageViewPagerAdapter( getApplicationContext(),
+                                                                    getSupportFragmentManager());
+
+        mainPageViewPager   = UiUtils.findView(this, R.id.mainPageViewPager);
+        mainPageViewPager.setAdapter(mainPageViewPagerAdapter);
+
+        mainPageTabLayout   = UiUtils.findView(this, R.id.mainPageTabLayout);
+        mainPageTabLayout.setupWithViewPager(mainPageViewPager);
+
+//        userRecyclerView    = UiUtils.findView(this, R.id.userRecyclerView);
+//        userRecyclerView.setHasFixedSize(true);
+//        userRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         fbRef.addChildEventListener(childEventListener);
     }
@@ -114,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
                                               User                          model,
                                               final int                     position) {
 
-                String currentUserKey   = fbAuth.getCurrentUser().getUid();
+                //String currentUserKey   = fbAuth.getCurrentUser().getUid();
                 String listUserKey      = getRef(position).getKey();
 
                 //Log.e("LOG", "MainActivity: onStart(): populateViewHolder(): currentUserKey= " +currentUserKey);
@@ -152,12 +155,13 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        userRecyclerView.setAdapter(fbAdapter);
+//        userRecyclerView.setAdapter(fbAdapter);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu, menu);
+        getMenuInflater().inflate(  R.menu.menu,
+                                    menu);
 
         return true;
     }
@@ -166,9 +170,23 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         Log.e("LOG", "MainActivity: onOptionsItemSelected()");
 
-        if(item.getItemId() == R.id.menu_signout) {
-            logout();
+        switch(item.getItemId()) {
+
+            case R.id.menu_settings:
+                Intent settingsIntent = new Intent( MainActivity.this,
+                                                    SettingsActivity.class);
+                //settingsIntent.addFlags();
+                startActivity(settingsIntent);
+                //finish();
+                break;
+            case R.id.menu_signout:
+                logout();
+                break;
         }
+
+//        if(item.getItemId() == R.id.menu_signout) {
+//            logout();
+//        }
 
         return true;
     }
@@ -210,6 +228,29 @@ public class MainActivity extends AppCompatActivity {
 
     // ------------------------------ LISTENERS ----------------------------------------- //
 
+    FirebaseAuth.AuthStateListener fbAuthListener = new FirebaseAuth.AuthStateListener() {
+        @Override
+        public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+
+            Log.e("LOG", "MainActivity: fbAuthListener: currentUser is null: " +(firebaseAuth.getCurrentUser() == null));
+
+            if(firebaseAuth.getCurrentUser() == null) {
+                startActivity(new Intent(   MainActivity.this,
+                                            LoginActivity.class));
+                finish();
+            }
+            else {
+                currentUserKey = fbAuth.getCurrentUser().getUid();
+            }
+                /*else {
+
+                    String currentUser = firebaseAuth.getCurrentUser().getDisplayName();
+
+                    Log.e("LOG", "MainActivity: onAuthStateChanged(): currentUser: " +currentUser);
+                }*/
+        }
+    };
+
     ChildEventListener childEventListener = new ChildEventListener() {
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -247,7 +288,11 @@ public class MainActivity extends AppCompatActivity {
             Log.e("LOG", "LoginActivity: valueEventListener: (dataSnapshot.hasChild(" +userId+ "): " +(dataSnapshot.hasChild(userId)));
 
             if(!dataSnapshot.hasChild(userId)) {
-                startActivity(new Intent(MainActivity.this, SetAccountActivity.class));
+
+                Intent setAccountIntent = new Intent(   MainActivity.this,
+                                                        SetAccountActivity.class);
+                setAccountIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(setAccountIntent);
             }
         }
 

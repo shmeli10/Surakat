@@ -93,7 +93,9 @@ public class LoginActivity extends AppCompatActivity {
         }
         else {
 
-            progressDialog.setMessage(getResources().getString(R.string.message_checking_sign_in));
+            progressDialog.setTitle(getResources().getString(R.string.message_checking_sign_in));
+            progressDialog.setMessage(getResources().getString(R.string.message_check_account_wait));
+            progressDialog.setCanceledOnTouchOutside(false);
             progressDialog.show();
 
             fbAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(onCompleteListener);
@@ -133,30 +135,23 @@ public class LoginActivity extends AppCompatActivity {
 
             Log.e("LOG", "LoginActivity: onCompleteListener: task.isSuccessful(): " +task.isSuccessful());
 
-            progressDialog.dismiss();
+            // progressDialog.dismiss();
 
             if(task.isSuccessful()) {
+
+                progressDialog.dismiss();
+
                 checkUserExists();
             }
             else {
+                progressDialog.hide();
+
                 Snackbar.make(  signInContainer,
                                 R.string.error_sign_in,
                                 Snackbar.LENGTH_LONG).show();
             }
         }
     };
-
-//    FirebaseAuth.AuthStateListener authStateListener = new FirebaseAuth.AuthStateListener() {
-//        @Override
-//        public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-//
-//            if(firebaseAuth.getCurrentUser() != null) {
-//
-//                // startActivity(new Intent(LoginActivity.this, MainActivity.class));
-//                Log.e("LOG", "LoginActivity: valueEventListener: move to MainActivity");
-//            }
-//        }
-//    };
 
     ValueEventListener valueEventListener = new ValueEventListener() {
         @Override
@@ -165,21 +160,26 @@ public class LoginActivity extends AppCompatActivity {
             Log.e("LOG", "LoginActivity: valueEventListener: (dataSnapshot.hasChild(" +userId+ ")): " +(dataSnapshot.hasChild(userId)));
 
             if(dataSnapshot.hasChild(userId)) {
-                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+
+                Intent mainIntent = new Intent( LoginActivity.this,
+                                                MainActivity.class);
+                mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(mainIntent);
+
+                finish();
             }
             else {
-                startActivity(new Intent(LoginActivity.this, SetAccountActivity.class));
 
-//                Snackbar.make(  signInContainer,
-//                                R.string.error_account,
-//                                Snackbar.LENGTH_LONG).show();
+                Intent setAccountIntent = new Intent(   LoginActivity.this,
+                                                        SetAccountActivity.class);
+                setAccountIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(setAccountIntent);
+
+                finish();
             }
-
         }
 
         @Override
-        public void onCancelled(DatabaseError databaseError) {
-
-        }
+        public void onCancelled(DatabaseError databaseError) { }
     };
 }

@@ -4,22 +4,55 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/mainContainer"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.shmeli.surakat.ui.MainActivity"
-    android:padding="@dimen/spacing_2x">
+    style="@style/MM"
+    android:theme="@style/Base.ThemeOverlay.AppCompat.Dark.ActionBar"
+    tools:context="com.shmeli.surakat.ui.MainActivity">
 
-    <TextView
-        android:id="@+id/userListTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="@dimen/text_size_2.0x"
-        android:textColor="@color/colorPrimaryDark"
-        android:text="@string/text_user_list"/>
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/mainPageAppBar"
+        style="@style/MW">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/userRecyclerView"
-        style="@style/MM"
-        android:layout_below="@+id/userListTextView"/>
+        <include
+            layout="@layout/app_bar"
+            android:id="@+id/mainPageToolbar"/>
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/mainPageTabLayout"
+            style="@style/MW">
+
+
+        </android.support.design.widget.TabLayout>
+
+    </android.support.design.widget.AppBarLayout>
+    <android.support.v4.view.ViewPager
+        android:id="@+id/mainPageViewPager"
+        style="@style/MW"
+        android:layout_below="@+id/mainPageAppBar">
+
+
+
+    </android.support.v4.view.ViewPager>
+
+
+    <!--<LinearLayout-->
+        <!--style="@style/MW"-->
+        <!--android:orientation="vertical"-->
+        <!--android:layout_below="@+id/mainPageAppBar"-->
+        <!--android:padding="@dimen/spacing_2x">-->
+
+        <!--<TextView-->
+            <!--android:id="@+id/userListTextView"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:textSize="@dimen/text_size_2.0x"-->
+            <!--android:textColor="@color/colorPrimaryDark"-->
+            <!--android:text="@string/text_user_list"/>-->
+
+        <!--<android.support.v7.widget.RecyclerView-->
+            <!--android:id="@+id/userRecyclerView"-->
+            <!--style="@style/MM"-->
+            <!--android:layout_below="@+id/userListTextView"/>-->
+
+    <!--</LinearLayout>-->
 
 </RelativeLayout>

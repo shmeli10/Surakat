@@ -4,88 +4,92 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/registerContainer"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="@dimen/spacing_2x"
+    style="@style/MM"
     tools:context="com.shmeli.surakat.ui.RegisterActivity"
     android:background="@color/colorPrimary">
 
-    <TextView
-        android:id="@+id/createUserTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/spacing_2x"
-        android:gravity="center"
-        android:textSize="@dimen/text_size_2.5x"
-        android:textColor="@color/white"
-        android:text="@string/button_register"/>
+    <include
+        layout="@layout/app_bar"
+        android:id="@+id/registerPageToolbar"/>
 
-    <EditText
-        android:id="@+id/nameEditText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/createUserTextView"
-        android:layout_marginTop="@dimen/spacing_6x"
-        android:padding="@dimen/spacing_3x"
-        android:ems="10"
-        android:inputType="text"
-        android:textColor="@color/colorPrimaryDark"
-        android:textSize="@dimen/text_size_1.5x"
-        android:textColorHint="@color/colorPrimary"
-        android:hint="@string/hint_name"
-        android:background="@drawable/input_background"/>
+    <LinearLayout
+        style="@style/MW"
+        android:orientation="vertical"
+        android:layout_below="@+id/registerPageToolbar"
+        android:padding="@dimen/spacing_2x">
 
-    <EditText
-        android:id="@+id/emailEditText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/nameEditText"
-        android:layout_marginTop="@dimen/spacing_2x"
-        android:padding="@dimen/spacing_3x"
-        android:ems="10"
-        android:inputType="textEmailAddress"
-        android:textColor="@color/colorPrimaryDark"
-        android:textSize="@dimen/text_size_1.5x"
-        android:textColorHint="@color/colorPrimary"
-        android:hint="@string/hint_email"
-        android:background="@drawable/input_background"/>
+        <TextView
+            android:id="@+id/createUserTextView"
+            style="@style/MW"
+            android:layout_marginTop="@dimen/spacing_2x"
+            android:gravity="center"
+            android:visibility="gone"
+            android:textSize="@dimen/text_size_2.5x"
+            android:textColor="@color/white"
+            android:text="@string/button_register"/>
 
-    <EditText
-        android:id="@+id/passwordEditText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/emailEditText"
-        android:layout_marginTop="@dimen/spacing_2x"
-        android:padding="@dimen/spacing_3x"
-        android:ems="10"
-        android:inputType="textPassword"
-        android:textColor="@color/colorPrimaryDark"
-        android:textSize="@dimen/text_size_1.5x"
-        android:textColorHint="@color/colorPrimary"
-        android:hint="@string/hint_password"
-        android:background="@drawable/input_background"/>
+        <EditText
+            android:id="@+id/nameEditText"
+            style="@style/MW"
+            android:layout_below="@+id/createUserTextView"
+            android:layout_marginTop="@dimen/spacing_6x"
+            android:padding="@dimen/spacing_3x"
+            android:ems="10"
+            android:inputType="text"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="@dimen/text_size_1.5x"
+            android:textColorHint="@color/colorPrimary"
+            android:hint="@string/hint_name"
+            android:background="@drawable/input_background"/>
 
-    <Button
-        android:id="@+id/createButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/passwordEditText"
-        android:layout_marginTop="@dimen/spacing_2x"
-        android:background="@drawable/button_background"
-        android:textColor="@color/colorPrimary"
-        android:textSize="@dimen/text_size_1.5x"
-        android:text="@string/button_create"/>
+        <EditText
+            android:id="@+id/emailEditText"
+            style="@style/MW"
+            android:layout_below="@+id/nameEditText"
+            android:layout_marginTop="@dimen/spacing_2x"
+            android:padding="@dimen/spacing_3x"
+            android:ems="10"
+            android:inputType="textEmailAddress"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="@dimen/text_size_1.5x"
+            android:textColorHint="@color/colorPrimary"
+            android:hint="@string/hint_email"
+            android:background="@drawable/input_background"/>
 
-    <Button
-        android:id="@+id/backButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/createButton"
-        android:layout_marginTop="@dimen/spacing_6x"
-        android:background="@drawable/button_register_background"
-        android:textColor="@color/colorPrimary"
-        android:textSize="@dimen/text_size_1.5x"
-        android:text="@string/button_back"/>
+        <EditText
+            android:id="@+id/passwordEditText"
+            style="@style/MW"
+            android:layout_below="@+id/emailEditText"
+            android:layout_marginTop="@dimen/spacing_2x"
+            android:padding="@dimen/spacing_3x"
+            android:ems="10"
+            android:inputType="textPassword"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="@dimen/text_size_1.5x"
+            android:textColorHint="@color/colorPrimary"
+            android:hint="@string/hint_password"
+            android:background="@drawable/input_background"/>
 
+        <Button
+            android:id="@+id/createButton"
+            style="@style/MW"
+            android:layout_below="@+id/passwordEditText"
+            android:layout_marginTop="@dimen/spacing_2x"
+            android:background="@drawable/button_green"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/text_size_1.5x"
+            android:text="@string/button_create"/>
+
+        <Button
+            android:id="@+id/backButton"
+            style="@style/MW"
+            android:layout_below="@+id/createButton"
+            android:layout_marginTop="@dimen/spacing_6x"
+            android:background="@drawable/button_yellow"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/text_size_1.5x"
+            android:text="@string/button_back"/>
+
+    </LinearLayout>
 
 </RelativeLayout>

@@ -36,6 +36,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
@@ -69,6 +70,8 @@ public class ChatActivity extends AppCompatActivity {
     private DatabaseReference       messagesDatabaseRef;
     private DatabaseReference       usersFBDatabaseRef;
 
+    private Query                   messagesQuery;
+
 //    private ArrayList<String>       messageList = new ArrayList<>();
 
     private ProgressDialog          progressDialog;
@@ -93,6 +96,9 @@ public class ChatActivity extends AppCompatActivity {
 
         messagesDatabaseRef             = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_MESSAGES_CHILD);
         usersFBDatabaseRef              = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_USERS_CHILD).child(fbCurrentUser.getUid());
+
+        //messagesQuery                   = messagesDatabaseRef.orderByChild("messageAuthorKey").equalTo(fbAuth.getCurrentUser().getUid());
+        //messagesQuery                   = messagesDatabaseRef.orderByChild("messageDateAndTime").orderByValue();
 
         messageEditText                 = UiUtils.findView(this, R.id.messageEditText);
         messageEditText.addTextChangedListener(onTextChangedListener);
@@ -201,6 +207,7 @@ public class ChatActivity extends AppCompatActivity {
                                                                                 R.layout.message_row,
                                                                                 MessageViewHolder.class,
                                                                                 messagesDatabaseRef) {
+                                                                                //messagesQuery) {
 
                 @Override
                 protected void populateViewHolder(MessageViewHolder viewHolder,

@@ -36,7 +36,7 @@
         style="@style/MW"
         android:layout_below="@+id/setAccountNameEditText"
         android:layout_marginTop="@dimen/spacing_2x"
-        android:background="@drawable/button_background"
+        android:background="@drawable/button_green"
         android:textColor="@color/colorPrimary"
         android:textSize="@dimen/text_size_1.5x"
         android:text="@string/button_set"/>

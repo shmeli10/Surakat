@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/settingContainer"
+    style="@style/MM"
+    android:padding="@dimen/spacing_2x"
+    android:theme="@style/Base.ThemeOverlay.AppCompat.Dark.ActionBar"
+    android:background="@color/colorPrimary"
+    tools:context="com.shmeli.surakat.ui.SettingsActivity">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/settingPageAvatar"
+        style="@style/WW"
+        android:layout_width="@dimen/avatar_big_size"
+        android:layout_height="@dimen/avatar_big_size"
+        android:layout_marginTop="@dimen/spacing_4x"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/default_avatar"/>
+
+    <TextView
+        android:id="@+id/settingPageUserName"
+        style="@style/MW"
+        android:layout_below="@+id/settingPageAvatar"
+        android:layout_marginTop="@dimen/spacing_2x"
+        android:gravity="center"
+        android:textSize="@dimen/text_size_2.5x"
+        android:textColor="@color/white"
+        android:hint="@string/hint_name"/>
+
+    <TextView
+        android:id="@+id/settingPageUserStatus"
+        style="@style/MW"
+        android:layout_below="@+id/settingPageUserName"
+        android:layout_marginTop="@dimen/spacing_2x"
+        android:gravity="center"
+        android:textSize="@dimen/text_size_2.5x"
+        android:textColor="@color/white"
+        android:hint="@string/hint_status"/>
+
+    <Button
+        android:id="@+id/settingPageChangeImage"
+        style="@style/MW"
+        android:layout_above="@+id/settingPageChangeStatus"
+        android:layout_marginBottom="@dimen/spacing_2x"
+        android:background="@drawable/button_green"
+        android:textColor="@color/colorPrimary"
+        android:textSize="@dimen/text_size_1.5x"
+        android:text="@string/button_change_image"/>
+
+    <Button
+        android:id="@+id/settingPageChangeStatus"
+        style="@style/MW"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/button_yellow"
+        android:textColor="@color/colorPrimary"
+        android:textSize="@dimen/text_size_1.5x"
+        android:text="@string/button_change_status"/>
+
+</RelativeLayout>

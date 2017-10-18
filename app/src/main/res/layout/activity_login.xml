@@ -4,8 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/signInContainer"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    style="@style/MM"
     android:padding="@dimen/spacing_2x"
     tools:context="com.shmeli.surakat.ui.LoginActivity"
     android:background="@color/colorPrimary">
@@ -62,7 +61,7 @@
         style="@style/MW"
         android:layout_below="@+id/passwordEditText"
         android:layout_marginTop="@dimen/spacing_2x"
-        android:background="@drawable/button_background"
+        android:background="@drawable/button_green"
         android:textColor="@color/colorPrimary"
         android:textSize="@dimen/text_size_1.5x"
         android:text="@string/button_sign_in"/>
@@ -72,7 +71,7 @@
         style="@style/MW"
         android:layout_below="@+id/signInButton"
         android:layout_marginTop="@dimen/spacing_6x"
-        android:background="@drawable/button_register_background"
+        android:background="@drawable/button_yellow"
         android:textColor="@color/colorPrimary"
         android:textSize="@dimen/text_size_1.5x"
         android:text="@string/button_register"/>
