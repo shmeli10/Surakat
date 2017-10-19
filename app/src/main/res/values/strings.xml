@@ -28,6 +28,9 @@
     <string name="message_setting_account">Setting account...</string>
     <string name="message_checking_sign_in">Checking sign in...</string>
     <string name="message_check_account_wait">Please wait while we check your credentials</string>
+    <string name="message_uploading_image">Uploading image...</string>
+    <string name="message_uploading_image_wait">Please wait while we upload and process the image</string>
+
 
     <string name="text_hello_user">Let\'s chat</string>
     <string name="text_left_characters_head">Left</string>

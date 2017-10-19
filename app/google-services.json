@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "536068524011-n4o3tjkpl7rkc1acvn46qj0ur463rjvk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.shmeli.surakat",
+            "certificate_hash": "d1e7f9e67814b373788dc1de149b1d9ea4b7bb5e"
+          }
+        },
+        {
           "client_id": "536068524011-osft937snk2h6pc1c23l679jpooktaee.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -29,8 +37,13 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "536068524011-osft937snk2h6pc1c23l679jpooktaee.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         },
         "ads_service": {
           "status": 2

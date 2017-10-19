@@ -1,37 +1,47 @@
 package com.shmeli.surakat.ui.settings;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+
 import android.util.Log;
 import android.view.View;
+
 import android.widget.Button;
 import android.widget.TextView;
 
-
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+
 import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
 import com.shmeli.surakat.utils.UiUtils;
-import com.theartofdev.edmodo.cropper.CropImage;
 
-import java.util.Date;
+import com.squareup.picasso.Picasso;
+import com.theartofdev.edmodo.cropper.CropImage;
+import de.hdodenhof.circleimageview.CircleImageView;
+
 import java.util.Random;
 
-import de.hdodenhof.circleimageview.CircleImageView;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -47,6 +57,8 @@ public class SettingsActivity extends AppCompatActivity {
     private FirebaseUser        fbCurrentUser;
 
     private StorageReference    fbStorageReference;
+
+    private ProgressDialog      progressDialog;
 
     private String              currentUserId;
 
@@ -72,7 +84,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         fbStorageReference      = FirebaseStorage.getInstance().getReference();
 
-        userFBDatabaseRef   = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_USERS_CHILD).child(currentUserId);
+        userFBDatabaseRef       = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_USERS_CHILD).child(currentUserId);
         userFBDatabaseRef.addValueEventListener(valueEventListener);
     }
 
@@ -94,18 +106,36 @@ public class SettingsActivity extends AppCompatActivity {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
 
             if (resultCode == RESULT_OK) {
+
+                progressDialog = new ProgressDialog(SettingsActivity.this);
+                progressDialog.setTitle(getResources().getString(R.string.message_uploading_image));
+                progressDialog.setMessage(getResources().getString(R.string.message_uploading_image_wait));
+                progressDialog.setCanceledOnTouchOutside(false);
+                progressDialog.show();
+
                 Uri resultUri = result.getUri();
 
                 StringBuilder imageIdSB = new StringBuilder("");
                 //imageIdSB.append(new Date().getTime());
-                imageIdSB.append(getRandomString());
+                //imageIdSB.append(getRandomString());
+                imageIdSB.append(currentUserId);
                 imageIdSB.append(".jpg");
 
                 StorageReference filePath = fbStorageReference.child("images").child(imageIdSB.toString());
-                filePath.putFile(resultUri).addOnCompleteListener(uploadImageCompleteListener);
+
+                try {
+                    filePath.putFile(resultUri).addOnSuccessListener(uploadImageSuccessListener).addOnFailureListener(uploadImageFailureListener);
+                }
+                catch (Exception exc) {
+                    Log.e("LOG", "SettingsActivity: onActivityResult(): putFile error: " +exc.getMessage().toString());
+
+                    progressDialog.dismiss();
+                }
 
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                Exception error = result.getError();
+                //Exception error = result.getError();
+
+                Log.e("LOG", "SettingsActivity: onActivityResult(): Crop Image error: " +result.getError().getMessage().toString());
             }
         }
     }
@@ -172,6 +202,8 @@ public class SettingsActivity extends AppCompatActivity {
             settingPageUserName.setText(userName);
             settingPageUserStatus.setText(userStatus);
 
+            Picasso.with(SettingsActivity.this).load(userImage).into(settingPageAvatar);
+
 /*            if(dataSnapshot.hasChild(currentUserId)) {
 
 
@@ -191,16 +223,46 @@ public class SettingsActivity extends AppCompatActivity {
         public void onCancelled(DatabaseError databaseError) { }
     };
 
-    OnCompleteListener uploadImageCompleteListener = new OnCompleteListener<UploadTask.TaskSnapshot>() {
+    OnSuccessListener uploadImageSuccessListener = new OnSuccessListener<UploadTask.TaskSnapshot>() {
         @Override
-        public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+            String downloadUrl = taskSnapshot.getDownloadUrl().toString();
+
+            Log.e("LOG", "SettingsActivity: uploadImageSuccessListener: upload image success: url: " +downloadUrl);
+
+            userFBDatabaseRef.child("userImage").setValue(downloadUrl).addOnCompleteListener(saveImageUrlCompleteListener);
+            //userFBDatabaseRef.child("thumbImage").setValue();
+
+            //progressDialog.dismiss();
+        }
+    };
+
+    OnFailureListener uploadImageFailureListener = new OnFailureListener() {
+        @Override
+        public void onFailure(@NonNull Exception exception) {
+
+            Log.e("LOG", "SettingsActivity: uploadImageFailureListener: upload image error");
+
+            progressDialog.dismiss();
+        }
+    };
+
+    OnCompleteListener saveImageUrlCompleteListener = new OnCompleteListener() {
+        @Override
+        public void onComplete(@NonNull Task task) {
 
             if(task.isSuccessful()) {
 
-            }
-            else {
+                progressDialog.dismiss();
 
+                Log.e("LOG", "SettingsActivity: saveImageUrlCompleteListener: save image url success");
+                //progressDialog.hide();
             }
+//            else {
+//                Log.e("LOG", "SettingsActivity: saveImageUrlCompleteListener: save image url error");
+//                progressDialog.dismiss();
+//            }
         }
     };
 }
