@@ -3,24 +3,24 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/settingsContainer"
+    android:id="@+id/profileContainer"
     style="@style/MM"
     android:padding="@dimen/spacing_2x"
     android:theme="@style/Base.ThemeOverlay.AppCompat.Dark.ActionBar"
     android:background="@color/colorPrimary"
-    tools:context="com.shmeli.surakat.ui.settings.SettingsActivity">
+    tools:context="com.shmeli.surakat.ui.ProfileActivity">
 
     <include
         layout="@layout/app_bar"
-        android:id="@+id/settingsPageToolbar"/>
+        android:id="@+id/profilePageToolbar"/>
 
     <LinearLayout
         style="@style/MW"
         android:orientation="vertical"
-        android:layout_below="@+id/settingsPageToolbar">
+        android:layout_below="@+id/profilePageToolbar">
 
         <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/settingsPageAvatar"
+            android:id="@+id/profilePageAvatar"
             style="@style/WW"
             android:layout_width="@dimen/avatar_big_size"
             android:layout_height="@dimen/avatar_big_size"
@@ -29,9 +29,9 @@
             android:src="@drawable/default_avatar"/>
 
         <TextView
-            android:id="@+id/settingsPageUserName"
+            android:id="@+id/profilePageUserName"
             style="@style/MW"
-            android:layout_below="@+id/settingsPageAvatar"
+            android:layout_below="@+id/profilePageAvatar"
             android:layout_marginTop="@dimen/spacing_2x"
             android:gravity="center"
             android:textSize="@dimen/text_size_2.5x"
@@ -39,9 +39,9 @@
             android:hint="@string/hint_name"/>
 
         <TextView
-            android:id="@+id/settingsPageUserStatus"
+            android:id="@+id/profilePageUserStatus"
             style="@style/MW"
-            android:layout_below="@+id/settingsPageUserName"
+            android:layout_below="@+id/profilePageUserName"
             android:layout_marginTop="@dimen/spacing_2x"
             android:gravity="center"
             android:textSize="@dimen/text_size_2.0x"
@@ -50,23 +50,23 @@
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/settingsPageChangeImage"
+    <TextView
+        android:id="@+id/profilePageFriendsCount"
         style="@style/MW"
-        android:layout_above="@+id/settingsPageChangeStatus"
+        android:layout_above="@+id/profilePageSendRequest"
         android:layout_marginBottom="@dimen/spacing_2x"
+        android:gravity="center"
+        android:textSize="@dimen/text_size_2.0x"
+        android:textColor="@color/white"
+        android:text="@string/text_total_friends"/>
+
+    <Button
+        android:id="@+id/profilePageSendRequest"
+        style="@style/MW"
+        android:layout_alignParentBottom="true"
         android:background="@drawable/button_green"
         android:textColor="@color/colorPrimary"
         android:textSize="@dimen/text_size_1.5x"
-        android:text="@string/button_change_image"/>
-
-    <Button
-        android:id="@+id/settingsPageChangeStatus"
-        style="@style/MW"
-        android:layout_alignParentBottom="true"
-        android:background="@drawable/button_yellow"
-        android:textColor="@color/colorPrimary"
-        android:textSize="@dimen/text_size_1.5x"
-        android:text="@string/button_change_status"/>
+        android:text="@string/text_send_friend_request"/>
 
 </RelativeLayout>

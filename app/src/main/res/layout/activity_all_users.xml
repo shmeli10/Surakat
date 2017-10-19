@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/allUsersContainer"
+    style="@style/MM"
+    android:theme="@style/Base.ThemeOverlay.AppCompat.Dark.ActionBar"
+    tools:context="com.shmeli.surakat.ui.AllUsersActivity">
+
+    <include
+        layout="@layout/app_bar"
+        android:id="@+id/allUsersPageToolbar"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/allUsersRecyclerVIew"
+        style="@style/MM"
+        android:layout_below="@+id/allUsersPageToolbar"
+        android:padding="@dimen/spacing_2x">
+
+
+    </android.support.v7.widget.RecyclerView>
+
+</RelativeLayout>

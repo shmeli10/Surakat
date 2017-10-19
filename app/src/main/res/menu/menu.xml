@@ -7,6 +7,9 @@
         android:id="@+id/menu_settings"
         android:title="@string/text_settings"/>
     <item
+        android:id="@+id/menu_all_users"
+        android:title="@string/text_all_users"/>
+    <item
         android:id="@+id/menu_signout"
         android:icon="@drawable/ic_logout"
         android:title=""

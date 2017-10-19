@@ -133,10 +133,15 @@ public class RegisterActivity extends AppCompatActivity {
                 databaseReference = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_USERS_CHILD).child(userId);
 
                 HashMap<String, String> userMap = new HashMap<>();
-                userMap.put("userName",     name);
-                userMap.put("userStatus",   CONST.USER_ONLINE_STATUS);
-                userMap.put("userImage",    CONST.DEFAULT_VALUE);
-                userMap.put("thumbImage",   CONST.DEFAULT_VALUE);
+                userMap.put(CONST.USER_IMAGE,       CONST.DEFAULT_VALUE);
+                userMap.put(CONST.USER_NAME,        name);
+                userMap.put(CONST.USER_STATUS,      CONST.USER_ONLINE_STATUS);
+                userMap.put(CONST.USER_THUMB_IMAGE, CONST.DEFAULT_VALUE);
+
+//                userMap.put("userName",     name);
+//                userMap.put("userStatus",   CONST.USER_ONLINE_STATUS);
+//                userMap.put("userImage",    CONST.DEFAULT_VALUE);
+//                userMap.put("thumbImage",   CONST.DEFAULT_VALUE);
 
                 databaseReference.setValue(userMap).addOnCompleteListener(onCreateUserInDBCompleteListener);
 

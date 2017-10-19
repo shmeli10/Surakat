@@ -9,7 +9,10 @@ public class User {
     // private int userId;
     //private String userId;
 
+    private String userImageUrl;
     private String userName;
+    private String userStatus;
+    private String userThumbImageUrl;
 
     //private String userEmail;
 
@@ -17,6 +20,54 @@ public class User {
 //    private String isUserOnline;
 
     public User() { }
+
+    public User(String userImageUrl,
+                String userName,
+                String userStatus,
+                String userThumbImageUrl) {
+
+        this.userImageUrl       = userImageUrl;
+        this.userName           = userName;
+        this.userStatus         = userStatus;
+        this.userThumbImageUrl  = userThumbImageUrl;
+    }
+
+    // ------------------------ GETTERS ----------------------------- //
+
+    public String getUserImageUrl() {
+        return userImageUrl;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public String getUserStatus() {
+        return userStatus;
+    }
+
+    public String getUserThumbImageUrl() {
+        return userThumbImageUrl;
+    }
+
+    // ------------------------ SETTERS ----------------------------- //
+
+    public void setUserImageUrl(String userImageUrl) {
+        this.userImageUrl = userImageUrl;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public void setUserStatus(String userStatus) {
+        this.userStatus = userStatus;
+    }
+
+    public void setUserThumbImageUrl(String userThumbImageUrl) {
+        this.userThumbImageUrl = userThumbImageUrl;
+    }
+
 
     //    public User(int     userId,
 //                String  userName,
@@ -42,9 +93,7 @@ public class User {
 //        return userId;
 //    }
 
-    public String getUserName() {
-        return userName;
-    }
+
 
 //    public void setUserName(String userName) {
 //        this.userName = userName;

@@ -24,4 +24,10 @@ public class CONST {
     public static String USER_OFFLINE_STATUS        = "offline";
 
     public static String DEFAULT_VALUE              = "default";
+
+    public static String USER_ID                    = "userId";
+    public static String USER_IMAGE                 = "userImageUrl";
+    public static String USER_NAME                  = "userName";
+    public static String USER_STATUS                = "userStatus";
+    public static String USER_THUMB_IMAGE           = "userThumbImageUrl";
 }

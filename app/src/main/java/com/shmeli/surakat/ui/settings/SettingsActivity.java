@@ -2,12 +2,14 @@ package com.shmeli.surakat.ui.settings;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 
@@ -15,8 +17,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -39,8 +39,13 @@ import com.shmeli.surakat.utils.UiUtils;
 import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import de.hdodenhof.circleimageview.CircleImageView;
+import id.zelory.compressor.Compressor;
 
-import java.util.Random;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class SettingsActivity extends AppCompatActivity {
@@ -52,13 +57,20 @@ public class SettingsActivity extends AppCompatActivity {
     private TextView            settingPageUserName;
     private TextView            settingPageUserStatus;
 
+    private ProgressDialog      progressDialog;
+    private Toolbar             settingsPageToolbar;
+
     private DatabaseReference   userFBDatabaseRef;
 
     private FirebaseUser        fbCurrentUser;
 
     private StorageReference    fbStorageReference;
 
-    private ProgressDialog      progressDialog;
+    private Uri                 croppedImageUri;
+    private StringBuilder       croppedImageIdSB = new StringBuilder("");
+
+    private String              uploadedImageUrl = "";
+    private String              uploadedThumbUrl = "";
 
     private String              currentUserId;
 
@@ -69,15 +81,20 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        settingPageChangeImage  = UiUtils.findView(this, R.id.settingPageChangeImage);
+        settingsPageToolbar     = UiUtils.findView(this, R.id.settingsPageToolbar);
+        setSupportActionBar(settingsPageToolbar);
+        getSupportActionBar().setTitle(R.string.text_settings);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        settingPageChangeImage  = UiUtils.findView(this, R.id.settingsPageChangeImage);
         settingPageChangeImage.setOnClickListener(changeImageOnClickListener);
 
-        settingPageChangeStatus = UiUtils.findView(this, R.id.settingPageChangeStatus);
+        settingPageChangeStatus = UiUtils.findView(this, R.id.settingsPageChangeStatus);
         settingPageChangeStatus.setOnClickListener(changeStatusOnClickListener);
 
-        settingPageAvatar       = UiUtils.findView(this, R.id.settingPageAvatar);
-        settingPageUserName     = UiUtils.findView(this, R.id.settingPageUserName);
-        settingPageUserStatus   = UiUtils.findView(this, R.id.settingPageUserStatus);
+        settingPageAvatar       = UiUtils.findView(this, R.id.settingsPageAvatar);
+        settingPageUserName     = UiUtils.findView(this, R.id.settingsPageUserName);
+        settingPageUserStatus   = UiUtils.findView(this, R.id.settingsPageUserStatus);
 
         fbCurrentUser           = FirebaseAuth.getInstance().getCurrentUser();
         currentUserId           = fbCurrentUser.getUid();
@@ -98,6 +115,7 @@ public class SettingsActivity extends AppCompatActivity {
 
             CropImage.activity(imageUri)
                     .setAspectRatio(1, 1)
+                    .setMinCropWindowSize(500, 500)
                     .start(this);
         }
 
@@ -113,24 +131,14 @@ public class SettingsActivity extends AppCompatActivity {
                 progressDialog.setCanceledOnTouchOutside(false);
                 progressDialog.show();
 
-                Uri resultUri = result.getUri();
+                croppedImageUri = result.getUri();
 
-                StringBuilder imageIdSB = new StringBuilder("");
-                //imageIdSB.append(new Date().getTime());
-                //imageIdSB.append(getRandomString());
-                imageIdSB.append(currentUserId);
-                imageIdSB.append(".jpg");
+                croppedImageIdSB.append(currentUserId);
+                croppedImageIdSB.append(".jpg");
 
-                StorageReference filePath = fbStorageReference.child("images").child(imageIdSB.toString());
+                StorageReference filePath = fbStorageReference.child("images").child(croppedImageIdSB.toString());
 
-                try {
-                    filePath.putFile(resultUri).addOnSuccessListener(uploadImageSuccessListener).addOnFailureListener(uploadImageFailureListener);
-                }
-                catch (Exception exc) {
-                    Log.e("LOG", "SettingsActivity: onActivityResult(): putFile error: " +exc.getMessage().toString());
-
-                    progressDialog.dismiss();
-                }
+                filePath.putFile(croppedImageUri).addOnCompleteListener(uploadImageOnCompleteListener);
 
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 //Exception error = result.getError();
@@ -140,23 +148,27 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
-    private String getRandomString() {
+    private void uploadThumb() {
 
-        Random generator = new Random();
+        File thumbFile = new File(croppedImageUri.getPath());
 
-        int randomLength = generator.nextInt(10);
+        Bitmap thumbBitmap = new Compressor(this)
+                .setMaxWidth(200)
+                .setMaxHeight(200)
+                .setQuality(75)
+                .compressToBitmap(thumbFile);
 
-        StringBuilder randomSB = new StringBuilder();
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        thumbBitmap.compress(   Bitmap.CompressFormat.JPEG,
+                100,
+                byteArrayOutputStream);
 
-        char tempChar;
+        byte[] thumbDataArray = byteArrayOutputStream.toByteArray();
 
-        for(int i=0; i<randomLength; i++) {
-            tempChar = (char) (generator.nextInt(96) + 32);
+        StorageReference thumbFilePath = fbStorageReference.child("images").child("thumbs").child(croppedImageIdSB.toString());
 
-            randomSB.append(tempChar);
-        }
-
-        return randomSB.toString();
+        UploadTask uploadTask = thumbFilePath.putBytes(thumbDataArray);
+        uploadTask.addOnCompleteListener(uploadThumbOnCompleteListener);
     }
 
     // ------------------------------ LISTENERS ----------------------------------------- //
@@ -194,15 +206,24 @@ public class SettingsActivity extends AppCompatActivity {
 
             //Log.e("LOG", "SettingsActivity: valueEventListener: dataSnapshot: " +dataSnapshot.toString());
 
-            String userName     = dataSnapshot.child("userName").getValue().toString();
-            String userStatus   = dataSnapshot.child("userStatus").getValue().toString();
-            String userImage    = dataSnapshot.child("userImage").getValue().toString();
-            String thumbImage   = dataSnapshot.child("thumbImage").getValue().toString();
+            String userName             = dataSnapshot.child(CONST.USER_NAME).getValue().toString();
+            String userStatus           = dataSnapshot.child(CONST.USER_STATUS).getValue().toString();
+            String userImageUrl         = dataSnapshot.child(CONST.USER_IMAGE).getValue().toString();
+            String userThumbImageUrl    = dataSnapshot.child(CONST.USER_THUMB_IMAGE).getValue().toString();
+
+//            String userName     = dataSnapshot.child("userName").getValue().toString();
+//            String userStatus   = dataSnapshot.child("userStatus").getValue().toString();
+//            String userImage    = dataSnapshot.child("userImage").getValue().toString();
+//            String thumbImage   = dataSnapshot.child("thumbImage").getValue().toString();
 
             settingPageUserName.setText(userName);
             settingPageUserStatus.setText(userStatus);
 
-            Picasso.with(SettingsActivity.this).load(userImage).into(settingPageAvatar);
+            if(!userImageUrl.equals(CONST.DEFAULT_VALUE))
+                Picasso.with(SettingsActivity.this)
+                        .load(userImageUrl)
+                        .placeholder(R.drawable.default_avatar)
+                        .into(settingPageAvatar);
 
 /*            if(dataSnapshot.hasChild(currentUserId)) {
 
@@ -223,28 +244,46 @@ public class SettingsActivity extends AppCompatActivity {
         public void onCancelled(DatabaseError databaseError) { }
     };
 
-    OnSuccessListener uploadImageSuccessListener = new OnSuccessListener<UploadTask.TaskSnapshot>() {
+    OnCompleteListener uploadImageOnCompleteListener = new OnCompleteListener<UploadTask.TaskSnapshot>() {
         @Override
-        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+        public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> imageTask) {
 
-            String downloadUrl = taskSnapshot.getDownloadUrl().toString();
+            if(imageTask.isSuccessful()) {
 
-            Log.e("LOG", "SettingsActivity: uploadImageSuccessListener: upload image success: url: " +downloadUrl);
+                uploadedImageUrl = imageTask.getResult().getDownloadUrl().toString();
 
-            userFBDatabaseRef.child("userImage").setValue(downloadUrl).addOnCompleteListener(saveImageUrlCompleteListener);
-            //userFBDatabaseRef.child("thumbImage").setValue();
+                uploadThumb();
 
-            //progressDialog.dismiss();
+                Log.e("LOG", "SettingsActivity: uploadImageOnCompleteListener: upload image success: url: " +uploadedImageUrl);
+            }
+            else {
+
+                Log.e("LOG", "SettingsActivity: uploadImageOnCompleteListener: upload image error");
+            }
         }
     };
 
-    OnFailureListener uploadImageFailureListener = new OnFailureListener() {
+    OnCompleteListener uploadThumbOnCompleteListener = new OnCompleteListener<UploadTask.TaskSnapshot>() {
         @Override
-        public void onFailure(@NonNull Exception exception) {
+        public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> thumbTask) {
 
-            Log.e("LOG", "SettingsActivity: uploadImageFailureListener: upload image error");
+            if(thumbTask.isSuccessful()) {
 
-            progressDialog.dismiss();
+                uploadedThumbUrl = thumbTask.getResult().getDownloadUrl().toString();
+                Log.e("LOG", "SettingsActivity: uploadThumbOnCompleteListener: upload thumb success: uploadedThumbUrl: " +uploadedThumbUrl);
+
+                Map uploadMap = new HashMap<>();
+                uploadMap.put(CONST.USER_IMAGE,         uploadedImageUrl);
+                uploadMap.put(CONST.USER_THUMB_IMAGE,   uploadedThumbUrl);
+
+                userFBDatabaseRef.updateChildren(uploadMap).addOnCompleteListener(saveImageUrlCompleteListener);
+                //userFBDatabaseRef.child(CONST.USER_IMAGE).setValue(uploadedImageUrl).addOnCompleteListener(saveImageUrlCompleteListener);
+                //userFBDatabaseRef.child("userImage").setValue(uploadedImageUrl).addOnCompleteListener(saveImageUrlCompleteListener);
+            }
+            else {
+
+                Log.e("LOG", "SettingsActivity: uploadThumbOnCompleteListener: upload thumb error");
+            }
         }
     };
 

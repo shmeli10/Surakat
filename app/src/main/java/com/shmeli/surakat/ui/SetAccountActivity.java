@@ -59,7 +59,8 @@ public class SetAccountActivity extends AppCompatActivity {
             progressDialog.setMessage(getResources().getString(R.string.message_setting_account));
             progressDialog.show();
 
-            usersFBDatabaseRef.child(userId).child("userName").setValue(name);
+            usersFBDatabaseRef.child(userId).child(CONST.USER_NAME).setValue(name);
+            //usersFBDatabaseRef.child(userId).child("userName").setValue(name);
 
             progressDialog.dismiss();
 

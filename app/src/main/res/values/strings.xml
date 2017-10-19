@@ -28,21 +28,29 @@
     <string name="message_setting_account">Setting account...</string>
     <string name="message_checking_sign_in">Checking sign in...</string>
     <string name="message_check_account_wait">Please wait while we check your credentials</string>
+    <string name="message_loading_profile_data">Loading profile data...</string>
+    <string name="message_loading_profile_data_wait">Please wait while we load the profile data</string>
     <string name="message_uploading_image">Uploading image...</string>
     <string name="message_uploading_image_wait">Please wait while we upload and process the image</string>
 
 
+    <string name="text_all_users">All users</string>
     <string name="text_hello_user">Let\'s chat</string>
     <string name="text_left_characters_head">Left</string>
     <string name="text_left_characters_tail">symbols</string>
     <string name="text_create_account">Create account</string>s
     <string name="text_message">Message</string>
     <string name="text_message_author_name">Message author name</string>
+    <string name="text_profile">Profile</string>
     <string name="text_saving_changes">Saving changes</string>
+    <string name="text_send_friend_request">Send friend request</string>
     <string name="text_set_account">Set account</string>
     <string name="text_set_status">Set status</string>
+    <string name="text_status">Status</string>
     <string name="text_settings">Settings</string>
+    <string name="text_total_friends">Total friends:</string>
     <string name="text_user">User</string>
+    <string name="text_user_name">User name</string>
     <string name="text_user_list">User list:</string>
 
     <!-- TODO: Remove or change this placeholder text -->

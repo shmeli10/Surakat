@@ -345,7 +345,8 @@ public class ChatActivity extends AppCompatActivity {
 
                     Log.e("LOG", "ChatActivity: startSendMessage(): usersFBDatabaseRef: onDataChange(): update newMessageKey= " +newMessageKey);
 
-                    messagesDatabaseRef.child(newMessageKey).child("messageAuthorName").setValue(dataSnapshot.child("userName").getValue());
+                    messagesDatabaseRef.child(newMessageKey).child("messageAuthorName").setValue(dataSnapshot.child(CONST.USER_NAME).getValue());
+                    //messagesDatabaseRef.child(newMessageKey).child("messageAuthorName").setValue(dataSnapshot.child("userName").getValue());
 
 //                    String recipientKey = getSelectedRecipientKey();
 //

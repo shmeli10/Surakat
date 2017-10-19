@@ -172,15 +172,20 @@ public class MainActivity extends AppCompatActivity {
 
         switch(item.getItemId()) {
 
+            case R.id.menu_all_users:
+                Intent allUsersIntent = new Intent( MainActivity.this,
+                                                    AllUsersActivity.class);
+                startActivity(allUsersIntent);
+                break;
+            case R.id.menu_signout:
+                logout();
+                break;
             case R.id.menu_settings:
                 Intent settingsIntent = new Intent( MainActivity.this,
                                                     SettingsActivity.class);
                 //settingsIntent.addFlags();
                 startActivity(settingsIntent);
                 //finish();
-                break;
-            case R.id.menu_signout:
-                logout();
                 break;
         }
 
@@ -205,14 +210,14 @@ public class MainActivity extends AppCompatActivity {
 
         View            view;
         TextView        userNameTextView;
-        LinearLayout    userContainer;
+        RelativeLayout  userContainer;
 
         public UserViewHolder(View itemView) {
             super(itemView);
 
             view                = itemView;
-            userContainer       = UiUtils.findView(view, R.id.userContainer);
-            userNameTextView    = UiUtils.findView(view, R.id.userNameTextView);
+            userContainer       = UiUtils.findView(view, R.id.userRowContainer);
+            userNameTextView    = UiUtils.findView(view, R.id.userRowName);
         }
 
         public void setUserName(String userName) {
