@@ -10,7 +10,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import android.util.Log;
 import android.view.View;
 
 import android.widget.Button;
@@ -32,6 +31,8 @@ import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
 import com.shmeli.surakat.utils.UiUtils;
 
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -45,7 +46,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class ProfileActivity extends AppCompatActivity {
 
     private Toolbar             profilePageToolbar;
-    private ProgressDialog      progressDialog;
+    //private ProgressDialog      progressDialog;
 
     private RelativeLayout      profileContainer;
 
@@ -64,6 +65,7 @@ public class ProfileActivity extends AppCompatActivity {
     private FirebaseUser        currentFBUser;
 
     private String selectedUserId   = "";
+    private String userImageUrl     = "";
 
     private int friendshipState     = CONST.IS_NOT_A_FRIEND_STATE;
 
@@ -82,15 +84,16 @@ public class ProfileActivity extends AppCompatActivity {
             //Log.e("LOG", "ProfileActivity: onCreate(): selectedUserId= " +selectedUserId);
         }
 
-        progressDialog = new ProgressDialog(ProfileActivity.this);
-        progressDialog.setTitle(getResources().getString(R.string.message_loading_profile_data));
-        progressDialog.setMessage(getResources().getString(R.string.message_loading_profile_data_wait));
-        progressDialog.setCanceledOnTouchOutside(false);
-        progressDialog.show();
+//        progressDialog = new ProgressDialog(ProfileActivity.this);
+//        progressDialog.setTitle(getResources().getString(R.string.message_loading_profile_data));
+//        progressDialog.setMessage(getResources().getString(R.string.message_loading_profile_data_wait));
+//        progressDialog.setCanceledOnTouchOutside(false);
+//        progressDialog.show();
 
         friendsFBDatabaseRef    = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_FRIENDS_CHILD);
 
         userFBDatabaseRef       = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_USERS_CHILD).child(selectedUserId);
+        userFBDatabaseRef.keepSynced(true);
         userFBDatabaseRef.addValueEventListener(selectedUserProfileValueListener);
 
         friendRequestFBDatabaseRef = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_FRIEND_REQUEST_CHILD);
@@ -136,17 +139,26 @@ public class ProfileActivity extends AppCompatActivity {
 
             //Log.e("LOG", "SettingsActivity: valueEventListener: dataSnapshot: " +dataSnapshot.toString());
 
-            String userName             = dataSnapshot.child(CONST.USER_NAME).getValue().toString();
-            String userStatus           = dataSnapshot.child(CONST.USER_STATUS).getValue().toString();
-            String userImageUrl         = dataSnapshot.child(CONST.USER_IMAGE).getValue().toString();
+            String userName     = dataSnapshot.child(CONST.USER_NAME).getValue().toString();
+            String userStatus   = dataSnapshot.child(CONST.USER_STATUS).getValue().toString();
+            userImageUrl        = dataSnapshot.child(CONST.USER_IMAGE).getValue().toString();
 
             profilePageUserName.setText(userName);
             profilePageUserStatus.setText(userStatus);
 
-            Picasso.with(ProfileActivity.this)
+            if(!userImageUrl.equals(CONST.DEFAULT_VALUE)) {
+                Picasso.with(ProfileActivity.this)
+                        .load(userImageUrl)
+                        .networkPolicy(NetworkPolicy.OFFLINE)
+                        .placeholder(R.drawable.default_avatar)
+                        .into(  profilePageAvatar,
+                                loadImageCallback);
+
+                /*Picasso.with(ProfileActivity.this)
                         .load(userImageUrl)
                         .placeholder(R.drawable.default_avatar)
-                        .into(profilePageAvatar);
+                        .into(profilePageAvatar);*/
+            }
 
             // GET LIST OF FRIEND REQUESTS
             friendRequestFBDatabaseRef.child(currentFBUser.getUid()).addListenerForSingleValueEvent(friendRequestsListValueListener);
@@ -178,7 +190,7 @@ public class ProfileActivity extends AppCompatActivity {
                         break;
                 }
 
-                progressDialog.dismiss();
+                //progressDialog.dismiss();
             }
             else {
 
@@ -202,13 +214,13 @@ public class ProfileActivity extends AppCompatActivity {
                 profilePageSendRequest.setText(R.string.text_unfriend_request);
             }
 
-            progressDialog.dismiss();
+            //progressDialog.dismiss();
         }
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
 
-            progressDialog.dismiss();
+            //progressDialog.dismiss();
         }
     };
 
@@ -220,13 +232,13 @@ public class ProfileActivity extends AppCompatActivity {
 
             profilePageSendRequest.setEnabled(false);
 
-            Log.e("LOG", "ProfileActivity: sendRequestClickListener: friendshipState= " +friendshipState);
+            //Log.e("LOG", "ProfileActivity: sendRequestClickListener: friendshipState= " +friendshipState);
 
             switch(friendshipState) {
 
                 // NOT FRIENDS, SEND FRIEND REQUEST
                 case CONST.IS_NOT_A_FRIEND_STATE:
-                    Log.e("LOG", "ProfileActivity: sendRequestClickListener: IS_NOT_A_FRIEND_STATE");
+                    //Log.e("LOG", "ProfileActivity: sendRequestClickListener: IS_NOT_A_FRIEND_STATE");
 
                     Map requestTypeMap = new HashMap();
                     requestTypeMap.put(CONST.REQUEST_TYPE_TEXT, CONST.SENT_REQUEST);
@@ -239,14 +251,14 @@ public class ProfileActivity extends AppCompatActivity {
                     break;
                 // NOT FRIENDS, CANCEL SENT FRIEND REQUEST
                 case CONST.SENT_REQUEST_STATE:
-                    Log.e("LOG", "ProfileActivity: sendRequestClickListener: SENT_REQUEST_STATE");
+                    //Log.e("LOG", "ProfileActivity: sendRequestClickListener: SENT_REQUEST_STATE");
 
                     canChangeState = true;
                     removeFriendRequestFromFBDatabase();
                     break;
                 // NOT FRIENDS, ACCEPT FRIEND REQUEST
                 case CONST.RECEIVED_REQUEST_STATE:
-                    Log.e("LOG", "ProfileActivity: sendRequestClickListener: RECEIVED_REQUEST_STATE");
+                    //Log.e("LOG", "ProfileActivity: sendRequestClickListener: RECEIVED_REQUEST_STATE");
 
                     friendsFBDatabaseRef.child(currentFBUser.getUid())
                             .child(selectedUserId)
@@ -255,7 +267,7 @@ public class ProfileActivity extends AppCompatActivity {
                     break;
                 // FRIENDS, SEND UNFRIEND REQUEST
                 case CONST.IS_A_FRIEND_STATE:
-                    Log.e("LOG", "ProfileActivity: sendRequestClickListener: IS_A_FRIEND_STATE");
+                    //Log.e("LOG", "ProfileActivity: sendRequestClickListener: IS_A_FRIEND_STATE");
 
                     friendsFBDatabaseRef.child(currentFBUser.getUid())
                             .child(selectedUserId)
@@ -288,7 +300,7 @@ public class ProfileActivity extends AppCompatActivity {
                         .addOnCompleteListener(onSendFriendRequestSelectedUserPartCompleteListener);
             }
             else {
-                progressDialog.hide();
+                //progressDialog.hide();
 
                 Snackbar.make(  profileContainer,
                                 R.string.error_send_friend_request,
@@ -468,6 +480,22 @@ public class ProfileActivity extends AppCompatActivity {
                         R.string.error_unfriend_request,
                         Snackbar.LENGTH_LONG).show();
             }
+        }
+    };
+
+    Callback loadImageCallback = new Callback() {
+        @Override
+        public void onSuccess() {
+
+        }
+
+        @Override
+        public void onError() {
+
+            Picasso.with(ProfileActivity.this)
+                    .load(userImageUrl)
+                    .placeholder(R.drawable.default_avatar)
+                    .into(profilePageAvatar);
         }
     };
 }

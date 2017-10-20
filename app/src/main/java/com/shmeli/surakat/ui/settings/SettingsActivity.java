@@ -36,6 +36,8 @@ import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
 import com.shmeli.surakat.utils.UiUtils;
 
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -73,6 +75,7 @@ public class SettingsActivity extends AppCompatActivity {
     private String              uploadedThumbUrl = "";
 
     private String              currentUserId;
+    private String              userImageUrl;
 
     private static final int    GALLERY_PICK = 1;
 
@@ -102,6 +105,7 @@ public class SettingsActivity extends AppCompatActivity {
         fbStorageReference      = FirebaseStorage.getInstance().getReference();
 
         userFBDatabaseRef       = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_USERS_CHILD).child(currentUserId);
+        userFBDatabaseRef.keepSynced(true);
         userFBDatabaseRef.addValueEventListener(valueEventListener);
     }
 
@@ -208,7 +212,8 @@ public class SettingsActivity extends AppCompatActivity {
 
             String userName             = dataSnapshot.child(CONST.USER_NAME).getValue().toString();
             String userStatus           = dataSnapshot.child(CONST.USER_STATUS).getValue().toString();
-            String userImageUrl         = dataSnapshot.child(CONST.USER_IMAGE).getValue().toString();
+            userImageUrl                = dataSnapshot.child(CONST.USER_IMAGE).getValue().toString();
+            //String userImageUrl         = dataSnapshot.child(CONST.USER_IMAGE).getValue().toString();
             String userThumbImageUrl    = dataSnapshot.child(CONST.USER_THUMB_IMAGE).getValue().toString();
 
 //            String userName     = dataSnapshot.child("userName").getValue().toString();
@@ -219,11 +224,20 @@ public class SettingsActivity extends AppCompatActivity {
             settingPageUserName.setText(userName);
             settingPageUserStatus.setText(userStatus);
 
-            if(!userImageUrl.equals(CONST.DEFAULT_VALUE))
+            if(!userImageUrl.equals(CONST.DEFAULT_VALUE)) {
+
                 Picasso.with(SettingsActivity.this)
                         .load(userImageUrl)
+                        .networkPolicy(NetworkPolicy.OFFLINE)
                         .placeholder(R.drawable.default_avatar)
-                        .into(settingPageAvatar);
+                        .into(  settingPageAvatar,
+                                loadImageCallback);
+
+                /*Picasso.with(SettingsActivity.this)
+                        .load(userImageUrl)
+                        .placeholder(R.drawable.default_avatar)
+                        .into(settingPageAvatar);*/
+            }
 
 /*            if(dataSnapshot.hasChild(currentUserId)) {
 
@@ -302,6 +316,22 @@ public class SettingsActivity extends AppCompatActivity {
 //                Log.e("LOG", "SettingsActivity: saveImageUrlCompleteListener: save image url error");
 //                progressDialog.dismiss();
 //            }
+        }
+    };
+
+    Callback loadImageCallback = new Callback() {
+        @Override
+        public void onSuccess() {
+
+        }
+
+        @Override
+        public void onError() {
+
+            Picasso.with(SettingsActivity.this)
+                    .load(userImageUrl)
+                    .placeholder(R.drawable.default_avatar)
+                    .into(settingPageAvatar);
         }
     };
 }

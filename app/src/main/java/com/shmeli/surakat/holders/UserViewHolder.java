@@ -5,7 +5,10 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.shmeli.surakat.R;
+import com.shmeli.surakat.data.CONST;
 import com.shmeli.surakat.utils.UiUtils;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -22,6 +25,8 @@ public class UserViewHolder extends RecyclerView.ViewHolder {
     TextView userStatusTextView;
 
     CircleImageView userAvatar;
+
+    private String imageUrl = "";
 
     public UserViewHolder(View itemView) {
         super(itemView);
@@ -45,10 +50,38 @@ public class UserViewHolder extends RecyclerView.ViewHolder {
 
     public void setAvatar(String imageUrl) {
 
-        Picasso.with(itemView.getContext())
+        this.imageUrl = imageUrl;
+
+        if(!imageUrl.equals(CONST.DEFAULT_VALUE)) {
+
+            Picasso.with(itemView.getContext())
+                    .load(imageUrl)
+                    .networkPolicy(NetworkPolicy.OFFLINE)
+                    .placeholder(R.drawable.default_avatar)
+                    .into(  userAvatar,
+                            loadImageCallback);
+        }
+
+        /*Picasso.with(itemView.getContext())
                 .load(imageUrl)
                 .placeholder(R.drawable.default_avatar)
-                .into(userAvatar);
+                .into(userAvatar);*/
 
     }
+
+    Callback loadImageCallback = new Callback() {
+        @Override
+        public void onSuccess() {
+
+        }
+
+        @Override
+        public void onError() {
+
+            Picasso.with(itemView.getContext())
+                    .load(imageUrl)
+                    .placeholder(R.drawable.default_avatar)
+                    .into(userAvatar);;
+        }
+    };
 }

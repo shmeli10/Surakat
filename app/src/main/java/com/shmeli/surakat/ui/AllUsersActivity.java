@@ -48,6 +48,7 @@ public class AllUsersActivity extends AppCompatActivity {
         allUsersRecyclerVIew.setLayoutManager(new LinearLayoutManager(this));
 
         usersFBDatabaseRef  = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_USERS_CHILD);
+        usersFBDatabaseRef.keepSynced(true);
     }
 
     @Override
