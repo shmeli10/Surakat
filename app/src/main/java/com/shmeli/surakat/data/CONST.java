@@ -13,6 +13,8 @@ public class CONST {
     public static final String FIREBASE_MESSAGES_CHILD          = "Messages";
     public static final String FIREBASE_MESSAGES_LINK           = FIREBASE_BASE_LINK + "/" + FIREBASE_MESSAGES_CHILD;
 
+    public static final String FIREBASE_NOTIFICATIONS_CHILD     = "Notifications";
+
     public static final String FIREBASE_FRIEND_REQUEST_CHILD    = "FriendRequests";
 
     public static final String FIREBASE_USERS_CHILD             = "Users";
@@ -26,6 +28,11 @@ public class CONST {
     public static final String USER_OFFLINE_STATUS              = "offline";
 
     public static final String DEFAULT_VALUE                    = "default";
+
+    public static final String NOTIFICATION_SENDER_ID           = "senderId";
+    public static final String NOTIFICATION_TYPE                = "type";
+
+    public static final String NOTIFICATION_REQUEST_TYPE        = "request";
 
     public static final String USER_ID                          = "userId";
     public static final String USER_IMAGE                       = "userImageUrl";

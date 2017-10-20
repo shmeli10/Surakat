@@ -17,6 +17,7 @@
     <string name="error_receive_friend_request">Receive friend request problem occur</string>
     <string name="error_save_changes">There was an error in saving changes</string>
     <string name="error_send_message">Send message problem occur</string>
+    <string name="error_send_notification">Send notification problem occur</string>
     <string name="error_send_friend_request">Send friend request problem occur</string>
     <string name="error_sign_in">Sign In Problem</string>
     <string name="error_unfriend_request">Unfriend request problem occur</string>

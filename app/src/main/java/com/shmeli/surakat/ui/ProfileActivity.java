@@ -61,6 +61,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private DatabaseReference   friendsFBDatabaseRef;
     private DatabaseReference   friendRequestFBDatabaseRef;
+    private DatabaseReference   notificationsFBDatabaseRef;
     private DatabaseReference   userFBDatabaseRef;
 
     private FirebaseUser        currentFBUser;
@@ -99,6 +100,8 @@ public class ProfileActivity extends AppCompatActivity {
 
         friendRequestFBDatabaseRef = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_FRIEND_REQUEST_CHILD);
 
+        notificationsFBDatabaseRef = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_NOTIFICATIONS_CHILD);
+
         currentFBUser = FirebaseAuth.getInstance().getCurrentUser();
 
         profilePageToolbar = UiUtils.findView(this, R.id.profilePageToolbar);
@@ -118,6 +121,8 @@ public class ProfileActivity extends AppCompatActivity {
         profilePageDeclineRequest.setOnClickListener(declineRequestClickListener);
 
         profileContainer        = UiUtils.findView(this, R.id.profileContainer);
+
+        showSendRequestButton();
     }
 
     private String getCurrentDate() {
@@ -255,10 +260,10 @@ public class ProfileActivity extends AppCompatActivity {
                 //hideDeclineButton();
                 showSendRequestButton();
             }
-            else {
-
-                hideSendRequestButton();
-            }
+//            else {
+//
+//                hideSendRequestButton();
+//            }
 
             hideDeclineButton();
             //progressDialog.dismiss();
@@ -383,10 +388,14 @@ public class ProfileActivity extends AppCompatActivity {
 
             if(task.isSuccessful()) {
 
-                friendshipState = CONST.SENT_REQUEST_STATE;
-                profilePageSendRequest.setText(R.string.text_cancel_friend_request);
+                HashMap<String, String> notificationDataMap = new HashMap<>();
+                notificationDataMap.put(CONST.NOTIFICATION_SENDER_ID,   currentFBUser.getUid());
+                notificationDataMap.put(CONST.NOTIFICATION_TYPE,        CONST.NOTIFICATION_REQUEST_TYPE);
 
-                hideDeclineButton();
+                notificationsFBDatabaseRef.child(selectedUserId)
+                        .push()
+                        .setValue(notificationDataMap)
+                        .addOnCompleteListener(onSendNotificationRequestCompleteListener);
 
                 //Log.e("LOG", "ProfileActivity: onSendFriendRequestSelectedUserPartCompleteListener: success");
             }
@@ -549,6 +558,36 @@ public class ProfileActivity extends AppCompatActivity {
 
                 Snackbar.make(  profileContainer,
                         R.string.error_unfriend_request,
+                        Snackbar.LENGTH_LONG).show();
+            }
+        }
+    };
+
+    // SEND NOTIFICATION REQUEST RESULT
+    OnCompleteListener<Void> onSendNotificationRequestCompleteListener = new OnCompleteListener<Void>() {
+        @Override
+        public void onComplete(@NonNull Task<Void> task) {
+
+            //Log.e("LOG", "ProfileActivity: onSendNotificationRequestCompleteListener: task.isSuccessful(): " +task.isSuccessful());
+
+            if(task.isSuccessful()) {
+
+                friendshipState = CONST.SENT_REQUEST_STATE;
+                profilePageSendRequest.setText(R.string.text_cancel_friend_request);
+
+                hideDeclineButton();
+
+//                friendsFBDatabaseRef.child(selectedUserId)
+//                        .child(currentFBUser.getUid())
+//                        .removeValue()
+//                        .addOnCompleteListener(onUnfriendRequestSelectedUserPartCompleteListener);
+
+                //Log.e("LOG", "ProfileActivity: onSendNotificationRequestCompleteListener: friendshipState=" +friendshipState);
+            }
+            else {
+
+                Snackbar.make(  profileContainer,
+                        R.string.error_send_notification,
                         Snackbar.LENGTH_LONG).show();
             }
         }
