@@ -50,6 +50,7 @@
     <string name="text_message_author_name">Message author name</string>
     <string name="text_profile">Profile</string>
     <string name="text_saving_changes">Saving changes</string>
+    <string name="text_decline_friend_request">Decline friend request</string>
     <string name="text_send_friend_request">Send friend request</string>
     <string name="text_set_account">Set account</string>
     <string name="text_set_status">Set status</string>

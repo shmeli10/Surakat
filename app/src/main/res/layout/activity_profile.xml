@@ -60,13 +60,34 @@
         android:textColor="@color/white"
         android:text="@string/text_total_friends"/>
 
+    <!--<Button-->
+        <!--android:id="@+id/profilePageSendRequest"-->
+        <!--style="@style/MW"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:background="@drawable/button_green"-->
+        <!--android:textColor="@color/colorPrimary"-->
+        <!--android:textSize="@dimen/text_size_1.5x"-->
+        <!--android:text="@string/text_send_friend_request"/>-->
+
     <Button
         android:id="@+id/profilePageSendRequest"
         style="@style/MW"
-        android:layout_alignParentBottom="true"
+        android:layout_above="@+id/profilePageDeclineRequest"
+        android:layout_marginBottom="@dimen/spacing_2x"
         android:background="@drawable/button_green"
+        android:visibility="invisible"
         android:textColor="@color/colorPrimary"
         android:textSize="@dimen/text_size_1.5x"
         android:text="@string/text_send_friend_request"/>
+
+    <Button
+        android:id="@+id/profilePageDeclineRequest"
+        style="@style/MW"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/button_yellow"
+        android:visibility="invisible"
+        android:textColor="@color/colorPrimary"
+        android:textSize="@dimen/text_size_1.5x"
+        android:text="@string/text_decline_friend_request"/>
 
 </RelativeLayout>

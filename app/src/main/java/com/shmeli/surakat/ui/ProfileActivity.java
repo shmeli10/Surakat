@@ -1,6 +1,5 @@
 package com.shmeli.surakat.ui;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 
 import android.os.Bundle;
@@ -10,6 +9,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
+import android.util.Log;
 import android.view.View;
 
 import android.widget.Button;
@@ -57,6 +57,7 @@ public class ProfileActivity extends AppCompatActivity {
     private TextView            profilePageFriendsCount;
 
     private Button              profilePageSendRequest;
+    private Button              profilePageDeclineRequest;
 
     private DatabaseReference   friendsFBDatabaseRef;
     private DatabaseReference   friendRequestFBDatabaseRef;
@@ -109,8 +110,12 @@ public class ProfileActivity extends AppCompatActivity {
         profilePageUserName     = UiUtils.findView(this, R.id.profilePageUserName);
         profilePageUserStatus   = UiUtils.findView(this, R.id.profilePageUserStatus);
         profilePageFriendsCount = UiUtils.findView(this, R.id.profilePageFriendsCount);
+
         profilePageSendRequest  = UiUtils.findView(this, R.id.profilePageSendRequest);
         profilePageSendRequest.setOnClickListener(sendRequestClickListener);
+
+        profilePageDeclineRequest = UiUtils.findView(this, R.id.profilePageDeclineRequest);
+        profilePageDeclineRequest.setOnClickListener(declineRequestClickListener);
 
         profileContainer        = UiUtils.findView(this, R.id.profileContainer);
     }
@@ -129,6 +134,34 @@ public class ProfileActivity extends AppCompatActivity {
                 .child(selectedUserId)
                 .removeValue()
                 .addOnCompleteListener(onCancelSentFriendRequestMyPartCompleteListener);
+    }
+
+    private void showDeclineButton() {
+
+        // enable and show decline button
+        profilePageDeclineRequest.setVisibility(View.VISIBLE);
+        profilePageDeclineRequest.setEnabled(true);
+    }
+
+    private void hideDeclineButton() {
+
+        // disable and hide decline button
+        profilePageDeclineRequest.setVisibility(View.INVISIBLE);
+        profilePageDeclineRequest.setEnabled(false);
+    }
+
+    private void showSendRequestButton() {
+
+        // enable and show send request button
+        profilePageSendRequest.setVisibility(View.VISIBLE);
+        profilePageSendRequest.setEnabled(true);
+    }
+
+    private void hideSendRequestButton() {
+
+        // disable and hide send request button
+        profilePageSendRequest.setVisibility(View.INVISIBLE);
+        profilePageSendRequest.setEnabled(false);
     }
 
     // ------------------------------ VALUE EVENT LISTENERS ----------------------------------- //
@@ -182,13 +215,19 @@ public class ProfileActivity extends AppCompatActivity {
                     case CONST.RECEIVED_REQUEST_STATE:
                         friendshipState = CONST.RECEIVED_REQUEST_STATE;
                         profilePageSendRequest.setText(R.string.text_accept_friend_request);
+
+                        showDeclineButton();
                         break;
                     // CANCEL SENT FRIEND REQUEST
                     case CONST.SENT_REQUEST_STATE:
                         friendshipState = CONST.SENT_REQUEST_STATE;
                         profilePageSendRequest.setText(R.string.text_cancel_friend_request);
+
+                        hideDeclineButton();
                         break;
                 }
+
+                showSendRequestButton();
 
                 //progressDialog.dismiss();
             }
@@ -210,10 +249,18 @@ public class ProfileActivity extends AppCompatActivity {
 
             if(dataSnapshot.hasChild(selectedUserId)) {
                 friendshipState = CONST.IS_A_FRIEND_STATE;
-                profilePageSendRequest.setEnabled(true);
+                //profilePageSendRequest.setEnabled(true);
                 profilePageSendRequest.setText(R.string.text_unfriend_request);
+
+                //hideDeclineButton();
+                showSendRequestButton();
+            }
+            else {
+
+                hideSendRequestButton();
             }
 
+            hideDeclineButton();
             //progressDialog.dismiss();
         }
 
@@ -279,6 +326,24 @@ public class ProfileActivity extends AppCompatActivity {
         }
     };
 
+    View.OnClickListener declineRequestClickListener = new View.OnClickListener() {
+
+        @Override
+        public void onClick(View v) {
+
+            canChangeState = true;
+            removeFriendRequestFromFBDatabase();
+
+//            //removeFriendRequestFromFBDatabase();
+//
+//            friendshipState = CONST.IS_NOT_A_FRIEND_STATE;
+//            profilePageSendRequest.setEnabled(true);
+//            profilePageSendRequest.setText(R.string.text_unfriend_request);
+//
+//            hideDeclineButton();
+        }
+    };
+
     // ------------------------------ ON COMPLETE LISTENERS ----------------------------------- //
 
     // SEND FRIEND REQUEST RESULT (CURRENT USER PART)
@@ -320,6 +385,8 @@ public class ProfileActivity extends AppCompatActivity {
 
                 friendshipState = CONST.SENT_REQUEST_STATE;
                 profilePageSendRequest.setText(R.string.text_cancel_friend_request);
+
+                hideDeclineButton();
 
                 //Log.e("LOG", "ProfileActivity: onSendFriendRequestSelectedUserPartCompleteListener: success");
             }
@@ -372,6 +439,8 @@ public class ProfileActivity extends AppCompatActivity {
                     friendshipState = CONST.IS_NOT_A_FRIEND_STATE;
                     profilePageSendRequest.setEnabled(true);
                     profilePageSendRequest.setText(R.string.text_send_friend_request);
+
+                    hideDeclineButton();
                 }
 
                 //Log.e("LOG", "ProfileActivity: onCancelSentFriendRequestSelectedUserPartCompleteListener: friendshipState=" +friendshipState);
@@ -422,6 +491,8 @@ public class ProfileActivity extends AppCompatActivity {
                 friendshipState = CONST.IS_A_FRIEND_STATE;
                 profilePageSendRequest.setEnabled(true);
                 profilePageSendRequest.setText(R.string.text_unfriend_request);
+
+                hideDeclineButton();
 
                 //Log.e("LOG", "ProfileActivity: onAcceptFriendRequestSelectedUserPartCompleteListener: friendshipState=" +friendshipState);
             }
