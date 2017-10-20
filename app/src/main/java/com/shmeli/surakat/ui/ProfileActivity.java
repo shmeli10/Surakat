@@ -2,21 +2,24 @@ package com.shmeli.surakat.ui;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+
+import android.os.Bundle;
+
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
+
 import android.util.Log;
 import android.view.View;
+
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -24,12 +27,16 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
 import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
-import com.shmeli.surakat.ui.settings.SettingsActivity;
 import com.shmeli.surakat.utils.UiUtils;
+
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
+
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,14 +57,17 @@ public class ProfileActivity extends AppCompatActivity {
 
     private Button              profilePageSendRequest;
 
-    private DatabaseReference   userFBDatabaseRef;
+    private DatabaseReference   friendsFBDatabaseRef;
     private DatabaseReference   friendRequestFBDatabaseRef;
+    private DatabaseReference   userFBDatabaseRef;
 
     private FirebaseUser        currentFBUser;
 
     private String selectedUserId   = "";
 
     private int friendshipState     = CONST.IS_NOT_A_FRIEND_STATE;
+
+    private boolean canChangeState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +87,8 @@ public class ProfileActivity extends AppCompatActivity {
         progressDialog.setMessage(getResources().getString(R.string.message_loading_profile_data_wait));
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
+
+        friendsFBDatabaseRef    = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_FRIENDS_CHILD);
 
         userFBDatabaseRef       = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_USERS_CHILD).child(selectedUserId);
         userFBDatabaseRef.addValueEventListener(selectedUserProfileValueListener);
@@ -100,7 +112,23 @@ public class ProfileActivity extends AppCompatActivity {
         profileContainer        = UiUtils.findView(this, R.id.profileContainer);
     }
 
-    // ------------------------------ LISTENERS ----------------------------------------- //
+    private String getCurrentDate() {
+
+        SimpleDateFormat simpleDateFormat   = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
+        String currentDate                  = simpleDateFormat.format(new Date());
+
+        return currentDate;
+    }
+
+    private void removeFriendRequestFromFBDatabase() {
+
+        friendRequestFBDatabaseRef.child(currentFBUser.getUid())
+                .child(selectedUserId)
+                .removeValue()
+                .addOnCompleteListener(onCancelSentFriendRequestMyPartCompleteListener);
+    }
+
+    // ------------------------------ VALUE EVENT LISTENERS ----------------------------------- //
 
     ValueEventListener selectedUserProfileValueListener = new ValueEventListener() {
         @Override
@@ -134,32 +162,28 @@ public class ProfileActivity extends AppCompatActivity {
 
             if(dataSnapshot.hasChild(selectedUserId)) {
 
-                //String requestTypeText = dataSnapshot.child(selectedUserId).child(CONST.REQUEST_TYPE_ID).getValue().toString();
+                int requestTypeId = Integer.valueOf(dataSnapshot.child(selectedUserId).child(CONST.REQUEST_TYPE_ID).getValue().toString());
 
-                //Log.e("LOG", "ProfileActivity: friendRequestsListValueListener: requestTypeText= " +requestTypeText);
+                switch (requestTypeId) {
 
-                //if(!TextUtils.isEmpty(requestTypeText)) {
+                    // ACCEPT FRIEND REQUEST
+                    case CONST.RECEIVED_REQUEST_STATE:
+                        friendshipState = CONST.RECEIVED_REQUEST_STATE;
+                        profilePageSendRequest.setText(R.string.text_accept_friend_request);
+                        break;
+                    // CANCEL SENT FRIEND REQUEST
+                    case CONST.SENT_REQUEST_STATE:
+                        friendshipState = CONST.SENT_REQUEST_STATE;
+                        profilePageSendRequest.setText(R.string.text_cancel_friend_request);
+                        break;
+                }
 
-                    int requestTypeId = Integer.valueOf(dataSnapshot.child(selectedUserId).child(CONST.REQUEST_TYPE_ID).getValue().toString());
-                    //int requestTypeId = Integer.valueOf(requestTypeText);
-
-                    switch (requestTypeId) {
-
-                        // ACCEPT FRIEND REQUEST
-                        case CONST.RECEIVED_REQUEST_STATE:
-                            friendshipState = CONST.RECEIVED_REQUEST_STATE;
-                            profilePageSendRequest.setText(R.string.text_accept_friend_request);
-                            break;
-                        // CANCEL SENT FRIEND REQUEST
-                        case CONST.SENT_REQUEST_STATE:
-                            friendshipState = CONST.SENT_REQUEST_STATE;
-                            profilePageSendRequest.setText(R.string.text_cancel_friend_request);
-                            break;
-                    }
-                //}
+                progressDialog.dismiss();
             }
+            else {
 
-            progressDialog.dismiss();
+                friendsFBDatabaseRef.child(currentFBUser.getUid()).addListenerForSingleValueEvent(currentUserFriendsListValueListener);
+            }
         }
 
         @Override
@@ -168,68 +192,100 @@ public class ProfileActivity extends AppCompatActivity {
         }
     };
 
+    ValueEventListener currentUserFriendsListValueListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+
+            if(dataSnapshot.hasChild(selectedUserId)) {
+                friendshipState = CONST.IS_A_FRIEND_STATE;
+                profilePageSendRequest.setEnabled(true);
+                profilePageSendRequest.setText(R.string.text_unfriend_request);
+            }
+
+            progressDialog.dismiss();
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+            progressDialog.dismiss();
+        }
+    };
+
+    // ------------------------------ ON CLICK LISTENER ------------------------------------- //
+
     View.OnClickListener sendRequestClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
 
             profilePageSendRequest.setEnabled(false);
 
+            Log.e("LOG", "ProfileActivity: sendRequestClickListener: friendshipState= " +friendshipState);
+
             switch(friendshipState) {
 
-                // NOT FRIENDS, SEND REQUEST
+                // NOT FRIENDS, SEND FRIEND REQUEST
                 case CONST.IS_NOT_A_FRIEND_STATE:
+                    Log.e("LOG", "ProfileActivity: sendRequestClickListener: IS_NOT_A_FRIEND_STATE");
 
                     Map requestTypeMap = new HashMap();
                     requestTypeMap.put(CONST.REQUEST_TYPE_TEXT, CONST.SENT_REQUEST);
                     requestTypeMap.put(CONST.REQUEST_TYPE_ID,   CONST.SENT_REQUEST_STATE);
-                    //requestTypeMap.put(CONST.REQUEST_TYPE_ID,   "" +CONST.SENT_REQUEST_STATE);
 
                     friendRequestFBDatabaseRef.child(currentFBUser.getUid())
                             .child(selectedUserId)
                             .setValue(requestTypeMap)
-                            .addOnCompleteListener(onSendFriendRequestCompleteListener);
-
-//                    friendRequestFBDatabaseRef.child(currentFBUser.getUid())
-//                            .child(selectedUserId)
-//                            .child(CONST.REQUEST_TYPE_TEXT)
-//                            .setValue(CONST.SENT_REQUEST)
-//                            .addOnCompleteListener(onSendFriendRequestCompleteListener);
+                            .addOnCompleteListener(onSendFriendRequestMyPartCompleteListener);
                     break;
-                // NOT FRIENDS, CANCEL SENT REQUEST
+                // NOT FRIENDS, CANCEL SENT FRIEND REQUEST
                 case CONST.SENT_REQUEST_STATE:
-                    friendRequestFBDatabaseRef.child(currentFBUser.getUid())
+                    Log.e("LOG", "ProfileActivity: sendRequestClickListener: SENT_REQUEST_STATE");
+
+                    canChangeState = true;
+                    removeFriendRequestFromFBDatabase();
+                    break;
+                // NOT FRIENDS, ACCEPT FRIEND REQUEST
+                case CONST.RECEIVED_REQUEST_STATE:
+                    Log.e("LOG", "ProfileActivity: sendRequestClickListener: RECEIVED_REQUEST_STATE");
+
+                    friendsFBDatabaseRef.child(currentFBUser.getUid())
+                            .child(selectedUserId)
+                            .setValue(getCurrentDate())
+                            .addOnCompleteListener(onAcceptFriendRequestMyPartCompleteListener);
+                    break;
+                // FRIENDS, SEND UNFRIEND REQUEST
+                case CONST.IS_A_FRIEND_STATE:
+                    Log.e("LOG", "ProfileActivity: sendRequestClickListener: IS_A_FRIEND_STATE");
+
+                    friendsFBDatabaseRef.child(currentFBUser.getUid())
                             .child(selectedUserId)
                             .removeValue()
-                            .addOnCompleteListener(onCancelSentFriendRequestMyPartCompleteListener);
+                            .addOnCompleteListener(onUnfriendRequestMyPartCompleteListener);
+
                     break;
             }
         }
     };
 
-    OnCompleteListener<Void> onSendFriendRequestCompleteListener = new OnCompleteListener<Void>() {
+    // ------------------------------ ON COMPLETE LISTENERS ----------------------------------- //
+
+    // SEND FRIEND REQUEST RESULT (CURRENT USER PART)
+    OnCompleteListener<Void> onSendFriendRequestMyPartCompleteListener = new OnCompleteListener<Void>() {
         @Override
         public void onComplete(@NonNull Task<Void> task) {
 
-            Log.e("LOG", "ProfileActivity: onSendFriendRequestCompleteListener: task.isSuccessful(): " +task.isSuccessful());
+            //Log.e("LOG", "ProfileActivity: onSendFriendRequestCompleteListener: task.isSuccessful(): " +task.isSuccessful());
 
             if(task.isSuccessful()) {
 
                 Map requestTypeMap = new HashMap();
                 requestTypeMap.put(CONST.REQUEST_TYPE_TEXT, CONST.RECEIVED_REQUEST);
                 requestTypeMap.put(CONST.REQUEST_TYPE_ID,   CONST.RECEIVED_REQUEST_STATE);
-                //requestTypeMap.put(CONST.REQUEST_TYPE_ID,   "" +CONST.RECEIVED_REQUEST_STATE);
 
                 friendRequestFBDatabaseRef.child(selectedUserId)
                         .child(currentFBUser.getUid())
                         .setValue(requestTypeMap)
-                        .addOnCompleteListener(onFriendRequestReceiveCompleteListener);
-
-//                friendRequestFBDatabaseRef.child(selectedUserId)
-//                        .child(currentFBUser.getUid())
-//                        .child(CONST.REQUEST_TYPE)
-//                        .setValue(CONST.RECEIVED_REQUEST)
-//                        //.addOnSuccessListener(onSendFriendRequestReceiveSuccessListener);
-//                        .addOnCompleteListener(onFriendRequestReceiveCompleteListener);
+                        .addOnCompleteListener(onSendFriendRequestSelectedUserPartCompleteListener);
             }
             else {
                 progressDialog.hide();
@@ -241,19 +297,19 @@ public class ProfileActivity extends AppCompatActivity {
         }
     };
 
-    OnCompleteListener<Void> onFriendRequestReceiveCompleteListener = new OnCompleteListener<Void>() {
+    // SEND FRIEND REQUEST RESULT (SELECTED USER PART)
+    OnCompleteListener<Void> onSendFriendRequestSelectedUserPartCompleteListener = new OnCompleteListener<Void>() {
         @Override
         public void onComplete(@NonNull Task<Void> task) {
 
-            Log.e("LOG", "ProfileActivity: onFriendRequestReceiveCompleteListener: task.isSuccessful(): " +task.isSuccessful());
+            //Log.e("LOG", "ProfileActivity: onSendFriendRequestSelectedUserPartCompleteListener: task.isSuccessful(): " +task.isSuccessful());
 
             if(task.isSuccessful()) {
 
                 friendshipState = CONST.SENT_REQUEST_STATE;
-                profilePageSendRequest.setEnabled(true);
                 profilePageSendRequest.setText(R.string.text_cancel_friend_request);
 
-                //Log.e("LOG", "ProfileActivity: onFriendRequestReceiveCompleteListener: success");
+                //Log.e("LOG", "ProfileActivity: onSendFriendRequestSelectedUserPartCompleteListener: success");
             }
             else {
 
@@ -261,14 +317,17 @@ public class ProfileActivity extends AppCompatActivity {
                         R.string.error_receive_friend_request,
                         Snackbar.LENGTH_LONG).show();
             }
+
+            profilePageSendRequest.setEnabled(true);
         }
     };
 
+    // ON CANCEL SENT FRIEND REQUEST RESULT (CURRENT USER PART)
     OnCompleteListener<Void> onCancelSentFriendRequestMyPartCompleteListener = new OnCompleteListener<Void>() {
         @Override
         public void onComplete(@NonNull Task<Void> task) {
 
-            Log.e("LOG", "ProfileActivity: onCancelSentFriendRequestCompleteListener: task.isSuccessful(): " +task.isSuccessful());
+            //Log.e("LOG", "ProfileActivity: onCancelSentFriendRequestMyPartCompleteListener: task.isSuccessful(): " +task.isSuccessful());
 
             if(task.isSuccessful()) {
 
@@ -286,22 +345,127 @@ public class ProfileActivity extends AppCompatActivity {
         }
     };
 
+    // ON CANCEL SENT FRIEND REQUEST RESULT (SELECTED USER PART)
     OnCompleteListener<Void> onCancelSentFriendRequestSelectedUserPartCompleteListener = new OnCompleteListener<Void>() {
         @Override
         public void onComplete(@NonNull Task<Void> task) {
 
-            Log.e("LOG", "ProfileActivity: onCancelSentFriendRequestSelectedUserPartCompleteListener: task.isSuccessful(): " +task.isSuccessful());
+            //Log.e("LOG", "ProfileActivity: onCancelSentFriendRequestSelectedUserPartCompleteListener: task.isSuccessful(): " +task.isSuccessful());
+
+            if(task.isSuccessful()) {
+
+                if(canChangeState) {
+                    canChangeState = false;
+
+                    friendshipState = CONST.IS_NOT_A_FRIEND_STATE;
+                    profilePageSendRequest.setEnabled(true);
+                    profilePageSendRequest.setText(R.string.text_send_friend_request);
+                }
+
+                //Log.e("LOG", "ProfileActivity: onCancelSentFriendRequestSelectedUserPartCompleteListener: friendshipState=" +friendshipState);
+            }
+            else {
+
+                Snackbar.make(  profileContainer,
+                        R.string.error_cancel_sent_friend_request,
+                        Snackbar.LENGTH_LONG).show();
+            }
+        }
+    };
+
+    // ACCEPT FRIEND REQUEST RESULT (CURRENT USER PART)
+    OnCompleteListener<Void> onAcceptFriendRequestMyPartCompleteListener = new OnCompleteListener<Void>() {
+        @Override
+        public void onComplete(@NonNull Task<Void> task) {
+
+            //Log.e("LOG", "ProfileActivity: onAcceptFriendRequestMyPartCompleteListener: task.isSuccessful(): " +task.isSuccessful());
+
+            if(task.isSuccessful()) {
+
+                friendsFBDatabaseRef.child(selectedUserId)
+                        .child(currentFBUser.getUid())
+                        .setValue(getCurrentDate())
+                        .addOnCompleteListener(onAcceptFriendRequestSelectedUserPartCompleteListener);
+            }
+            else {
+
+                Snackbar.make(  profileContainer,
+                                R.string.error_accept_friend_request,
+                                Snackbar.LENGTH_LONG).show();
+            }
+        }
+    };
+
+    // ACCEPT FRIEND REQUEST RESULT (SELECTED USER PART)
+    OnCompleteListener<Void> onAcceptFriendRequestSelectedUserPartCompleteListener = new OnCompleteListener<Void>() {
+        @Override
+        public void onComplete(@NonNull Task<Void> task) {
+
+            //Log.e("LOG", "ProfileActivity: onAcceptFriendRequestSelectedUserPartCompleteListener: task.isSuccessful(): " +task.isSuccessful());
+
+            if(task.isSuccessful()) {
+
+                removeFriendRequestFromFBDatabase();
+
+                friendshipState = CONST.IS_A_FRIEND_STATE;
+                profilePageSendRequest.setEnabled(true);
+                profilePageSendRequest.setText(R.string.text_unfriend_request);
+
+                //Log.e("LOG", "ProfileActivity: onAcceptFriendRequestSelectedUserPartCompleteListener: friendshipState=" +friendshipState);
+            }
+            else {
+
+                Snackbar.make(  profileContainer,
+                        R.string.error_accept_friend_request,
+                        Snackbar.LENGTH_LONG).show();
+            }
+        }
+    };
+
+    // UNFRIEND REQUEST RESULT (CURRENT USER PART)
+    OnCompleteListener<Void> onUnfriendRequestMyPartCompleteListener = new OnCompleteListener<Void>() {
+        @Override
+        public void onComplete(@NonNull Task<Void> task) {
+
+            //Log.e("LOG", "ProfileActivity: onUnfriendRequestMyPartCompleteListener: task.isSuccessful(): " +task.isSuccessful());
+
+            if(task.isSuccessful()) {
+
+                friendsFBDatabaseRef.child(selectedUserId)
+                        .child(currentFBUser.getUid())
+                        .removeValue()
+                        .addOnCompleteListener(onUnfriendRequestSelectedUserPartCompleteListener);
+
+                //Log.e("LOG", "ProfileActivity: onUnfriendRequestMyPartCompleteListener: friendshipState=" +friendshipState);
+            }
+            else {
+
+                Snackbar.make(  profileContainer,
+                        R.string.error_unfriend_request,
+                        Snackbar.LENGTH_LONG).show();
+            }
+        }
+    };
+
+    // UNFRIEND REQUEST RESULT (SELECTED USER PART)
+    OnCompleteListener<Void> onUnfriendRequestSelectedUserPartCompleteListener = new OnCompleteListener<Void>() {
+        @Override
+        public void onComplete(@NonNull Task<Void> task) {
+
+            //Log.e("LOG", "ProfileActivity: onUnfriendRequestSelectedUserPartCompleteListener: task.isSuccessful(): " +task.isSuccessful());
 
             if(task.isSuccessful()) {
 
                 friendshipState = CONST.IS_NOT_A_FRIEND_STATE;
                 profilePageSendRequest.setEnabled(true);
                 profilePageSendRequest.setText(R.string.text_send_friend_request);
+
+                //Log.e("LOG", "ProfileActivity: onUnfriendRequestSelectedUserPartCompleteListener: friendshipState=" +friendshipState);
             }
             else {
 
                 Snackbar.make(  profileContainer,
-                        R.string.error_cancel_sent_friend_request,
+                        R.string.error_unfriend_request,
                         Snackbar.LENGTH_LONG).show();
             }
         }
