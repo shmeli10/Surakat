@@ -10,9 +10,12 @@
     <string name="button_back">Back</string>
 
     <string name="error_empty_field">Field(s) is(are) empty</string>
+    <string name="error_cancel_sent_friend_request">Cancel sent friend request problem occur</string>
     <string name="error_register_user">Register user problem occur</string>
+    <string name="error_receive_friend_request">Receive friend request problem occur</string>
     <string name="error_save_changes">There was an error in saving changes</string>
     <string name="error_send_message">Send message problem occur</string>
+    <string name="error_send_friend_request">Send friend request problem occur</string>
     <string name="error_sign_in">Sign In Problem</string>
     <string name="error_account">You need to setup your account</string>
 
@@ -34,11 +37,13 @@
     <string name="message_uploading_image_wait">Please wait while we upload and process the image</string>
 
 
+    <string name="text_accept_friend_request">Accept friend request</string>
     <string name="text_all_users">All users</string>
+    <string name="text_create_account">Create account</string>
+    <string name="text_cancel_friend_request">Cancel friend request</string>
     <string name="text_hello_user">Let\'s chat</string>
     <string name="text_left_characters_head">Left</string>
     <string name="text_left_characters_tail">symbols</string>
-    <string name="text_create_account">Create account</string>s
     <string name="text_message">Message</string>
     <string name="text_message_author_name">Message author name</string>
     <string name="text_profile">Profile</string>
