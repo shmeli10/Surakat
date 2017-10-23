@@ -27,6 +27,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
 import com.shmeli.surakat.utils.UiUtils;
@@ -128,15 +129,17 @@ public class RegisterActivity extends AppCompatActivity {
 
                 progressDialog.dismiss();
 
-                String userId = fbAuth.getCurrentUser().getUid();
+                String userId       = fbAuth.getCurrentUser().getUid();
+                String deviceToken  = FirebaseInstanceId.getInstance().getToken();
 
-                databaseReference = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_USERS_CHILD).child(userId);
+                databaseReference   = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_USERS_CHILD).child(userId);
 
                 HashMap<String, String> userMap = new HashMap<>();
-                userMap.put(CONST.USER_IMAGE,       CONST.DEFAULT_VALUE);
-                userMap.put(CONST.USER_NAME,        name);
-                userMap.put(CONST.USER_STATUS,      CONST.USER_ONLINE_STATUS);
-                userMap.put(CONST.USER_THUMB_IMAGE, CONST.DEFAULT_VALUE);
+                userMap.put(CONST.USER_IMAGE,           CONST.DEFAULT_VALUE);
+                userMap.put(CONST.USER_NAME,            name);
+                userMap.put(CONST.USER_DEVICE_TOKEN,    deviceToken);
+                userMap.put(CONST.USER_STATUS,          CONST.USER_ONLINE_STATUS);
+                userMap.put(CONST.USER_THUMB_IMAGE,     CONST.DEFAULT_VALUE);
 
 //                userMap.put("userName",     name);
 //                userMap.put("userStatus",   CONST.USER_ONLINE_STATUS);

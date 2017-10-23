@@ -37,6 +37,7 @@ public class CONST {
     public static final String USER_ID                          = "userId";
     public static final String USER_IMAGE                       = "userImageUrl";
     public static final String USER_NAME                        = "userName";
+    public static final String USER_DEVICE_TOKEN                = "userDeviceToken";
     public static final String USER_STATUS                      = "userStatus";
     public static final String USER_THUMB_IMAGE                 = "userThumbImageUrl";
 

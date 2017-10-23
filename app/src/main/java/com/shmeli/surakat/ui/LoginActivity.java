@@ -22,6 +22,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
 import com.shmeli.surakat.utils.UiUtils;
@@ -43,7 +44,7 @@ public class LoginActivity extends AppCompatActivity {
 
 //    private FirebaseAuth.AuthStateListener fbAuthListener;
 
-    private String userId = "";
+    private String currentUserId = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,7 +106,7 @@ public class LoginActivity extends AppCompatActivity {
     private void checkUserExists() {
         //Log.e("LOG", "LoginActivity: checkUserExists()");
 
-        userId = fbAuth.getCurrentUser().getUid();
+        currentUserId = fbAuth.getCurrentUser().getUid();
 
         usersFBDatabaseRef.addValueEventListener(valueEventListener);
     }
@@ -141,7 +142,11 @@ public class LoginActivity extends AppCompatActivity {
 
                 progressDialog.dismiss();
 
-                checkUserExists();
+                String deviceToken  = FirebaseInstanceId.getInstance().getToken();
+                currentUserId = fbAuth.getCurrentUser().getUid();
+
+                usersFBDatabaseRef.child(currentUserId).child(CONST.USER_DEVICE_TOKEN).setValue(deviceToken)
+                        .addOnCompleteListener(onSetDeviceTokenCompleteListener);
             }
             else {
                 progressDialog.hide();
@@ -157,9 +162,9 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
 
-            Log.e("LOG", "LoginActivity: valueEventListener: (dataSnapshot.hasChild(" +userId+ ")): " +(dataSnapshot.hasChild(userId)));
+            Log.e("LOG", "LoginActivity: valueEventListener: (dataSnapshot.hasChild(" + currentUserId + ")): " +(dataSnapshot.hasChild(currentUserId)));
 
-            if(dataSnapshot.hasChild(userId)) {
+            if(dataSnapshot.hasChild(currentUserId)) {
 
                 Intent mainIntent = new Intent( LoginActivity.this,
                                                 MainActivity.class);
@@ -181,5 +186,23 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         public void onCancelled(DatabaseError databaseError) { }
+    };
+
+    OnCompleteListener<Void> onSetDeviceTokenCompleteListener = new OnCompleteListener<Void>() {
+        @Override
+        public void onComplete(@NonNull Task<Void> task) {
+
+            Log.e("LOG", "RegisterActivity: onSetDeviceTokenCompleteListener: task.isSuccessful(): " +task.isSuccessful());
+
+            if(task.isSuccessful()) {
+                checkUserExists();
+            }
+            else {
+
+                Snackbar.make(  signInContainer,
+                                R.string.error_sign_in,
+                                Snackbar.LENGTH_LONG).show();
+            }
+        }
     };
 }

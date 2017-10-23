@@ -11,6 +11,7 @@ public class User {
 
     private String userImageUrl;
     private String userName;
+    private String userDeviceToken;
     private String userStatus;
     private String userThumbImageUrl;
 
@@ -23,11 +24,14 @@ public class User {
 
     public User(String userImageUrl,
                 String userName,
+                String userDeviceToken,
                 String userStatus,
                 String userThumbImageUrl) {
 
         this.userImageUrl       = userImageUrl;
         this.userName           = userName;
+        this.userDeviceToken    = userDeviceToken;
+
         this.userStatus         = userStatus;
         this.userThumbImageUrl  = userThumbImageUrl;
     }
@@ -40,6 +44,10 @@ public class User {
 
     public String getUserName() {
         return userName;
+    }
+
+    public String getUserDeviceToken() {
+        return userDeviceToken;
     }
 
     public String getUserStatus() {
@@ -58,6 +66,10 @@ public class User {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public void setUserDeviceToken(String userDeviceToken) {
+        this.userDeviceToken = userDeviceToken;
     }
 
     public void setUserStatus(String userStatus) {
