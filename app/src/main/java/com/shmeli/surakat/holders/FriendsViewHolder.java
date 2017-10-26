@@ -1,12 +1,14 @@
 package com.shmeli.surakat.holders;
 
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
 import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
 import com.shmeli.surakat.utils.UiUtils;
+
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -14,10 +16,10 @@ import com.squareup.picasso.Picasso;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
- * Created by Serghei Ostrovschi on 10/19/17.
+ * Created by Serghei Ostrovschi on 10/26/17.
  */
 
-public class UserViewHolder extends RecyclerView.ViewHolder {
+public class FriendsViewHolder extends RecyclerView.ViewHolder {
 
     public View itemView;
 
@@ -28,7 +30,7 @@ public class UserViewHolder extends RecyclerView.ViewHolder {
 
     private String imageUrl = "";
 
-    public UserViewHolder(View itemView) {
+    public FriendsViewHolder(View itemView) {
         super(itemView);
 
         this.itemView = itemView;
@@ -40,12 +42,18 @@ public class UserViewHolder extends RecyclerView.ViewHolder {
 
     public void setName(String userName) {
 
-        userNameTextView.setText(userName);
+        if(!TextUtils.isEmpty(userName))
+            userNameTextView.setText(userName);
+        else
+            userNameTextView.setText(CONST.NO_NAME_TEXT);
     }
 
-    public void setStatus(String userStatus) {
+    public void setDate(String date) {
 
-        userStatusTextView.setText(userStatus);
+        if(!TextUtils.isEmpty(date))
+            userStatusTextView.setText(date);
+        else
+            userStatusTextView.setText(CONST.NO_DATE_TEXT);
     }
 
     public void setAvatar(String imageUrl) {
@@ -61,19 +69,11 @@ public class UserViewHolder extends RecyclerView.ViewHolder {
                     .into(  userAvatar,
                             loadImageCallback);
         }
-
-        /*Picasso.with(itemView.getContext())
-                .load(imageUrl)
-                .placeholder(R.drawable.default_avatar)
-                .into(userAvatar);*/
-
     }
 
     Callback loadImageCallback = new Callback() {
         @Override
-        public void onSuccess() {
-
-        }
+        public void onSuccess() { }
 
         @Override
         public void onError() {

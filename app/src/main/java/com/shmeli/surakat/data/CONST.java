@@ -43,7 +43,11 @@ public class CONST {
     public static final String USER_DEVICE_TOKEN                = "userDeviceToken";
     public static final String USER_STATUS                      = "userStatus";
     public static final String USER_THUMB_IMAGE                 = "userThumbImageUrl";
+    public static final String USER_IS_ONLINE                   = "userIsOnline";
 
+    public static final String NO_DATE_TEXT                     = "No date";
+    public static final String NO_NAME_TEXT                     = "No name";
+    public static final String NO_STATUS_TEXT                   = "No status";
     public static final String REQUEST_TYPE_TEXT                = "requestTypeText";
     public static final String REQUEST_TYPE_ID                  = "requestTypeId";
 

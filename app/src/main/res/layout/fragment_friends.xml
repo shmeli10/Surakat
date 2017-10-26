@@ -1,13 +1,13 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:id="@+id/friendsContainer"
+    style="@style/MM"
     tools:context="com.shmeli.surakat.ui.fragments.FriendsFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="friends_fragment" />
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/friendsRecyclerVIew"
+        style="@style/MM"
+        android:padding="@dimen/spacing_2x"/>
 
-</FrameLayout>
+</RelativeLayout>

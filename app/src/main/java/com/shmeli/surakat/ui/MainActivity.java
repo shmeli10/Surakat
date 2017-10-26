@@ -19,7 +19,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -66,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<String> userList = new ArrayList<>();
 
     private String userId           = "";
-    private String currentUserKey   = "";
+    private String currentUserId    = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         fbAuth              = FirebaseAuth.getInstance();
 
         usersFBDatabaseRef  = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_USERS_CHILD);
-        //usersFBDatabaseRef.keepSynced(true);
+        usersFBDatabaseRef.keepSynced(true);
 
         mainContainer       = UiUtils.findView(this, R.id.mainContainer);
         mainPageToolbar     = UiUtils.findView(this, R.id.mainPageToolbar);
@@ -117,13 +116,13 @@ public class MainActivity extends AppCompatActivity {
                                               User                          model,
                                               final int                     position) {
 
-                //String currentUserKey   = fbAuth.getCurrentUser().getUid();
+                //String currentUserId   = fbAuth.getCurrentUser().getUid();
                 String listUserKey      = getRef(position).getKey();
 
-                //Log.e("LOG", "MainActivity: onStart(): populateViewHolder(): currentUserKey= " +currentUserKey);
+                //Log.e("LOG", "MainActivity: onStart(): populateViewHolder(): currentUserId= " +currentUserId);
                 //Log.e("LOG", "MainActivity: onStart(): populateViewHolder(): listUserKey= " +listUserKey);
 
-                if(!listUserKey.equals(currentUserKey)) {
+                if(!listUserKey.equals(currentUserId)) {
                     Log.e("LOG", "MainActivity: onStart(): populateViewHolder(): show user: " +model.getUserName());
 
                     viewHolder.setUserName(model.getUserName());
@@ -157,6 +156,14 @@ public class MainActivity extends AppCompatActivity {
 
 //        userRecyclerView.setAdapter(fbAdapter);
     }
+
+
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//
+//        usersFBDatabaseRef.child(currentUserId).child(CONST.USER_IS_ONLINE).setValue(false);
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -244,9 +251,9 @@ public class MainActivity extends AppCompatActivity {
                                             LoginActivity.class));
                 finish();
             }
-            else {
-                currentUserKey = fbAuth.getCurrentUser().getUid();
-            }
+            /*else {
+                currentUserId = fbAuth.getCurrentUser().getUid();
+            }*/
                 /*else {
 
                     String currentUser = firebaseAuth.getCurrentUser().getDisplayName();
@@ -299,6 +306,22 @@ public class MainActivity extends AppCompatActivity {
                 setAccountIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(setAccountIntent);
             }
+//            else {
+//
+//                if(fbAuth.getCurrentUser() != null) {
+//
+//                    currentUserId = fbAuth.getCurrentUser().getUid();
+//
+//                    usersFBDatabaseRef.child(currentUserId).child(CONST.USER_IS_ONLINE).setValue(true);
+//                }
+//                else {
+//
+//                    Intent loginIntent = new Intent(MainActivity.this,
+//                                                    LoginActivity.class);
+//                    loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                    startActivity(loginIntent);
+//                }
+//            }
         }
 
         @Override
