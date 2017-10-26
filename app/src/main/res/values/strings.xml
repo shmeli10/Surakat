@@ -11,6 +11,7 @@
 
     <string name="error_accept_friend_request">Accept friend request problem occur</string>
     <string name="error_account">You need to setup your account</string>
+    <string name="error_decline_friend_request">Decline friend request problem occur</string>
     <string name="error_empty_field">Field(s) is(are) empty</string>
     <string name="error_cancel_sent_friend_request">Cancel sent friend request problem occur</string>
     <string name="error_register_user">Register user problem occur</string>

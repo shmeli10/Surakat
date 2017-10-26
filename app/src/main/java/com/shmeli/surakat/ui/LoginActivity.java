@@ -99,14 +99,14 @@ public class LoginActivity extends AppCompatActivity {
             progressDialog.setCanceledOnTouchOutside(false);
             progressDialog.show();
 
-            fbAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(onCompleteListener);
+            fbAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(onSignInCompleteListener);
         }
     }
 
     private void checkUserExists() {
         //Log.e("LOG", "LoginActivity: checkUserExists()");
 
-        currentUserId = fbAuth.getCurrentUser().getUid();
+        //currentUserId = fbAuth.getCurrentUser().getUid();
 
         usersFBDatabaseRef.addValueEventListener(valueEventListener);
     }
@@ -130,11 +130,11 @@ public class LoginActivity extends AppCompatActivity {
         }
     };
 
-    OnCompleteListener<AuthResult> onCompleteListener = new OnCompleteListener<AuthResult>() {
+    OnCompleteListener<AuthResult> onSignInCompleteListener = new OnCompleteListener<AuthResult>() {
         @Override
         public void onComplete(@NonNull Task<AuthResult> task) {
 
-            Log.e("LOG", "LoginActivity: onCompleteListener: task.isSuccessful(): " +task.isSuccessful());
+            Log.e("LOG", "LoginActivity: onSignInCompleteListener: task.isSuccessful(): " +task.isSuccessful());
 
             // progressDialog.dismiss();
 
@@ -143,9 +143,11 @@ public class LoginActivity extends AppCompatActivity {
                 progressDialog.dismiss();
 
                 String deviceToken  = FirebaseInstanceId.getInstance().getToken();
-                currentUserId = fbAuth.getCurrentUser().getUid();
+                currentUserId       = fbAuth.getCurrentUser().getUid();
 
-                usersFBDatabaseRef.child(currentUserId).child(CONST.USER_DEVICE_TOKEN).setValue(deviceToken)
+                usersFBDatabaseRef.child(currentUserId)
+                        .child(CONST.USER_DEVICE_TOKEN)
+                        .setValue(deviceToken)
                         .addOnCompleteListener(onSetDeviceTokenCompleteListener);
             }
             else {

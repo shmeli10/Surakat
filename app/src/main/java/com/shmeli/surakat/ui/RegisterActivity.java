@@ -52,9 +52,9 @@ public class RegisterActivity extends AppCompatActivity {
 
     private ProgressDialog      progressDialog;
 
-    private String              name        = "";
-    private String              email       = "";
-    private String              password    = "";
+    private String              userName        = "";
+    private String              userEmail       = "";
+    private String              userPassword    = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,18 +85,19 @@ public class RegisterActivity extends AppCompatActivity {
 
     private void startRegister() {
 
-        name         = nameEditText.getText().toString();
-        email        = emailEditText.getText().toString();
-        password     = passwordEditText.getText().toString();
+        userName        = nameEditText.getText().toString();
+        userEmail       = emailEditText.getText().toString();
+        userPassword    = passwordEditText.getText().toString();
 
-        if(!TextUtils.isEmpty(name) && !TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
+        if(!TextUtils.isEmpty(userName) && !TextUtils.isEmpty(userEmail) && !TextUtils.isEmpty(userPassword)) {
 
             progressDialog.setTitle(getResources().getString(R.string.message_creating_account));
             progressDialog.setMessage(getResources().getString(R.string.message_create_account_wait));
             progressDialog.setCanceledOnTouchOutside(false);
             progressDialog.show();
 
-            fbAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(onCreateUserCompleteListener);
+            fbAuth.createUserWithEmailAndPassword(userEmail, userPassword)
+                    .addOnCompleteListener(onCreateUserCompleteListener);
         }
     }
 
@@ -136,30 +137,12 @@ public class RegisterActivity extends AppCompatActivity {
 
                 HashMap<String, String> userMap = new HashMap<>();
                 userMap.put(CONST.USER_IMAGE,           CONST.DEFAULT_VALUE);
-                userMap.put(CONST.USER_NAME,            name);
+                userMap.put(CONST.USER_NAME,            userName);
                 userMap.put(CONST.USER_DEVICE_TOKEN,    deviceToken);
                 userMap.put(CONST.USER_STATUS,          CONST.USER_ONLINE_STATUS);
                 userMap.put(CONST.USER_THUMB_IMAGE,     CONST.DEFAULT_VALUE);
 
-//                userMap.put("userName",     name);
-//                userMap.put("userStatus",   CONST.USER_ONLINE_STATUS);
-//                userMap.put("userImage",    CONST.DEFAULT_VALUE);
-//                userMap.put("thumbImage",   CONST.DEFAULT_VALUE);
-
                 databaseReference.setValue(userMap).addOnCompleteListener(onCreateUserInDBCompleteListener);
-
-
-                        /*DatabaseReference createUser = databaseReference.child(userId);
-
-                        //createUser.child("userId").setValue();
-                        createUser.child("userName").setValue(name);*/
-
-                        /*Intent mainIntent = new Intent( RegisterActivity.this,
-                                                        MainActivity.class);
-                        mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(mainIntent);
-
-                        finish();*/
             }
             else {
 

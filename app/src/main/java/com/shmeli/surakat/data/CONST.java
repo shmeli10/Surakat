@@ -29,6 +29,9 @@ public class CONST {
 
     public static final String DEFAULT_VALUE                    = "default";
 
+    public static final String DATE_TEXT                        = "date";
+
+    public static final String NOTIFICATION_ID                  = "notificationId";
     public static final String NOTIFICATION_SENDER_ID           = "senderId";
     public static final String NOTIFICATION_TYPE                = "type";
 
@@ -44,8 +47,8 @@ public class CONST {
     public static final String REQUEST_TYPE_TEXT                = "requestTypeText";
     public static final String REQUEST_TYPE_ID                  = "requestTypeId";
 
-    public static final String SENT_REQUEST                     = "sent";
-    public static final String RECEIVED_REQUEST                 = "received";
+    public static final String SENT_REQUEST_TEXT                = "sent";
+    public static final String RECEIVED_REQUEST_TEXT            = "received";
 
     public static final int PUBLICATION_MAX_LENGTH              = 400;
 
