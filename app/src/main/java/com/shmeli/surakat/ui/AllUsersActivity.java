@@ -11,6 +11,7 @@ import android.view.View;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.shmeli.surakat.R;
@@ -31,7 +32,9 @@ public class AllUsersActivity extends AppCompatActivity {
 
     private DatabaseReference   usersFBDatabaseRef;
 
-    //private String              selectedUserId = "";
+    private FirebaseAuth        fbAuth;
+
+    private String              currentUserId = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,11 +52,16 @@ public class AllUsersActivity extends AppCompatActivity {
 
         usersFBDatabaseRef  = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_USERS_CHILD);
         usersFBDatabaseRef.keepSynced(true);
+
+        fbAuth              = FirebaseAuth.getInstance();
+        currentUserId       = fbAuth.getCurrentUser().getUid();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+
+        checkUserExists();
 
         FirebaseRecyclerAdapter<User, UserViewHolder> fbAdapter = new FirebaseRecyclerAdapter<User, UserViewHolder>(User.class,
                                                                                                                     R.layout.user_row,
@@ -87,5 +95,32 @@ public class AllUsersActivity extends AppCompatActivity {
         };
 
         allUsersRecyclerVIew.setAdapter(fbAdapter);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        usersFBDatabaseRef.child(currentUserId)
+                .child(CONST.USER_IS_ONLINE).setValue(false);
+    }
+
+    // ------------------------------------------------------------------------ //
+
+    private void checkUserExists() {
+        Log.e("LOG", "AllUsersActivity: checkUserExists()");
+
+        if(fbAuth.getCurrentUser() != null) {
+
+            usersFBDatabaseRef.child(currentUserId)
+                    .child(CONST.USER_IS_ONLINE).setValue(true);
+        }
+        else {
+
+            Intent loginIntent = new Intent(AllUsersActivity.this,
+                                            LoginActivity.class);
+            loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(loginIntent);
+        }
     }
 }

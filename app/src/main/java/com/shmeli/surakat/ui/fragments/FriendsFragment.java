@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -91,8 +92,16 @@ public class FriendsFragment extends Fragment {
                         String userName             = dataSnapshot.child(CONST.USER_NAME).getValue().toString();
                         String userThumbImageUrl    = dataSnapshot.child(CONST.USER_THUMB_IMAGE).getValue().toString();
 
+                        if(dataSnapshot.hasChild(CONST.USER_IS_ONLINE)) {
+                            Boolean userIsOnline = (boolean) dataSnapshot.child(CONST.USER_IS_ONLINE).getValue();
+                            friendsViewHolder.setOnlineStatus(userIsOnline);
+
+                            //Log.e();
+                        }
+
                         friendsViewHolder.setName(userName);
                         friendsViewHolder.setAvatar(userThumbImageUrl);
+
                     }
 
                     @Override

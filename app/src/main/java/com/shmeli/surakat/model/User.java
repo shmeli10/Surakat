@@ -15,6 +15,8 @@ public class User {
     private String userStatus;
     private String userThumbImageUrl;
 
+    private Boolean userIsOnline;
+
     //private String userEmail;
 
     // private boolean isUserOnline;
@@ -26,7 +28,8 @@ public class User {
                 String userName,
                 String userDeviceToken,
                 String userStatus,
-                String userThumbImageUrl) {
+                String userThumbImageUrl,
+                Boolean userIsOnline) {
 
         this.userImageUrl       = userImageUrl;
         this.userName           = userName;
@@ -34,6 +37,9 @@ public class User {
 
         this.userStatus         = userStatus;
         this.userThumbImageUrl  = userThumbImageUrl;
+
+        this.userIsOnline       = userIsOnline;
+
     }
 
     // ------------------------ GETTERS ----------------------------- //
@@ -58,6 +64,10 @@ public class User {
         return userThumbImageUrl;
     }
 
+    public Boolean getUserIsOnline() {
+        return userIsOnline;
+    }
+
     // ------------------------ SETTERS ----------------------------- //
 
     public void setUserImageUrl(String userImageUrl) {
@@ -80,6 +90,9 @@ public class User {
         this.userThumbImageUrl = userThumbImageUrl;
     }
 
+    public void setUserIsOnline(Boolean userIsOnline) {
+        this.userIsOnline = userIsOnline;
+    }
 
     //    public User(int     userId,
 //                String  userName,

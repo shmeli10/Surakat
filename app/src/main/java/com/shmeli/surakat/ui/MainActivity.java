@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 
 import android.view.Menu;
@@ -30,6 +31,7 @@ import com.firebase.client.FirebaseError;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -56,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Firebase                        fbRef;
     private FirebaseAuth                    fbAuth;
+    private FirebaseUser                    fbUser;
     private DatabaseReference               usersFBDatabaseRef;
 
     private FirebaseRecyclerAdapter<User, MainActivity.UserViewHolder> fbAdapter;
@@ -64,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ArrayList<String> userList = new ArrayList<>();
 
-    private String userId           = "";
+    //private String userId           = "";
     private String currentUserId    = "";
 
     @Override
@@ -74,6 +77,14 @@ public class MainActivity extends AppCompatActivity {
 
         fbRef               = new Firebase(CONST.FIREBASE_USERS_LINK);
         fbAuth              = FirebaseAuth.getInstance();
+
+        fbUser              = fbAuth.getCurrentUser();
+
+        if(fbUser != null) {
+            currentUserId = fbUser.getUid();
+        }
+
+        //currentUserId       = fbAuth.getCurrentUser().getUid();
 
         usersFBDatabaseRef  = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_USERS_CHILD);
         usersFBDatabaseRef.keepSynced(true);
@@ -157,13 +168,16 @@ public class MainActivity extends AppCompatActivity {
 //        userRecyclerView.setAdapter(fbAdapter);
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
 
-//    @Override
-//    protected void onStop() {
-//        super.onStop();
-//
-//        usersFBDatabaseRef.child(currentUserId).child(CONST.USER_IS_ONLINE).setValue(false);
-//    }
+        if(!TextUtils.isEmpty(currentUserId)) {
+
+            usersFBDatabaseRef.child(currentUserId)
+                    .child(CONST.USER_IS_ONLINE).setValue(false);
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -297,31 +311,32 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
 
-            Log.e("LOG", "LoginActivity: valueEventListener: (dataSnapshot.hasChild(" +userId+ "): " +(dataSnapshot.hasChild(userId)));
+            Log.e("LOG", "LoginActivity: valueEventListener: (dataSnapshot.hasChild(" +currentUserId+ "): " +(dataSnapshot.hasChild(currentUserId)));
 
-            if(!dataSnapshot.hasChild(userId)) {
+            if(!dataSnapshot.hasChild(currentUserId)) {
 
                 Intent setAccountIntent = new Intent(   MainActivity.this,
                                                         SetAccountActivity.class);
                 setAccountIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(setAccountIntent);
             }
-//            else {
-//
-//                if(fbAuth.getCurrentUser() != null) {
-//
-//                    currentUserId = fbAuth.getCurrentUser().getUid();
-//
-//                    usersFBDatabaseRef.child(currentUserId).child(CONST.USER_IS_ONLINE).setValue(true);
-//                }
-//                else {
-//
-//                    Intent loginIntent = new Intent(MainActivity.this,
-//                                                    LoginActivity.class);
-//                    loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                    startActivity(loginIntent);
-//                }
-//            }
+            else {
+
+                if(fbAuth.getCurrentUser() != null) {
+
+                    //currentUserId = fbAuth.getCurrentUser().getUid();
+
+                    usersFBDatabaseRef.child(currentUserId)
+                            .child(CONST.USER_IS_ONLINE).setValue(true);
+                }
+                else {
+
+                    Intent loginIntent = new Intent(MainActivity.this,
+                                                    LoginActivity.class);
+                    loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(loginIntent);
+                }
+            }
         }
 
         @Override

@@ -34,6 +34,7 @@ import com.google.firebase.storage.UploadTask;
 
 import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
+import com.shmeli.surakat.ui.LoginActivity;
 import com.shmeli.surakat.utils.UiUtils;
 
 import com.squareup.picasso.Callback;
@@ -62,8 +63,11 @@ public class SettingsActivity extends AppCompatActivity {
     private ProgressDialog      progressDialog;
     private Toolbar             settingsPageToolbar;
 
+    private DatabaseReference   rootFBDatabaseRef;
     private DatabaseReference   userFBDatabaseRef;
+    private DatabaseReference   usersFBDatabaseRef;
 
+    //private FirebaseAuth        fbAuth;
     private FirebaseUser        fbCurrentUser;
 
     private StorageReference    fbStorageReference;
@@ -74,7 +78,7 @@ public class SettingsActivity extends AppCompatActivity {
     private String              uploadedImageUrl = "";
     private String              uploadedThumbUrl = "";
 
-    private String              currentUserId;
+    private String              currentUserId = "";
     private String              userImageUrl;
 
     private static final int    GALLERY_PICK = 1;
@@ -83,6 +87,9 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+
+        //fbAuth                  = FirebaseAuth.getInstance();
+        //currentUserId           = fbAuth.getCurrentUser().getUid();
 
         settingsPageToolbar     = UiUtils.findView(this, R.id.settingsPageToolbar);
         setSupportActionBar(settingsPageToolbar);
@@ -104,9 +111,26 @@ public class SettingsActivity extends AppCompatActivity {
 
         fbStorageReference      = FirebaseStorage.getInstance().getReference();
 
-        userFBDatabaseRef       = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_USERS_CHILD).child(currentUserId);
+        rootFBDatabaseRef       = FirebaseDatabase.getInstance().getReference();
+        usersFBDatabaseRef      = rootFBDatabaseRef.child(CONST.FIREBASE_USERS_CHILD);
+
+        userFBDatabaseRef       = usersFBDatabaseRef.child(currentUserId);
         userFBDatabaseRef.keepSynced(true);
         userFBDatabaseRef.addValueEventListener(valueEventListener);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        checkUserExists();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        userFBDatabaseRef.child(CONST.USER_IS_ONLINE).setValue(false);
     }
 
     @Override
@@ -150,6 +174,24 @@ public class SettingsActivity extends AppCompatActivity {
                 Log.e("LOG", "SettingsActivity: onActivityResult(): Crop Image error: " +result.getError().getMessage().toString());
             }
         }
+    }
+
+    // ------------------------------------------------------------------------ //
+
+    private void checkUserExists() {
+        Log.e("LOG", "SettingsActivity: checkUserExists(): fbCurrentUser is null: " +(fbCurrentUser == null));
+
+        if(fbCurrentUser != null) {
+
+            userFBDatabaseRef.child(CONST.USER_IS_ONLINE).setValue(true);
+        }
+//        else {
+//
+//            Intent loginIntent = new Intent(SettingsActivity.this,
+//                                            LoginActivity.class);
+//            loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//            startActivity(loginIntent);
+//        }
     }
 
     private void uploadThumb() {

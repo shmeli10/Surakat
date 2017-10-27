@@ -1,10 +1,12 @@
 package com.shmeli.surakat;
 
 import android.app.Application;
+import android.text.TextUtils;
 
 import com.firebase.client.Firebase;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -21,6 +23,8 @@ import com.squareup.picasso.Picasso;
 public class SurakatApp extends Application {
 
     private DatabaseReference   userFBDatabaseRef;
+
+    private FirebaseUser        fbUser;
 
     private String              currentUserId = "";
 
@@ -43,26 +47,34 @@ public class SurakatApp extends Application {
 
             Picasso.setSingletonInstance(built);
 
-            currentUserId       = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-            userFBDatabaseRef   = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_USERS_CHILD).child(currentUserId);
-
-            userFBDatabaseRef.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-
-                    if(dataSnapshot != null) {
-
-                        userFBDatabaseRef.child(CONST.USER_IS_ONLINE).onDisconnect().setValue(false);
-                        userFBDatabaseRef.child(CONST.USER_IS_ONLINE).setValue(true);
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
+//            fbUser = FirebaseAuth.getInstance().getCurrentUser();
+//
+//            if(fbUser != null) {
+//
+//                currentUserId       = fbUser.getUid();
+//
+//                if(!TextUtils.isEmpty(currentUserId)) {
+//
+//                    userFBDatabaseRef = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_USERS_CHILD).child(currentUserId);
+//
+//                    userFBDatabaseRef.addValueEventListener(new ValueEventListener() {
+//                        @Override
+//                        public void onDataChange(DataSnapshot dataSnapshot) {
+//
+//                            if (dataSnapshot != null) {
+//
+//                                userFBDatabaseRef.child(CONST.USER_IS_ONLINE).onDisconnect().setValue(false);
+//                                //userFBDatabaseRef.child(CONST.USER_IS_ONLINE).setValue(true);
+//                            }
+//                        }
+//
+//                        @Override
+//                        public void onCancelled(DatabaseError databaseError) {
+//
+//                        }
+//                    });
+//                }
+//            }
         }
     }
 }

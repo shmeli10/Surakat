@@ -3,6 +3,7 @@ package com.shmeli.surakat.holders;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.shmeli.surakat.R;
@@ -28,6 +29,8 @@ public class FriendsViewHolder extends RecyclerView.ViewHolder {
 
     private CircleImageView userAvatar;
 
+    private ImageView       userStatusImageView;
+
     private String imageUrl = "";
 
     public FriendsViewHolder(View itemView) {
@@ -38,6 +41,7 @@ public class FriendsViewHolder extends RecyclerView.ViewHolder {
         userNameTextView    = UiUtils.findView(itemView, R.id.userRowName);
         userStatusTextView  = UiUtils.findView(itemView, R.id.userRowStatus);
         userAvatar          = UiUtils.findView(itemView, R.id.userRowAvatar);
+        userStatusImageView = UiUtils.findView(itemView, R.id.userRowStatusImageView);
     }
 
     public void setName(String userName) {
@@ -68,6 +72,16 @@ public class FriendsViewHolder extends RecyclerView.ViewHolder {
                     .placeholder(R.drawable.default_avatar)
                     .into(  userAvatar,
                             loadImageCallback);
+        }
+    }
+
+    public void setOnlineStatus(boolean isUserOnline) {
+
+        if(isUserOnline) {
+            userStatusImageView.setVisibility(View.VISIBLE);
+        }
+        else {
+            userStatusImageView.setVisibility(View.INVISIBLE);
         }
     }
 
