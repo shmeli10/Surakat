@@ -1,76 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/chatContainer"
     style="@style/MM"
-    tools:context="com.shmeli.surakat.ui.MainActivity"
-    android:padding="@dimen/spacing_2x">
+    android:theme="@style/Base.ThemeOverlay.AppCompat.Dark.ActionBar"
+    tools:context="com.shmeli.surakat.ui.MainActivity">
 
-    <EditText
-        android:id="@+id/messageEditText"
-        style="@style/MW"
-        android:inputType="textMultiLine"
-        android:lines="3"
-        android:maxLength="@integer/message_length"
-        android:ems="10"
-        android:gravity="top|left"
-        android:padding="@dimen/spacing_1x"
-        android:selectAllOnFocus="false"
-        android:background="@drawable/input_outline"
-        android:textColor="@color/colorPrimaryDark"
-        android:textSize="@dimen/text_size_1.5x"
-        android:textColorHint="@color/colorPrimary"
-        android:hint="@string/hint_type_message"/>
-    <TextView
-        android:id="@+id/messageLeftCharsHeadTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/messageEditText"
-        android:textSize="@dimen/text_size_1.5x"
-        android:textColor="@color/colorPrimary"
-        android:text="@string/text_left_characters_head"/>
-    <TextView
-        android:id="@+id/messageLeftCharsBodyTextView"
-        style="@style/WW"
-        android:layout_below="@+id/messageEditText"
-        android:layout_toRightOf="@+id/messageLeftCharsHeadTextView"
-        android:layout_marginLeft="@dimen/spacing_1x"
-        android:textColor="@color/colorAccent"
-        android:textStyle="bold"
-        android:textSize="@dimen/text_size_1.5x"
-        android:text="0"/>
-    <TextView
-        android:id="@+id/messageLeftCharactersTail"
-        style="@style/WW"
-        android:layout_below="@+id/messageEditText"
-        android:layout_toRightOf="@+id/messageLeftCharsBodyTextView"
-        android:layout_marginLeft="@dimen/spacing_1x"
-        android:textSize="@dimen/text_size_1.5x"
-        android:textColor="@color/colorPrimary"
-        android:text="@string/text_left_characters_tail"/>
-    <Button
-        android:id="@+id/sendButton"
-        style="@style/MW"
-        android:layout_below="@+id/messageLeftCharsHeadTextView"
-        android:layout_marginTop="@dimen/spacing_1x"
-        android:background="@drawable/button_green"
-        android:textSize="@dimen/text_size_1.5x"
-        android:textColor="@color/colorPrimary"
-        android:text="@string/button_send"/>
+    <include
+        layout="@layout/app_bar"
+        android:id="@+id/chatPageToolbar"/>
 
-    <View
-        android:id="@+id/chatTopDividerView"
-        style="@style/HLine"
-        android:layout_below="@+id/sendButton"
-        android:layout_marginTop="5dp"
-        android:background="@color/colorPrimary"
-        android:visibility="gone"/>
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/messagesRecyclerView"
+    <LinearLayout
         style="@style/MM"
-        android:layout_below="@+id/chatTopDividerView"/>
+        android:orientation="vertical"
+        android:padding="@dimen/spacing_2x"
+        android:layout_below="@+id/chatPageToolbar">
+
+        <EditText
+            android:id="@+id/messageEditText"
+            style="@style/MW"
+            android:inputType="textMultiLine"
+            android:lines="3"
+            android:maxLength="@integer/message_length"
+            android:ems="10"
+            android:gravity="top|left"
+            android:padding="@dimen/spacing_1x"
+            android:selectAllOnFocus="false"
+            android:background="@drawable/input_outline"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="@dimen/text_size_1.5x"
+            android:textColorHint="@color/colorPrimary"
+            android:hint="@string/hint_type_message"/>
+        <LinearLayout
+            style="@style/MW"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/messageLeftCharsHeadTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/text_size_1.5x"
+                android:textColor="@color/colorPrimary"
+                android:text="@string/text_left_characters_head"/>
+            <TextView
+                android:id="@+id/messageLeftCharsBodyTextView"
+                style="@style/WW"
+                android:layout_marginLeft="@dimen/spacing_1x"
+                android:textColor="@color/colorAccent"
+                android:textStyle="bold"
+                android:textSize="@dimen/text_size_1.5x"
+                android:text="0"/>
+            <TextView
+                android:id="@+id/messageLeftCharactersTail"
+                style="@style/WW"
+                android:layout_marginLeft="@dimen/spacing_1x"
+                android:textSize="@dimen/text_size_1.5x"
+                android:textColor="@color/colorPrimary"
+                android:text="@string/text_left_characters_tail"/>
+
+        </LinearLayout>
+        <Button
+            android:id="@+id/sendButton"
+            style="@style/MW"
+            android:layout_below="@+id/messageLeftCharsHeadTextView"
+            android:layout_marginTop="@dimen/spacing_1x"
+            android:background="@drawable/button_green"
+            android:textSize="@dimen/text_size_1.5x"
+            android:textColor="@color/colorPrimary"
+            android:text="@string/button_send"/>
+
+        <View
+            android:id="@+id/chatTopDividerView"
+            style="@style/HLine"
+            android:layout_below="@+id/sendButton"
+            android:layout_marginTop="5dp"
+            android:background="@color/colorPrimary"
+            android:visibility="gone"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/messagesRecyclerView"
+            style="@style/MM"
+            android:layout_below="@+id/chatTopDividerView"/>
+
+    </LinearLayout>
 
 </RelativeLayout>

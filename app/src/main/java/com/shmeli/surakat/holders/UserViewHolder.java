@@ -81,7 +81,7 @@ public class UserViewHolder extends RecyclerView.ViewHolder {
             Picasso.with(itemView.getContext())
                     .load(imageUrl)
                     .placeholder(R.drawable.default_avatar)
-                    .into(userAvatar);;
+                    .into(userAvatar);
         }
     };
 }

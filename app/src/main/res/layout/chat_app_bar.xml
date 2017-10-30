@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/chatAppToolbar"
+    style="@style/MM"
+    android:background="@color/colorPrimary">
+
+    <TextView
+        android:id="@+id/chatAppToolbarUserName"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/avatar_chat_size"
+        android:layout_toLeftOf="@+id/chatAppToolbarAvatar"
+        android:gravity="center_vertical"
+        android:textSize="@dimen/text_size_2.5x"
+        android:textColor="@color/white"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/chatAppToolbarLastSeen"
+        style="@style/WW"
+        android:layout_below="@+id/chatAppToolbarUserName"
+        android:layout_toLeftOf="@+id/chatAppToolbarAvatar"
+        android:layout_marginTop="@dimen/spacing_2x"
+        android:textSize="@dimen/text_size_2.0x"
+        android:textColor="@color/white"
+        android:visibility="gone"/>
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/chatAppToolbarAvatar"
+        android:layout_width="@dimen/avatar_chat_size"
+        android:layout_height="@dimen/avatar_chat_size"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="@dimen/spacing_2x"
+        android:src="@drawable/default_avatar"/>
+
+</RelativeLayout>
+
+<!--<android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--android:id="@+id/appToolbar"-->
+    <!--style="@style/MW"-->
+    <!--android:background="@color/colorPrimary"-->
+    <!--android:theme="@style/Base.ThemeOverlay.AppCompat.Dark.ActionBar">-->
+
+
+<!--</android.support.v7.widget.Toolbar>-->

@@ -18,6 +18,7 @@
 
     <dimen name="avatar_big_size">170dp</dimen>
     <dimen name="avatar_small_size">64dp</dimen>
+    <dimen name="avatar_chat_size">36dp</dimen>
 
     <dimen name="input_outline_size">1dp</dimen>
 

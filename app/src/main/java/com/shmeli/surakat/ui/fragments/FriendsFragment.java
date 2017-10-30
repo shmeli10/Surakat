@@ -1,6 +1,9 @@
 package com.shmeli.surakat.ui.fragments;
 
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -21,6 +24,9 @@ import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
 import com.shmeli.surakat.holders.FriendsViewHolder;
 import com.shmeli.surakat.model.Friends;
+import com.shmeli.surakat.ui.ChatActivity;
+import com.shmeli.surakat.ui.MainActivity;
+import com.shmeli.surakat.ui.ProfileActivity;
 import com.shmeli.surakat.utils.UiUtils;
 
 /**
@@ -35,7 +41,10 @@ public class FriendsFragment extends Fragment {
     private DatabaseReference   friendsFBDatabaseRef;
     private DatabaseReference   usersFBDatabaseRef;
 
-    private String              currentUserId = "";
+    private String              currentUserId           = "";
+    private String              selectedUserId          = "";
+    private String              selectedUserName        = "";
+    private String              selectedUserThumbImage  = "";
 
     public FriendsFragment() {
         // Required empty public constructor
@@ -83,14 +92,17 @@ public class FriendsFragment extends Fragment {
 
                 friendsViewHolder.setDate(model.getDate());
 
-                String listUserId = getRef(position).getKey();
+                //String listUserId = getRef(position).getKey();
+                selectedUserId = getRef(position).getKey();
 
-                usersFBDatabaseRef.child(listUserId).addListenerForSingleValueEvent(new ValueEventListener() {
+                usersFBDatabaseRef.child(selectedUserId).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
-                        String userName             = dataSnapshot.child(CONST.USER_NAME).getValue().toString();
-                        String userThumbImageUrl    = dataSnapshot.child(CONST.USER_THUMB_IMAGE).getValue().toString();
+                        //String userName             = dataSnapshot.child(CONST.USER_NAME).getValue().toString();
+                        selectedUserName        = dataSnapshot.child(CONST.USER_NAME).getValue().toString();
+                        //String userThumbImageUrl    = dataSnapshot.child(CONST.USER_THUMB_IMAGE).getValue().toString();
+                        selectedUserThumbImage  = dataSnapshot.child(CONST.USER_THUMB_IMAGE).getValue().toString();
 
                         if(dataSnapshot.hasChild(CONST.USER_IS_ONLINE)) {
                             Boolean userIsOnline = (boolean) dataSnapshot.child(CONST.USER_IS_ONLINE).getValue();
@@ -99,8 +111,10 @@ public class FriendsFragment extends Fragment {
                             //Log.e();
                         }
 
-                        friendsViewHolder.setName(userName);
-                        friendsViewHolder.setAvatar(userThumbImageUrl);
+                        friendsViewHolder.setName(selectedUserName);
+                        friendsViewHolder.setAvatar(selectedUserThumbImage);
+
+                        friendsViewHolder.itemView.setOnClickListener(friendClickListener);
 
                     }
 
@@ -117,4 +131,51 @@ public class FriendsFragment extends Fragment {
 
     // ------------------------ VALUE EVENT LISTENERS ------------------------------------ //
 
+    View.OnClickListener friendClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
+            String openProfileText      = getResources().getString(R.string.text_open_profile);
+            String sendMessageText      = getResources().getString(R.string.text_send_message);
+            String selectOptionsText    = getResources().getString(R.string.text_select_options);
+
+            CharSequence[] optionsArr = new CharSequence[] {openProfileText, sendMessageText};
+
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
+            alertDialogBuilder.setTitle(selectOptionsText);
+            alertDialogBuilder.setItems(optionsArr,
+                                        optionClickListener);
+            alertDialogBuilder.show();
+
+        }
+    };
+
+    DialogInterface.OnClickListener optionClickListener = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog,
+                            int             which) {
+
+            switch(which) {
+
+                case CONST.OPEN_PROFILE_TYPE:
+                    Intent profileIntent = new Intent(  getContext(),
+                                                        ProfileActivity.class);
+                    profileIntent.putExtra( CONST.USER_ID,
+                                            selectedUserId);
+                    startActivity(profileIntent);
+                    break;
+                case CONST.SEND_MESSAGE_TYPE:
+                    Intent chatIntent = new Intent( getContext(),
+                                                    ChatActivity.class);
+                    chatIntent.putExtra(CONST.USER_ID,
+                                        selectedUserId);
+                    chatIntent.putExtra(CONST.USER_NAME,
+                                        selectedUserName);
+                    chatIntent.putExtra(CONST.USER_THUMB_IMAGE,
+                                        selectedUserThumbImage);
+                    startActivity(chatIntent);
+                    break;
+            }
+        }
+    };
 }

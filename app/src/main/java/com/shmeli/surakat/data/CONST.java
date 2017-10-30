@@ -37,13 +37,15 @@ public class CONST {
 
     public static final String NOTIFICATION_REQUEST_TYPE        = "request";
 
+    public static final String USER_DEVICE_TOKEN                = "userDeviceToken";
     public static final String USER_ID                          = "userId";
     public static final String USER_IMAGE                       = "userImageUrl";
+    public static final String USER_IS_ONLINE                   = "userIsOnline";
+    public static final String USER_LAST_SEEN                   = "userLastSeen";
     public static final String USER_NAME                        = "userName";
-    public static final String USER_DEVICE_TOKEN                = "userDeviceToken";
+
     public static final String USER_STATUS                      = "userStatus";
     public static final String USER_THUMB_IMAGE                 = "userThumbImageUrl";
-    public static final String USER_IS_ONLINE                   = "userIsOnline";
 
     public static final String NO_DATE_TEXT                     = "No date";
     public static final String NO_NAME_TEXT                     = "No name";
@@ -61,4 +63,6 @@ public class CONST {
     public static final int RECEIVED_REQUEST_STATE              = 2;
     public static final int SENT_REQUEST_STATE                  = 1;
 
+    public static final int OPEN_PROFILE_TYPE                   = 0;
+    public static final int SEND_MESSAGE_TYPE                   = 1;
 }

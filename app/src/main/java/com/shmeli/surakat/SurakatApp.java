@@ -1,7 +1,9 @@
 package com.shmeli.surakat;
 
 import android.app.Application;
+import android.content.Intent;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.firebase.client.Firebase;
 import com.google.firebase.FirebaseApp;
@@ -11,8 +13,10 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.shmeli.surakat.data.CONST;
+import com.shmeli.surakat.ui.SetAccountActivity;
 import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
 
@@ -22,9 +26,10 @@ import com.squareup.picasso.Picasso;
 
 public class SurakatApp extends Application {
 
-    private DatabaseReference   userFBDatabaseRef;
+    private FirebaseAuth        fbAuth;
+    private DatabaseReference   currentUserFBDatabaseRef;
 
-    private FirebaseUser        fbUser;
+    //private FirebaseUser        fbUser;
 
     private String              currentUserId = "";
 
@@ -46,6 +51,21 @@ public class SurakatApp extends Application {
             built.setLoggingEnabled(true);
 
             Picasso.setSingletonInstance(built);
+
+//            fbAuth = FirebaseAuth.getInstance();
+//
+//            if(fbAuth.getCurrentUser() != null) {
+//
+//                currentUserId = fbAuth.getCurrentUser().getUid();
+//
+//                if(!TextUtils.isEmpty(currentUserId)) {
+//
+//                    currentUserFBDatabaseRef = FirebaseDatabase.getInstance().getReference().child(currentUserId);
+//                    currentUserFBDatabaseRef.addListenerForSingleValueEvent(currentUserDataListener);
+//                }
+//                else
+//                    Log.e("LOG", "SurakatApp: onCreate(): get current user id error");
+//            }
 
 //            fbUser = FirebaseAuth.getInstance().getCurrentUser();
 //
@@ -77,4 +97,25 @@ public class SurakatApp extends Application {
 //            }
         }
     }
+
+    // ------------------------------ LISTENERS ----------------------------------------- //
+
+    ValueEventListener currentUserDataListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
+
+            //Log.e("LOG", "SurakatApp: currentUserDataListener: dataSnapshot is null: " +(dataSnapshot  == null));
+
+            if(dataSnapshot != null) {
+
+                currentUserFBDatabaseRef.child(CONST.USER_IS_ONLINE).onDisconnect().setValue(false);
+                currentUserFBDatabaseRef.child(CONST.USER_LAST_SEEN).setValue(ServerValue.TIMESTAMP);
+            }
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) { }
+    };
+
+
 }
