@@ -26,8 +26,8 @@ import com.squareup.picasso.Picasso;
 
 public class SurakatApp extends Application {
 
-    private FirebaseAuth        fbAuth;
-    private DatabaseReference   currentUserFBDatabaseRef;
+//    private FirebaseAuth        fbAuth;
+//    private DatabaseReference   currentUserFBDatabaseRef;
 
     //private FirebaseUser        fbUser;
 
@@ -100,22 +100,22 @@ public class SurakatApp extends Application {
 
     // ------------------------------ LISTENERS ----------------------------------------- //
 
-    ValueEventListener currentUserDataListener = new ValueEventListener() {
-        @Override
-        public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
-
-            //Log.e("LOG", "SurakatApp: currentUserDataListener: dataSnapshot is null: " +(dataSnapshot  == null));
-
-            if(dataSnapshot != null) {
-
-                currentUserFBDatabaseRef.child(CONST.USER_IS_ONLINE).onDisconnect().setValue(false);
-                currentUserFBDatabaseRef.child(CONST.USER_LAST_SEEN).setValue(ServerValue.TIMESTAMP);
-            }
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) { }
-    };
+//    ValueEventListener currentUserDataListener = new ValueEventListener() {
+//        @Override
+//        public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
+//
+//            //Log.e("LOG", "SurakatApp: currentUserDataListener: dataSnapshot is null: " +(dataSnapshot  == null));
+//
+//            if(dataSnapshot != null) {
+//
+//                currentUserFBDatabaseRef.child(CONST.USER_IS_ONLINE).onDisconnect().setValue(false);
+//                currentUserFBDatabaseRef.child(CONST.USER_LAST_SEEN).setValue(ServerValue.TIMESTAMP);
+//            }
+//        }
+//
+//        @Override
+//        public void onCancelled(DatabaseError databaseError) { }
+//    };
 
 
 }
