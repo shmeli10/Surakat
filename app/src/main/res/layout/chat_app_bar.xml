@@ -3,27 +3,26 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/chatAppToolbar"
     style="@style/MM"
+    android:paddingTop="@dimen/spacing_1x"
     android:background="@color/colorPrimary">
 
     <TextView
         android:id="@+id/chatAppToolbarUserName"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/avatar_chat_size"
+        style="@style/MW"
         android:layout_toLeftOf="@+id/chatAppToolbarAvatar"
-        android:gravity="center_vertical"
+        android:gravity="bottom"
         android:textSize="@dimen/text_size_2.5x"
         android:textColor="@color/white"
-        android:textStyle="bold"/>
+        android:textStyle="bold"
+        android:text="user_1"/>
 
     <TextView
         android:id="@+id/chatAppToolbarLastSeen"
         style="@style/WW"
         android:layout_below="@+id/chatAppToolbarUserName"
-        android:layout_toLeftOf="@+id/chatAppToolbarAvatar"
-        android:layout_marginTop="@dimen/spacing_2x"
         android:textSize="@dimen/text_size_2.0x"
         android:textColor="@color/white"
-        android:visibility="gone"/>
+        android:text="online"/>
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/chatAppToolbarAvatar"

@@ -8,10 +8,12 @@ public class CONST {
 
     public static final String FIREBASE_BASE_LINK               = "https://surakat-80b2e.firebaseio.com";
 
+    public static final String FIREBASE_CHAT_CHILD              = "Chat";
+
     public static final String FIREBASE_FRIENDS_CHILD           = "Friends";
 
     public static final String FIREBASE_MESSAGES_CHILD          = "Messages";
-    public static final String FIREBASE_MESSAGES_LINK           = FIREBASE_BASE_LINK + "/" + FIREBASE_MESSAGES_CHILD;
+    //public static final String FIREBASE_MESSAGES_LINK           = FIREBASE_BASE_LINK + "/" + FIREBASE_MESSAGES_CHILD;
 
     public static final String FIREBASE_NOTIFICATIONS_CHILD     = "Notifications";
 
@@ -36,6 +38,18 @@ public class CONST {
     public static final String NOTIFICATION_TYPE                = "type";
 
     public static final String NOTIFICATION_REQUEST_TYPE        = "request";
+
+    public static final String CHAT_SEEN                        = "seen";
+    public static final String CHAT_TIMESTAMP                   = "timeStamp";
+    public static final String CHAT_KEY                         = "Chat/";
+
+    public static final String MESSAGES_KEY                     = FIREBASE_MESSAGES_CHILD + "/";
+    public static final String MESSAGE_KEY                      = "message";
+    public static final String MESSAGE_IS_SEEN                  = "messageIsSeen";
+    public static final String MESSAGE_TYPE                     = "messageType";
+    public static final String MESSAGE_TIME                     = "messageTime";
+
+    public static final String MESSAGE_TEXT_TYPE                = "text";
 
     public static final String USER_DEVICE_TOKEN                = "userDeviceToken";
     public static final String USER_ID                          = "userId";

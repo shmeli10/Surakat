@@ -190,11 +190,11 @@ public class MainActivity extends AppCompatActivity {
         Log.e("LOG", "MainActivity: onStop()");
 
         //if(!TextUtils.isEmpty(currentUserId)) {
-        //if(fbAuth.getCurrentUser() != null) {
-        if(currentUserFBDatabaseRef != null) {
-            currentUserFBDatabaseRef.child(CONST.USER_IS_ONLINE).setValue(false);
-            currentUserFBDatabaseRef.child(CONST.USER_LAST_SEEN).setValue(ServerValue.TIMESTAMP);
-        }
+//        if(fbAuth.getCurrentUser() != null) {
+//        //if(currentUserFBDatabaseRef != null) {
+//            currentUserFBDatabaseRef.child(CONST.USER_IS_ONLINE).setValue(false);
+//            currentUserFBDatabaseRef.child(CONST.USER_LAST_SEEN).setValue(ServerValue.TIMESTAMP);
+//        }
     }
 
     @Override
@@ -256,10 +256,12 @@ public class MainActivity extends AppCompatActivity {
                 currentUserFBDatabaseRef    = usersFBDatabaseRef.child(currentUserId);
                 //currentUserFBDatabaseRef.addListenerForSingleValueEvent(currentUserDataListener);
 
-                Log.e("LOG", "MainActivity: init(): currentUserFBDatabaseRef is null: " + (currentUserFBDatabaseRef == null));
+                //Log.e("LOG", "MainActivity: init(): currentUserFBDatabaseRef is null: " + (currentUserFBDatabaseRef == null));
+                Log.e("LOG", "MainActivity: init(): fbAuth.getCurrentUser() is null: " + (fbAuth.getCurrentUser() == null));
 
-                if(currentUserFBDatabaseRef != null) {
-                    Log.e("LOG", "MainActivity: init(): currentUserFBDatabaseRef: " + currentUserFBDatabaseRef);
+                //if(currentUserFBDatabaseRef != null) {
+                if(fbAuth.getCurrentUser() != null) {
+                    //Log.e("LOG", "MainActivity: init(): currentUserFBDatabaseRef: " + currentUserFBDatabaseRef);
                     currentUserFBDatabaseRef.child(CONST.USER_IS_ONLINE).setValue(true);
                 }
                 else {
