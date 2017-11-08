@@ -9,12 +9,15 @@
 
     <dimen name="text_size_1.0x">8dp</dimen>
     <dimen name="text_size_1.5x">12dp</dimen>
+    <dimen name="text_size_1.75x">14dp</dimen>
     <dimen name="text_size_2.0x">16dp</dimen>
     <dimen name="text_size_2.5x">20dp</dimen>
     <dimen name="text_size_3.0x">24dp</dimen>
     <dimen name="text_size_3.5x">28dp</dimen>
 
     <dimen name="logo_size">125dp</dimen>
+
+    <dimen name="message_row_corner_radius">30dp</dimen>
 
     <dimen name="avatar_big_size">170dp</dimen>
     <dimen name="avatar_small_size">64dp</dimen>

@@ -44,10 +44,11 @@ public class CONST {
     public static final String CHAT_KEY                         = "Chat/";
 
     public static final String MESSAGES_KEY                     = FIREBASE_MESSAGES_CHILD + "/";
-    public static final String MESSAGE_KEY                      = "message";
+    public static final String MESSAGE_TEXT                     = "messageText";
     public static final String MESSAGE_IS_SEEN                  = "messageIsSeen";
     public static final String MESSAGE_TYPE                     = "messageType";
-    public static final String MESSAGE_TIME                     = "messageTime";
+    public static final String MESSAGE_CREATE_TIME              = "messageCreateTime";
+    public static final String MESSAGE_AUTHOR_ID                = "messageAuthorId";
 
     public static final String MESSAGE_TEXT_TYPE                = "text";
 
@@ -79,4 +80,6 @@ public class CONST {
 
     public static final int OPEN_PROFILE_TYPE                   = 0;
     public static final int SEND_MESSAGE_TYPE                   = 1;
+
+    public static final int LOAD_MESSAGES_COUNT                 = 2;
 }

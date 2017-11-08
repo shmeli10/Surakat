@@ -4,11 +4,9 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
@@ -23,21 +21,14 @@ import android.view.View;
 
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.firebase.client.ChildEventListener;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
 
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -46,6 +37,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.shmeli.surakat.R;
+import com.shmeli.surakat.adapters.MessageAdapter;
 import com.shmeli.surakat.data.CONST;
 import com.shmeli.surakat.model.Message;
 import com.shmeli.surakat.utils.GetTimeAgo;
@@ -55,8 +47,8 @@ import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -82,27 +74,34 @@ public class ChatActivity extends AppCompatActivity {
     private Button                  sendButton;
     private RecyclerView            messagesRecyclerView;
 
+    private SwipeRefreshLayout      chatSwipeRefreshLayout;
+
     private RelativeLayout          chatContainer;
 
     //private Firebase                fbRef;
     private FirebaseAuth            fbAuth;
     //private FirebaseUser            fbCurrentUser;
 
-    private FirebaseRecyclerAdapter<Message, MessageViewHolder> fbAdapter;
-
-    private DatabaseReference       messagesDatabaseRef;
+//    private FirebaseRecyclerAdapter<Message, MessageViewHolder> fbAdapter;
 
     private DatabaseReference       chatFBDatabaseRef;
-    private DatabaseReference       senderFBDatabaseRef;
-    private DatabaseReference       rootFBDatabaseRef;
+    private DatabaseReference       messagesDatabaseRef;
     private DatabaseReference       recipientFBDatabaseRef;
+    private DatabaseReference       rootFBDatabaseRef;
+    private DatabaseReference       senderFBDatabaseRef;
     private DatabaseReference       usersFBDatabaseRef;
 
     private Query                   messagesQuery;
 
 //    private ArrayList<String>       messageList = new ArrayList<>();
 
+    private Intent                  intent;
+
     private ProgressDialog          progressDialog;
+
+    private List<Message>           messagesList = new ArrayList<>();
+    private LinearLayoutManager     linearLayoutManager;
+    private MessageAdapter          messageAdapter;
 
     private boolean chatTopDividerIsVisible;
     private boolean canIncreaseMessagesSum = true;
@@ -116,9 +115,15 @@ public class ChatActivity extends AppCompatActivity {
     private String recipientName        = "";
     private String recipientThumbImage  = "";
 
+    private String lastLoadedMessageKey = "";
+
     private boolean recipientIsOnline   = false;
 
     private int chatMessagesSum = 0;
+
+    private int currentPageCount = 1;
+
+    private int loadMoreItemPosition = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,6 +131,8 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
         setChatToolbar();
+
+        init();
 
 //        chatPageToolbar     = UiUtils.findView(this, R.id.chatPageToolbar);
 //        setSupportActionBar(chatPageToolbar);
@@ -155,9 +162,19 @@ public class ChatActivity extends AppCompatActivity {
         sendButton                      = UiUtils.findView(this, R.id.sendButton);
         sendButton.setOnClickListener(sendClickListener);
 
+        messageAdapter                  = new MessageAdapter(   getApplicationContext(),
+                                                                messagesList);
+
         messagesRecyclerView            = UiUtils.findView(this, R.id.messagesRecyclerView);
-        //messagesRecyclerView.setHasFixedSize(true);
-        messagesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        messagesRecyclerView.setHasFixedSize(true);
+        //messagesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        linearLayoutManager             = new LinearLayoutManager(this);
+        messagesRecyclerView.setLayoutManager(linearLayoutManager);
+        messagesRecyclerView.setAdapter(messageAdapter);
+
+        chatSwipeRefreshLayout          = UiUtils.findView(this, R.id.chatSwipeRefreshLayout);
+        chatSwipeRefreshLayout.setOnRefreshListener(swipeRefreshListener);
 
         chatContainer                   = UiUtils.findView(this, R.id.chatContainer);
 
@@ -174,7 +191,9 @@ public class ChatActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        init();
+        checkUser();
+
+        //init();
 
 //        Intent intent = getIntent();
 //
@@ -253,14 +272,30 @@ public class ChatActivity extends AppCompatActivity {
 
         Log.e("LOG", "ChatActivity: onStop()");
 
-        Log.e("LOG", "ChatActivity: onStop(): fbAuth.getCurrentUser() is null: " + (fbAuth.getCurrentUser() == null));
+        FirebaseUser currentUser = fbAuth.getCurrentUser();
 
-        //if(!TextUtils.isEmpty(currentUserId)) {
-        if(fbAuth.getCurrentUser() != null) {
-        //if(senderFBDatabaseRef != null) {
-            senderFBDatabaseRef.child(CONST.USER_IS_ONLINE).setValue(false);
-            senderFBDatabaseRef.child(CONST.USER_LAST_SEEN).setValue(ServerValue.TIMESTAMP);
+        if(currentUser != null) {
+
+            if(senderFBDatabaseRef != null) {
+
+                senderFBDatabaseRef.child(CONST.USER_IS_ONLINE).setValue(false);
+                senderFBDatabaseRef.child(CONST.USER_LAST_SEEN).setValue(ServerValue.TIMESTAMP);
+            }
+            else {
+                goToSetAccountActivity();
+            }
         }
+
+//        Log.e("LOG", "ChatActivity: onStop()");
+//
+//        Log.e("LOG", "ChatActivity: onStop(): fbAuth.getCurrentUser() is null: " + (fbAuth.getCurrentUser() == null));
+//
+//        //if(!TextUtils.isEmpty(currentUserId)) {
+//        if(fbAuth.getCurrentUser() != null) {
+//        //if(senderFBDatabaseRef != null) {
+//            senderFBDatabaseRef.child(CONST.USER_IS_ONLINE).setValue(false);
+//            senderFBDatabaseRef.child(CONST.USER_LAST_SEEN).setValue(ServerValue.TIMESTAMP);
+//        }
     }
 
     // ----------------------- OTHER ------------------------------------ //
@@ -323,7 +358,7 @@ public class ChatActivity extends AppCompatActivity {
         }
     };
 
-    private void showChatMessages() {
+//    private void showChatMessages() {
 
         /*final String currentUserKey = fbAuth.getCurrentUser().getUid();
 
@@ -397,9 +432,9 @@ public class ChatActivity extends AppCompatActivity {
 
             Log.e("LOG", "ChatActivity: showChatMessages(): RETURN BACK");
         }*/
-    }
+//    }
 
-    public static class MessageViewHolder extends RecyclerView.ViewHolder {
+/*    public static class MessageViewHolder extends RecyclerView.ViewHolder {
 
         View            view;
 
@@ -439,7 +474,7 @@ public class ChatActivity extends AppCompatActivity {
             messageContainer.setVisibility(View.GONE);
             messageCardView.setVisibility(View.GONE);
         }
-    }
+    }*/
 
     private void startSendMessage() {
 
@@ -456,10 +491,11 @@ public class ChatActivity extends AppCompatActivity {
             if(!TextUtils.isEmpty(pushedMessageId)) {
 
                 Map messageMap = new HashMap();
-                messageMap.put(CONST.MESSAGE_KEY,       messageText);
-                messageMap.put(CONST.MESSAGE_IS_SEEN,   false);
-                messageMap.put(CONST.MESSAGE_TYPE,      CONST.MESSAGE_TEXT_TYPE);
-                messageMap.put(CONST.MESSAGE_TIME,      ServerValue.TIMESTAMP);
+                messageMap.put(CONST.MESSAGE_TEXT,          messageText);
+                messageMap.put(CONST.MESSAGE_IS_SEEN,       false);
+                messageMap.put(CONST.MESSAGE_TYPE,          CONST.MESSAGE_TEXT_TYPE);
+                messageMap.put(CONST.MESSAGE_CREATE_TIME,   ServerValue.TIMESTAMP);
+                messageMap.put(CONST.MESSAGE_AUTHOR_ID,     senderId);
 
                 StringBuilder mapKeySB  = new StringBuilder();
                 Map messageUserMap      = new HashMap();
@@ -479,6 +515,8 @@ public class ChatActivity extends AppCompatActivity {
                 mapKeySB.append(senderId);
                 mapKeySB.append("/");
                 messageUserMap.put(mapKeySB + pushedMessageId, messageMap);
+
+                messageEditText.setText("");
 
                 rootFBDatabaseRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener() {
                     @Override
@@ -593,9 +631,16 @@ public class ChatActivity extends AppCompatActivity {
     private void init() {
         Log.e("LOG", "ChatActivity: init()");
 
+        rootFBDatabaseRef   = FirebaseDatabase.getInstance().getReference();
+        usersFBDatabaseRef  = rootFBDatabaseRef.child(CONST.FIREBASE_USERS_CHILD);
+
+        fbAuth              = FirebaseAuth.getInstance();
+
+        intent              = getIntent();
+
 //        boolean errorOccured = false;
 
-        fbAuth = FirebaseAuth.getInstance();
+        /*fbAuth = FirebaseAuth.getInstance();
 
         Intent intent = getIntent();
 
@@ -686,7 +731,7 @@ public class ChatActivity extends AppCompatActivity {
                                             LoginActivity.class);
             loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(loginIntent);
-        }
+        }*/
 
 //        if(intent != null) {
             //selectedRecipientKey = intent.getStringExtra("userKey");
@@ -716,6 +761,189 @@ public class ChatActivity extends AppCompatActivity {
 
 //            showChatMessages();
 //        }
+    }
+
+    private void initSender() {
+        Log.e("LOG", "ChatActivity: initSender()");
+
+        senderId = fbAuth.getCurrentUser().getUid();
+
+        if(!TextUtils.isEmpty(senderId)) {
+
+            chatFBDatabaseRef = rootFBDatabaseRef.child(CONST.FIREBASE_CHAT_CHILD).child(senderId);
+            chatFBDatabaseRef.addValueEventListener(chatDataListener);
+
+            senderFBDatabaseRef = usersFBDatabaseRef.child(senderId);
+
+            if(senderFBDatabaseRef != null) {
+                senderFBDatabaseRef.child(CONST.USER_IS_ONLINE).setValue(true);
+
+                initRecipient();
+            }
+            else {
+
+                goToSetAccountActivity();
+
+//                Log.e("LOG", "MainActivity: checkUser(): go to SetAccountActivity");
+//
+//                Intent setAccountIntent = new Intent(   MainActivity.this,
+//                                                        SetAccountActivity.class);
+//                setAccountIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                startActivity(setAccountIntent);
+//                finish();
+            }
+
+            //currentUserFBDatabaseRef.addListenerForSingleValueEvent(currentUserDataListener);
+
+            //Log.e("LOG", "MainActivity: init(): currentUserFBDatabaseRef is null: " + (currentUserFBDatabaseRef == null));
+            //Log.e("LOG", "MainActivity: initUser(): fbAuth.getCurrentUser() is null: " + (fbAuth.getCurrentUser() == null));
+
+//            if(currentUserFBDatabaseRef != null) {
+//                //if(fbAuth.getCurrentUser() != null) {
+//                //Log.e("LOG", "MainActivity: init(): currentUserFBDatabaseRef: " + currentUserFBDatabaseRef);
+//                currentUserFBDatabaseRef.child(CONST.USER_IS_ONLINE).setValue(true);
+//            }
+//            else {
+//
+//                Log.e("LOG", "MainActivity: init(): go to SetAccountActivity");
+//
+//                Intent setAccountIntent = new Intent(   MainActivity.this,
+//                        SetAccountActivity.class);
+//                setAccountIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                startActivity(setAccountIntent);
+//            }
+        }
+        else
+            Log.e("LOG", "ChatActivity: initSender(): get current user id error!");
+    }
+
+    private void initRecipient() {
+        Log.e("LOG", "ChatActivity: initRecipient()");
+
+        if(intent != null) {
+
+            if(intent.hasExtra(CONST.USER_ID)) {
+                recipientId = intent.getStringExtra(CONST.USER_ID);
+
+                Log.e("LOG", "ChatActivity: init(): recipientId= " +recipientId);
+
+                if (!TextUtils.isEmpty(recipientId)) {
+
+                    recipientFBDatabaseRef = usersFBDatabaseRef.child(recipientId);
+                    recipientFBDatabaseRef.addListenerForSingleValueEvent(recipientDataListener);
+
+                    if(intent.hasExtra(CONST.USER_NAME)) {
+                        recipientName = intent.getStringExtra(CONST.USER_NAME);
+
+                        if (!TextUtils.isEmpty(recipientName)) {
+                            //getSupportActionBar().setTitle(recipientName);
+                            chatAppToolbarUserName.setText(recipientName);
+                        }
+                        else
+                            Log.e("LOG", "ChatActivity: initRecipient(): recipient name is empty or null");
+                    }
+                    else
+                        Log.e("LOG", "ChatActivity: initRecipient(): intent has no " +CONST.USER_NAME);
+
+                    if(intent.hasExtra(CONST.USER_THUMB_IMAGE)) {
+                        recipientThumbImage = intent.getStringExtra(CONST.USER_THUMB_IMAGE);
+
+                        if( (!TextUtils.isEmpty(recipientThumbImage)) &&
+                            (!recipientThumbImage.equals(CONST.DEFAULT_VALUE))) {
+
+                            Log.e("LOG", "ChatActivity: initRecipient(): load recipient avatar");
+
+                            Picasso.with(this)
+                                    .load(recipientThumbImage)
+                                    .networkPolicy(NetworkPolicy.OFFLINE)
+                                    .placeholder(R.drawable.default_avatar)
+                                    .into(  chatAppToolbarAvatar,
+                                            loadImageCallback);
+                        }
+                        else
+                            Log.e("LOG", "ChatActivity: initRecipient(): recipient link on avatar is empty or null");
+                    }
+                    else
+                        Log.e("LOG", "ChatActivity: initRecipient(): intent has no " +CONST.USER_THUMB_IMAGE);
+
+                    //showChatMessages();
+                    loadMessages();
+                }
+                else
+                    Log.e("LOG", "ChatActivity: initRecipient(): recipient id is empty or null");
+            }
+            else
+                Log.e("LOG", "ChatActivity: initRecipient(): intent has no " +CONST.USER_ID);
+        }
+        else {
+            Log.e("LOG", "ChatActivity: initRecipient(): intent is null");
+        }
+    }
+
+    private void checkUser() {
+        Log.e("LOG", "ChatActivity: checkUser()");
+
+        FirebaseUser currentUser = fbAuth.getCurrentUser();
+
+        if(currentUser == null) {
+            goToLoginActivity();
+        }
+        else {
+            initSender();
+        }
+    }
+
+    private void goToLoginActivity() {
+        Log.e("LOG", "ChatActivity: goToLoginActivity()");
+
+        Intent loginIntent = new Intent(ChatActivity.this,
+                                        LoginActivity.class);
+        loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(loginIntent);
+        finish();
+    }
+
+    private void goToSetAccountActivity() {
+        Log.e("LOG", "ChatActivity: goToSetAccountActivity()");
+
+        Intent setAccountIntent = new Intent(   ChatActivity.this,
+                                                SetAccountActivity.class);
+        setAccountIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(setAccountIntent);
+        finish();
+    }
+
+    private void loadMessages() {
+        Log.e("LOG", "ChatActivity: loadMessages()");
+
+        Log.e("LOG", "ChatActivity: loadMessages(): senderId: "     +senderId);
+        Log.e("LOG", "ChatActivity: loadMessages(): recipientId: "  +recipientId);
+
+        messagesDatabaseRef = rootFBDatabaseRef.child(CONST.FIREBASE_MESSAGES_CHILD)
+                .child(senderId)
+                .child(recipientId);
+
+        if(messagesDatabaseRef != null) {
+
+            //messagesDatabaseRef.addChildEventListener(childEventListener);
+
+            Query loadMessageQuery = messagesDatabaseRef.limitToLast(currentPageCount * CONST.LOAD_MESSAGES_COUNT);
+            loadMessageQuery.addChildEventListener(loadMessagesEventListener);
+        }
+        else
+            Log.e("LOG", "ChatActivity: loadMessages(): messagesDatabaseRef is null");
+    }
+
+    private void loadMoreMessages() {
+        Log.e("LOG", "ChatActivity: loadMoreMessages()");
+
+        if(messagesDatabaseRef != null) {
+
+            Query loadMoreMessageQuery = messagesDatabaseRef.orderByKey().endAt(lastLoadedMessageKey).limitToLast(CONST.LOAD_MESSAGES_COUNT);
+            loadMoreMessageQuery.addChildEventListener(loadMoreMessagesEventListener);
+        }
+        else
+            Log.e("LOG", "ChatActivity: loadMessages(): messagesDatabaseRef is null");
     }
 
     // ------------------------------ LISTENERS ----------------------------------------- //
@@ -821,6 +1049,97 @@ public class ChatActivity extends AppCompatActivity {
         public void onCancelled(DatabaseError databaseError) { }
     };
 
+    ChildEventListener loadMessagesEventListener = new ChildEventListener() {
+
+        @Override
+        public void onChildAdded(com.google.firebase.database.DataSnapshot dataSnapshot, String s) {
+
+            Message message = dataSnapshot.getValue(Message.class);
+
+            Log.e("LOG", "ChatActivity: loadMessagesEventListener: onChildAdded(): message: " +message.getMessageText());
+
+            loadMoreItemPosition++;
+
+            if(loadMoreItemPosition == 1) {
+                lastLoadedMessageKey = dataSnapshot.getKey();
+            }
+
+            messagesList.add(message);
+
+            messageAdapter.notifyDataSetChanged();
+
+            messagesRecyclerView.scrollToPosition(messagesList.size() - 1);
+
+            chatSwipeRefreshLayout.setRefreshing(false);
+        }
+
+        @Override
+        public void onChildChanged(com.google.firebase.database.DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onChildRemoved(com.google.firebase.database.DataSnapshot dataSnapshot) {
+
+        }
+
+        @Override
+        public void onChildMoved(com.google.firebase.database.DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    };
+
+    ChildEventListener loadMoreMessagesEventListener = new ChildEventListener() {
+
+        @Override
+        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
+            Message message = dataSnapshot.getValue(Message.class);
+
+            Log.e("LOG", "ChatActivity: loadMoreMessagesEventListener: onChildAdded(): message: " +message.getMessageText());
+
+            messagesList.add(   loadMoreItemPosition++,
+                                message);
+
+            if(loadMoreItemPosition == 1) {
+                lastLoadedMessageKey = dataSnapshot.getKey();
+            }
+
+            messageAdapter.notifyDataSetChanged();
+
+            //messagesRecyclerView.scrollToPosition(messagesList.size() - 1);
+
+            chatSwipeRefreshLayout.setRefreshing(false);
+
+            linearLayoutManager.scrollToPositionWithOffset( CONST.LOAD_MESSAGES_COUNT,
+                                                            0);
+        }
+
+        @Override
+        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+        }
+
+        @Override
+        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    };
 
 //    ChildEventListener childEventListener = new ChildEventListener() {
 //
@@ -874,5 +1193,19 @@ public class ChatActivity extends AppCompatActivity {
 
         @Override
         public void afterTextChanged(Editable s) { }
+    };
+
+    SwipeRefreshLayout.OnRefreshListener swipeRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
+        @Override
+        public void onRefresh() {
+
+            currentPageCount++;
+
+            loadMoreItemPosition = 0;
+
+//            messagesList.clear();
+
+            loadMoreMessages();
+        }
     };
 }

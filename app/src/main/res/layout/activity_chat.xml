@@ -2,15 +2,14 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/chatContainer"
     style="@style/MM"
     android:theme="@style/Base.ThemeOverlay.AppCompat.Dark.ActionBar"
     tools:context="com.shmeli.surakat.ui.MainActivity">
 
     <include
-        layout="@layout/app_bar"
-        android:id="@+id/chatPageToolbar"/>
+        android:id="@+id/chatPageToolbar"
+        layout="@layout/app_bar"/>
 
     <LinearLayout
         style="@style/MM"
@@ -79,10 +78,16 @@
             android:background="@color/colorPrimary"
             android:visibility="gone"/>
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/messagesRecyclerView"
-            style="@style/MM"
-            android:layout_below="@+id/chatTopDividerView"/>
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/chatSwipeRefreshLayout"
+            style="@style/MM">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/messagesRecyclerView"
+                style="@style/MM"
+                android:layout_below="@+id/chatTopDividerView"/>
+
+        </android.support.v4.widget.SwipeRefreshLayout>
 
     </LinearLayout>
 
