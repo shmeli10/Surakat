@@ -1016,21 +1016,21 @@ public class ChatActivity extends AppCompatActivity {
                 // ------------------------------------------------------------------- //
 
                 Map chatUserMap         = new HashMap();
-                StringBuilder chatKetSB = new StringBuilder();
+                StringBuilder chatKeySB = new StringBuilder();
 
-                chatKetSB.append(CONST.CHAT_KEY);
-                chatKetSB.append(senderId);
-                chatKetSB.append("/");
-                chatKetSB.append(recipientId);
-                chatUserMap.put(chatKetSB.toString(), chatAddMap);
+                chatKeySB.append(CONST.CHAT_KEY);
+                chatKeySB.append(senderId);
+                chatKeySB.append("/");
+                chatKeySB.append(recipientId);
+                chatUserMap.put(chatKeySB.toString(), chatAddMap);
 
-                chatKetSB.setLength(0);
+                chatKeySB.setLength(0);
 
-                chatKetSB.append(CONST.CHAT_KEY);
-                chatKetSB.append(recipientId);
-                chatKetSB.append("/");
-                chatKetSB.append(senderId);
-                chatUserMap.put(chatKetSB.toString(), chatAddMap);
+                chatKeySB.append(CONST.CHAT_KEY);
+                chatKeySB.append(recipientId);
+                chatKeySB.append("/");
+                chatKeySB.append(senderId);
+                chatUserMap.put(chatKeySB.toString(), chatAddMap);
 
                 rootFBDatabaseRef.updateChildren(chatUserMap, new DatabaseReference.CompletionListener() {
                     @Override

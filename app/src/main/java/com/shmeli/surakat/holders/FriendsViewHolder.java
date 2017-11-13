@@ -22,16 +22,16 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class FriendsViewHolder extends RecyclerView.ViewHolder {
 
-    public View itemView;
+    public View             itemView;
 
-    private TextView userNameTextView;
-    private TextView userStatusTextView;
+    private TextView        userNameTextView;
+    private TextView        userStatusTextView;
 
     private CircleImageView userAvatar;
 
     private ImageView       userStatusImageView;
 
-    private String imageUrl = "";
+    private String          imageUrl = "";
 
     public FriendsViewHolder(View itemView) {
         super(itemView);
@@ -52,12 +52,20 @@ public class FriendsViewHolder extends RecyclerView.ViewHolder {
             userNameTextView.setText(CONST.NO_NAME_TEXT);
     }
 
-    public void setDate(String date) {
+//    public void setDate(String date) {
+//
+//        if(!TextUtils.isEmpty(date))
+//            userStatusTextView.setText(date);
+//        else
+//            userStatusTextView.setText(CONST.NO_DATE_TEXT);
+//    }
 
-        if(!TextUtils.isEmpty(date))
-            userStatusTextView.setText(date);
+    public void setStatus(String status) {
+
+        if(!TextUtils.isEmpty(status))
+            userStatusTextView.setText(status);
         else
-            userStatusTextView.setText(CONST.NO_DATE_TEXT);
+            userStatusTextView.setText(CONST.NO_STATUS_TEXT);
     }
 
     public void setAvatar(String imageUrl) {

@@ -22,8 +22,9 @@ public class CONST {
     public static final String FIREBASE_USERS_CHILD             = "Users";
     public static final String FIREBASE_USERS_LINK              = FIREBASE_BASE_LINK + "/" + FIREBASE_USERS_CHILD;
 
-    public static final String REQUESTS_TAB_NAME                = "REQUESTS";
-    public static final String CHATS_TAB_NAME                   = "CHATS";
+//    public static final String REQUESTS_TAB_NAME                = "REQUESTS";
+//    public static final String CHATS_TAB_NAME                   = "CHATS";
+    public static final String ALL_USERS_TAB_NAME               = "ALL USERS";
     public static final String FRIENDS_TAB_NAME                 = "FRIENDS";
 
     public static final String USER_ONLINE_STATUS               = "online";
@@ -31,7 +32,8 @@ public class CONST {
 
     public static final String DEFAULT_VALUE                    = "default";
 
-    public static final String DATE_TEXT                        = "date";
+//    public static final String DATE_TEXT                        = "date";
+    public static final String FRIENDSHIP_START_DATE            = "friendshipStartDate";
 
     public static final String NOTIFICATION_ID                  = "notificationId";
     public static final String NOTIFICATION_SENDER_ID           = "senderId";
@@ -81,5 +83,5 @@ public class CONST {
     public static final int OPEN_PROFILE_TYPE                   = 0;
     public static final int SEND_MESSAGE_TYPE                   = 1;
 
-    public static final int LOAD_MESSAGES_COUNT                 = 2;
+    public static final int LOAD_MESSAGES_COUNT                 = 5;
 }

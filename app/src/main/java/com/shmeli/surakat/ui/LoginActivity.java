@@ -71,7 +71,7 @@ public class LoginActivity extends AppCompatActivity {
         usersFBDatabaseRef  = rootFBDatabaseRef.child(CONST.FIREBASE_USERS_CHILD);
         usersFBDatabaseRef.keepSynced(true);
 
-        progressDialog      = new ProgressDialog(this);
+        progressDialog      = new ProgressDialog(this, R.style.Theme_Sphinx_Dialog_Alert);
 
         signInContainer     = UiUtils.findView(this, R.id.signInContainer);
         emailEditText       = UiUtils.findView(this, R.id.emailEditText);
@@ -104,6 +104,19 @@ public class LoginActivity extends AppCompatActivity {
             progressDialog.setMessage(getResources().getString(R.string.message_check_account_wait));
             progressDialog.setCanceledOnTouchOutside(false);
             progressDialog.show();
+
+            // -------------------------------------------------------------------------------- //
+
+            // Set title divider color
+            int titleDividerId = getResources().getIdentifier(  "titleDivider",
+                                                                "id",
+                                                                "android");
+            View titleDivider = progressDialog.findViewById(titleDividerId);
+
+            if (titleDivider != null)
+                titleDivider.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+
+            // -------------------------------------------------------------------------------- //
 
             fbAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(signInCompleteListener);

@@ -1,5 +1,7 @@
 package com.shmeli.surakat.ui;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 
 import android.support.design.widget.TabLayout;
@@ -15,6 +17,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -54,33 +57,14 @@ public class MainActivity extends AppCompatActivity {
     private DatabaseReference               currentUserFBDatabaseRef;
     private DatabaseReference               usersFBDatabaseRef;
 
-    //private FirebaseRecyclerAdapter<User, MainActivity.UserViewHolder> fbAdapter;
-
     private MainPageViewPagerAdapter        mainPageViewPagerAdapter;
 
-    private ArrayList<String> userList = new ArrayList<>();
-
-    //private String userId           = "";
-    private String currentUserId    = "";
+    private String currentUserId = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-//        fbRef               = new Firebase(CONST.FIREBASE_USERS_LINK);
-//        fbAuth              = FirebaseAuth.getInstance();
-
-//        fbUser              = fbAuth.getCurrentUser();
-//
-//        if(fbUser != null) {
-//            currentUserId = fbUser.getUid();
-//        }
-
-        //currentUserId       = fbAuth.getCurrentUser().getUid();
-
-//        usersFBDatabaseRef  = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_USERS_CHILD);
-//        usersFBDatabaseRef.keepSynced(true);
 
         init();
 
@@ -89,22 +73,14 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(mainPageToolbar);
         getSupportActionBar().setTitle(R.string.app_name);
 
-        mainPageViewPagerAdapter    = new MainPageViewPagerAdapter( getApplicationContext(),
-                                                                    getSupportFragmentManager());
+        mainPageViewPagerAdapter = new MainPageViewPagerAdapter( getApplicationContext(),
+                                                                 getSupportFragmentManager());
 
         mainPageViewPager   = UiUtils.findView(this, R.id.mainPageViewPager);
         mainPageViewPager.setAdapter(mainPageViewPagerAdapter);
 
         mainPageTabLayout   = UiUtils.findView(this, R.id.mainPageTabLayout);
         mainPageTabLayout.setupWithViewPager(mainPageViewPager);
-
-//        init();
-
-//        userRecyclerView    = UiUtils.findView(this, R.id.userRecyclerView);
-//        userRecyclerView.setHasFixedSize(true);
-//        userRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-//        fbRef.addChildEventListener(childEventListener);
     }
 
     @Override
@@ -112,67 +88,6 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
 
         checkUser();
-
-//        if(currentUserFBDatabaseRef != null) {
-//            currentUserFBDatabaseRef.child(CONST.USER_IS_ONLINE).setValue(true);
-//        }
-
-//        init();
-
-//        checkUserExists();
-
-//        fbAuth.addAuthStateListener(fbAuthListener);
-
-//        fbAdapter = new FirebaseRecyclerAdapter<User, MainActivity.UserViewHolder>( User.class,
-//                                                                                    R.layout.user_row,
-//                                                                                    MainActivity.UserViewHolder.class,
-//                                                                                    usersFBDatabaseRef) {
-//            @Override
-//            protected void populateViewHolder(MainActivity.UserViewHolder   viewHolder,
-//                                              User                          model,
-//                                              final int                     position) {
-//
-//                //String currentUserId   = fbAuth.getCurrentUser().getUid();
-//                String listUserKey      = getRef(position).getKey();
-//
-//                //Log.e("LOG", "MainActivity: onStart(): populateViewHolder(): currentUserId= " +currentUserId);
-//                //Log.e("LOG", "MainActivity: onStart(): populateViewHolder(): listUserKey= " +listUserKey);
-//
-//                if(!listUserKey.equals(currentUserId)) {
-//                    Log.e("LOG", "MainActivity: onStart(): populateViewHolder(): show user: " +model.getUserName());
-//
-//                    viewHolder.setUserName(model.getUserName());
-//
-//                    viewHolder.view.setOnClickListener(new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View view) {
-//
-//                            //String userKey = getRef(position).getKey();
-//                            String userId = getRef(position).getKey();
-//
-//                            //User clickedUser = fbAdapter.getItem(position);
-//                            //String clickedUserName  = clickedUser.getUserName();
-//                            //Log.e("LOG", "Clicked on " +userKey);
-//                            //Log.e("LOG", "Clicked on " +clickedUserName);
-//
-//                            Intent chatIntent = new Intent( MainActivity.this,
-//                                                            ChatActivity.class);
-//                            //chatIntent.putExtra("userKey", userKey);
-//                            chatIntent.putExtra(CONST.USER_ID, userId);
-//
-//                            startActivity(chatIntent);
-//                        }
-//                    });
-//                }
-//                else {
-//                    Log.e("LOG", "MainActivity: onStart(): populateViewHolder: hide user: " +model.getUserName());
-//
-//                    viewHolder.hideItem();
-//                }
-//            }
-//        };
-
-//        userRecyclerView.setAdapter(fbAdapter);
     }
 
     @Override
@@ -187,13 +102,6 @@ public class MainActivity extends AppCompatActivity {
             currentUserFBDatabaseRef.child(CONST.USER_IS_ONLINE).setValue(false);
             currentUserFBDatabaseRef.child(CONST.USER_LAST_SEEN).setValue(ServerValue.TIMESTAMP);
         }
-
-        //if(!TextUtils.isEmpty(currentUserId)) {
-//        if(fbAuth.getCurrentUser() != null) {
-//        //if(currentUserFBDatabaseRef != null) {
-//            currentUserFBDatabaseRef.child(CONST.USER_IS_ONLINE).setValue(false);
-//            currentUserFBDatabaseRef.child(CONST.USER_LAST_SEEN).setValue(ServerValue.TIMESTAMP);
-//        }
     }
 
     @Override
@@ -210,26 +118,13 @@ public class MainActivity extends AppCompatActivity {
 
         switch(item.getItemId()) {
 
-            case R.id.menu_all_users:
-                Intent allUsersIntent = new Intent( MainActivity.this,
-                                                    AllUsersActivity.class);
-                startActivity(allUsersIntent);
-                break;
             case R.id.menu_signout:
-                logout();
+                showAlertDialog();
                 break;
             case R.id.menu_settings:
-                Intent settingsIntent = new Intent( MainActivity.this,
-                                                    SettingsActivity.class);
-                //settingsIntent.addFlags();
-                startActivity(settingsIntent);
-                //finish();
+                moveToSettings();
                 break;
         }
-
-//        if(item.getItemId() == R.id.menu_signout) {
-//            logout();
-//        }
 
         return true;
     }
@@ -400,6 +295,56 @@ public class MainActivity extends AppCompatActivity {
         setAccountIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(setAccountIntent);
         finish();
+    }
+
+    private void moveToSettings() {
+
+        Intent settingsIntent = new Intent( MainActivity.this,
+                                            SettingsActivity.class);
+        //settingsIntent.addFlags();
+        startActivity(settingsIntent);
+        //finish();
+    }
+
+    private void showAlertDialog() {
+
+        int alertDialogMessageResId = R.string.text_logout_confirm;
+        int alertDialogHeaderResId  = R.string.text_logout_header;
+
+        int alertDialogDividerColorResId = getResources().getColor(R.color.colorAccent);
+
+        int noTextResId     = R.string.text_no;
+        int yesTextResId    = R.string.text_yes;
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(   MainActivity.this,
+                                                                            R.style.Theme_Sphinx_Dialog_Alert);
+        alertDialogBuilder.setMessage(alertDialogMessageResId)
+                .setCancelable(false)
+                .setPositiveButton(yesTextResId, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        logout();
+                    }
+                })
+                .setNegativeButton(noTextResId, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        dialog.cancel();
+                    }
+                });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.setTitle(alertDialogHeaderResId);
+        alertDialog.show();
+
+        // Set title divider color
+        int titleDividerId = getResources().getIdentifier("titleDivider", "id", "android");
+        View titleDivider = alertDialog.findViewById(titleDividerId);
+
+        if (titleDivider != null)
+            titleDivider.setBackgroundColor(alertDialogDividerColorResId);
     }
 
 //    public static class UserViewHolder extends RecyclerView.ViewHolder{

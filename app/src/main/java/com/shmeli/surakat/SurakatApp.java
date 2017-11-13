@@ -103,6 +103,10 @@ public class SurakatApp extends Application {
         }
     }
 
+    public String getCurrentUserId() {
+        return currentUserId;
+    }
+
     // ------------------------------ LISTENERS ----------------------------------------- //
 
     ValueEventListener currentUserDataListener = new ValueEventListener() {

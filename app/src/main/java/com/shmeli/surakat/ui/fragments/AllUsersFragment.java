@@ -1,67 +1,82 @@
-package com.shmeli.surakat.ui;
+package com.shmeli.surakat.ui.fragments;
+
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
-
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
 import com.shmeli.surakat.holders.UserViewHolder;
 import com.shmeli.surakat.model.User;
+import com.shmeli.surakat.ui.MainActivity;
+import com.shmeli.surakat.ui.ProfileActivity;
 import com.shmeli.surakat.utils.UiUtils;
 
 /**
- * Created by Serghei Ostrovschi on 10/19/17.
+ * A simple {@link Fragment} subclass.
  */
+public class AllUsersFragment extends Fragment {
 
-public class AllUsersActivity extends AppCompatActivity {
-
-    private Toolbar             allUsersPageToolbar;
-
+    private View                view;
     private RecyclerView        allUsersRecyclerVIew;
 
+    private DatabaseReference   rootFBDatabaseRef;
+    private DatabaseReference   allUsersFBDatabaseRef;
     private DatabaseReference   usersFBDatabaseRef;
 
-    private FirebaseAuth        fbAuth;
+    private String              currentUserId           = "";
 
-    private String              currentUserId = "";
+    public AllUsersFragment() {
+        // Required empty public constructor
+    }
+
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_all_users);
+    public View onCreateView(LayoutInflater inflater,
+                             ViewGroup      container,
+                             Bundle         savedInstanceState) {
 
-        allUsersPageToolbar     = UiUtils.findView(this, R.id.allUsersPageToolbar);
-        setSupportActionBar(allUsersPageToolbar);
-        getSupportActionBar().setTitle(R.string.text_all_users);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        view = inflater.inflate(R.layout.all_users_fragment,
+                container,
+                false);
 
-        allUsersRecyclerVIew    = UiUtils.findView(this, R.id.allUsersRecyclerVIew);
+        allUsersRecyclerVIew = UiUtils.findView(view, R.id.allUsersRecyclerVIew);
         allUsersRecyclerVIew.setHasFixedSize(true);
-        allUsersRecyclerVIew.setLayoutManager(new LinearLayoutManager(this));
+        allUsersRecyclerVIew.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        usersFBDatabaseRef  = FirebaseDatabase.getInstance().getReference().child(CONST.FIREBASE_USERS_CHILD);
+        currentUserId           = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        rootFBDatabaseRef       = FirebaseDatabase.getInstance().getReference();
+//        allUsersFBDatabaseRef   = rootFBDatabaseRef.child(CONST.FIREBASE_FRIENDS_CHILD).child(currentUserId);
+//        allUsersFBDatabaseRef.keepSynced(true);
+        usersFBDatabaseRef      = rootFBDatabaseRef.child(CONST.FIREBASE_USERS_CHILD);
         usersFBDatabaseRef.keepSynced(true);
 
-        fbAuth              = FirebaseAuth.getInstance();
-        currentUserId       = fbAuth.getCurrentUser().getUid();
+        return view;
     }
 
     @Override
-    protected void onStart() {
+    public void onStart() {
         super.onStart();
 
-        checkUserExists();
+        populateAllUsersList();
+    }
+
+    private void populateAllUsersList() {
 
         FirebaseRecyclerAdapter<User, UserViewHolder> fbAdapter = new FirebaseRecyclerAdapter<User, UserViewHolder>(User.class,
                                                                                                                     R.layout.user_row,
@@ -82,9 +97,9 @@ public class AllUsersActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
 
-                        //Log.e("LOG", "AllUsersActivity: userClickListener: selectedUserId= " +selectedUserId);
+                        Log.e("LOG", "AllUsersFragment: userClickListener: selectedUserId= " +selectedUserId);
 
-                        Intent profileIntent = new Intent(  AllUsersActivity.this,
+                        Intent profileIntent = new Intent(  getContext(),
                                                             ProfileActivity.class);
                         profileIntent.putExtra(CONST.USER_ID, selectedUserId);
                         startActivity(profileIntent);
@@ -97,30 +112,4 @@ public class AllUsersActivity extends AppCompatActivity {
         allUsersRecyclerVIew.setAdapter(fbAdapter);
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        usersFBDatabaseRef.child(currentUserId)
-                .child(CONST.USER_IS_ONLINE).setValue(false);
-    }
-
-    // ------------------------------------------------------------------------ //
-
-    private void checkUserExists() {
-        Log.e("LOG", "AllUsersActivity: checkUserExists()");
-
-        if(fbAuth.getCurrentUser() != null) {
-
-            usersFBDatabaseRef.child(currentUserId)
-                    .child(CONST.USER_IS_ONLINE).setValue(true);
-        }
-        else {
-
-            Intent loginIntent = new Intent(AllUsersActivity.this,
-                                            LoginActivity.class);
-            loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(loginIntent);
-        }
-    }
 }

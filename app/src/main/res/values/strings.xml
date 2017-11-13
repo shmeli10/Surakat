@@ -55,10 +55,13 @@
     <string name="text_just_now">just now</string>
     <string name="text_left_characters_head">Left</string>
     <string name="text_left_characters_tail">symbols</string>
+    <string name="text_logout_confirm">Do you want to exit?</string>
+    <string name="text_logout_header">Logging out</string>
     <string name="text_message">Message</string>
     <string name="text_message_author_name">Message author name</string>
     <string name="text_minute_ago">a minute ago</string>
     <string name="text_minutes_ago">minutes ago</string>
+    <string name="text_no">No</string>
     <string name="text_open_profile">Open profile</string>
     <string name="text_profile">Profile</string>
     <string name="text_saving_changes">Saving changes</string>
@@ -74,6 +77,7 @@
     <string name="text_user">User</string>
     <string name="text_user_name">User name</string>
     <string name="text_user_list">User list:</string>
+    <string name="text_yes">Yes</string>
     <string name="text_yesterday">yesterday</string>
 
     <!-- TODO: Remove or change this placeholder text -->

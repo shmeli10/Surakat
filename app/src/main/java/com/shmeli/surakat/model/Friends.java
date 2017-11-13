@@ -16,13 +16,13 @@ public class Friends {
 
     // ---------------------------- GETTERS -------------------------- //
 
-    public String getDate() {
+    public String getFriendshipStartDate() {
         return date;
     }
 
     // ---------------------------- SETTERS -------------------------- //
 
-    public void setDate(String date) {
+    public void setFriendshipStartDate(String FriendshipStartDate) {
         this.date = date;
     }
 }

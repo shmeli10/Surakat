@@ -331,7 +331,7 @@ public class ProfileActivity extends AppCompatActivity {
         friendRequest.append("/");
         friendRequest.append(selectedUserId);
         friendRequest.append("/");
-        friendRequest.append(CONST.DATE_TEXT);
+        friendRequest.append(CONST.FRIENDSHIP_START_DATE);
 
         final Map requestMap = new HashMap();
         requestMap.put(friendRequest.toString(),  getCurrentDate());
@@ -345,7 +345,7 @@ public class ProfileActivity extends AppCompatActivity {
         friendRequest.append("/");
         friendRequest.append(currentUserId);
         friendRequest.append("/");
-        friendRequest.append(CONST.DATE_TEXT);
+        friendRequest.append(CONST.FRIENDSHIP_START_DATE);
 
         requestMap.put(friendRequest.toString(),  getCurrentDate());
         friendRequest.setLength(0);

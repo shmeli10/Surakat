@@ -1,0 +1,13 @@
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/allUsersContainer"
+    style="@style/MM"
+    tools:context="com.shmeli.surakat.ui.fragments.AllUsersFragment">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/allUsersRecyclerVIew"
+        style="@style/MM"
+        android:padding="@dimen/spacing_2x"/>
+
+</FrameLayout>

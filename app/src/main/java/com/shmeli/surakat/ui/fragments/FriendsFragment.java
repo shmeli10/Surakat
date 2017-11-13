@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +24,6 @@ import com.shmeli.surakat.data.CONST;
 import com.shmeli.surakat.holders.FriendsViewHolder;
 import com.shmeli.surakat.model.Friends;
 import com.shmeli.surakat.ui.ChatActivity;
-import com.shmeli.surakat.ui.MainActivity;
 import com.shmeli.surakat.ui.ProfileActivity;
 import com.shmeli.surakat.utils.UiUtils;
 
@@ -90,7 +88,8 @@ public class FriendsFragment extends Fragment {
                                               Friends           model,
                                               int               position) {
 
-                friendsViewHolder.setDate(model.getDate());
+//                friendsViewHolder.setDate(model.getFriendshipStartDate());
+                friendsViewHolder.setStatus("");
 
                 //String listUserId = getRef(position).getKey();
                 selectedUserId = getRef(position).getKey();
@@ -139,14 +138,27 @@ public class FriendsFragment extends Fragment {
             String sendMessageText      = getResources().getString(R.string.text_send_message);
             String selectOptionsText    = getResources().getString(R.string.text_select_options);
 
+            int alertDialogDividerColorResId = getResources().getColor(R.color.colorAccent);
+
             CharSequence[] optionsArr = new CharSequence[] {openProfileText, sendMessageText};
 
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(   getContext(),
+                                                                                R.style.Theme_Sphinx_Dialog_Alert);
             alertDialogBuilder.setTitle(selectOptionsText);
             alertDialogBuilder.setItems(optionsArr,
                                         optionClickListener);
-            alertDialogBuilder.show();
+//            alertDialogBuilder.show();
 
+            AlertDialog alertDialog = alertDialogBuilder.create();
+//            alertDialog.setTitle(alertDialogHeaderResId);
+            alertDialog.show();
+
+            // Set title divider color
+            int titleDividerId = getResources().getIdentifier("titleDivider", "id", "android");
+            View titleDivider = alertDialog.findViewById(titleDividerId);
+
+            if (titleDivider != null)
+                titleDivider.setBackgroundColor(alertDialogDividerColorResId);
         }
     };
 
