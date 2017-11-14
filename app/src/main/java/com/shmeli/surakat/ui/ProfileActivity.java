@@ -93,6 +93,9 @@ public class ProfileActivity extends AppCompatActivity {
 
             //Log.e("LOG", "ProfileActivity: onCreate(): selectedUserId= " +selectedUserId);
         }
+        else {
+            Log.e("LOG", "ProfileActivity: onCreate(): profileIntent is null");
+        }
 
 //        progressDialog = new ProgressDialog(ProfileActivity.this);
 //        progressDialog.setTitle(getResources().getString(R.string.message_loading_profile_data));
@@ -106,9 +109,26 @@ public class ProfileActivity extends AppCompatActivity {
         friendRequestFBDatabaseRef  = rootFBDatabaseRef.child(CONST.FIREBASE_FRIEND_REQUEST_CHILD);
         //notificationsFBDatabaseRef  = rootFBDatabaseRef.child(CONST.FIREBASE_NOTIFICATIONS_CHILD);
 
-        userFBDatabaseRef           = rootFBDatabaseRef.child(CONST.FIREBASE_USERS_CHILD).child(selectedUserId);
-        userFBDatabaseRef.keepSynced(true);
-        userFBDatabaseRef.addValueEventListener(selectedUserProfileValueListener);
+        Log.e("LOG", "ProfileActivity: onCreate(): selectedUserId is null: " +(selectedUserId == null));
+
+        if(selectedUserId != null) {
+
+            Log.e("LOG", "ProfileActivity: onCreate(): selectedUserId= " + selectedUserId);
+
+            userFBDatabaseRef = rootFBDatabaseRef.child(CONST.FIREBASE_USERS_CHILD).child(selectedUserId);
+
+            if(userFBDatabaseRef != null) {
+
+                userFBDatabaseRef.keepSynced(true);
+                userFBDatabaseRef.addValueEventListener(selectedUserProfileValueListener);
+            }
+            else {
+                Log.e("LOG", "ProfileActivity: onCreate(): userFBDatabaseRef is null: " +(userFBDatabaseRef == null));
+            }
+        }
+        else {
+            Log.e("LOG", "ProfileActivity: onCreate(): selectedUserId is null");
+        }
 
         profilePageToolbar = UiUtils.findView(this, R.id.profilePageToolbar);
         setSupportActionBar(profilePageToolbar);
@@ -517,33 +537,38 @@ public class ProfileActivity extends AppCompatActivity {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
 
-            //Log.e("LOG", "SettingsActivity: valueEventListener: dataSnapshot: " +dataSnapshot.toString());
+            if(dataSnapshot != null) {
+                //Log.e("LOG", "ProfileActivity: valueEventListener: dataSnapshot: " +dataSnapshot.toString());
 
-            String userName     = dataSnapshot.child(CONST.USER_NAME).getValue().toString();
-            String userStatus   = dataSnapshot.child(CONST.USER_STATUS).getValue().toString();
-            userImageUrl        = dataSnapshot.child(CONST.USER_IMAGE).getValue().toString();
+                String userName = dataSnapshot.child(CONST.USER_NAME).getValue().toString();
+                String userStatus = dataSnapshot.child(CONST.USER_STATUS).getValue().toString();
+                userImageUrl = dataSnapshot.child(CONST.USER_IMAGE).getValue().toString();
 
-            profilePageUserName.setText(userName);
-            profilePageUserStatus.setText(userStatus);
+                profilePageUserName.setText(userName);
+                profilePageUserStatus.setText(userStatus);
 
-            if(!userImageUrl.equals(CONST.DEFAULT_VALUE)) {
-                Picasso.with(ProfileActivity.this)
-                        .load(userImageUrl)
-                        .networkPolicy(NetworkPolicy.OFFLINE)
-                        .placeholder(R.drawable.default_avatar)
-                        .into(  profilePageAvatar,
-                                loadImageCallback);
+                if (!userImageUrl.equals(CONST.DEFAULT_VALUE)) {
+                    Picasso.with(ProfileActivity.this)
+                            .load(userImageUrl)
+                            .networkPolicy(NetworkPolicy.OFFLINE)
+                            .placeholder(R.drawable.default_avatar)
+                            .into(profilePageAvatar,
+                                    loadImageCallback);
 
                 /*Picasso.with(ProfileActivity.this)
                         .load(userImageUrl)
                         .placeholder(R.drawable.default_avatar)
                         .into(profilePageAvatar);*/
-            }
+                }
 
-            // GET LIST OF FRIEND REQUESTS
-            //friendRequestFBDatabaseRef.child(currentFBUser.getUid())
-            friendRequestFBDatabaseRef.child(currentUserId)
-                    .addListenerForSingleValueEvent(friendRequestsListValueListener);
+                // GET LIST OF FRIEND REQUESTS
+                //friendRequestFBDatabaseRef.child(currentFBUser.getUid())
+                friendRequestFBDatabaseRef.child(currentUserId)
+                        .addListenerForSingleValueEvent(friendRequestsListValueListener);
+            }
+            else {
+                Log.e("LOG", "ProfileActivity: valueEventListener: dataSnapshot is null");
+            }
         }
 
         @Override

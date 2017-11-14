@@ -50,12 +50,13 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager                       mainPageViewPager;
 
 //    private Firebase                        fbRef;
-    private FirebaseAuth                    fbAuth;
 //    private FirebaseUser                    fbUser;
 
     private DatabaseReference               rootFBDatabaseRef;
     private DatabaseReference               currentUserFBDatabaseRef;
     private DatabaseReference               usersFBDatabaseRef;
+
+    private FirebaseAuth                    fbAuth;
 
     private MainPageViewPagerAdapter        mainPageViewPagerAdapter;
 

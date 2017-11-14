@@ -2,6 +2,7 @@ package com.shmeli.surakat.holders;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.shmeli.surakat.R;
@@ -19,14 +20,16 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class UserViewHolder extends RecyclerView.ViewHolder {
 
-    public View itemView;
+    public View             itemView;
 
-    private TextView userNameTextView;
-    private TextView userStatusTextView;
+    private TextView        userNameTextView;
+    private TextView        userStatusTextView;
 
     private CircleImageView userAvatar;
 
-    private String imageUrl = "";
+    private ImageView       userStatusImageView;
+
+    private String          imageUrl = "";
 
     public UserViewHolder(View itemView) {
         super(itemView);
@@ -36,6 +39,7 @@ public class UserViewHolder extends RecyclerView.ViewHolder {
         userNameTextView    = UiUtils.findView(itemView, R.id.userRowName);
         userStatusTextView  = UiUtils.findView(itemView, R.id.userRowStatus);
         userAvatar          = UiUtils.findView(itemView, R.id.userRowAvatar);
+        userStatusImageView = UiUtils.findView(itemView, R.id.userRowStatusImageView);
     }
 
     public void setName(String userName) {
@@ -67,6 +71,16 @@ public class UserViewHolder extends RecyclerView.ViewHolder {
                 .placeholder(R.drawable.default_avatar)
                 .into(userAvatar);*/
 
+    }
+
+    public void setOnlineStatus(boolean isUserOnline) {
+
+        if(isUserOnline) {
+            userStatusImageView.setVisibility(View.VISIBLE);
+        }
+        else {
+            userStatusImageView.setVisibility(View.INVISIBLE);
+        }
     }
 
     Callback loadImageCallback = new Callback() {

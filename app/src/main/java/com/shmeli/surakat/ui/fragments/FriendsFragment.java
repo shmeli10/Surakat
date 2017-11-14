@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,8 +23,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
-import com.shmeli.surakat.holders.FriendsViewHolder;
-import com.shmeli.surakat.model.Friends;
+import com.shmeli.surakat.holders.UserViewHolder;
+import com.shmeli.surakat.model.User;
 import com.shmeli.surakat.ui.ChatActivity;
 import com.shmeli.surakat.ui.ProfileActivity;
 import com.shmeli.surakat.utils.UiUtils;
@@ -39,10 +41,13 @@ public class FriendsFragment extends Fragment {
     private DatabaseReference   friendsFBDatabaseRef;
     private DatabaseReference   usersFBDatabaseRef;
 
+    private FirebaseAuth        fbAuth;
+
     private String              currentUserId           = "";
     private String              selectedUserId          = "";
     private String              selectedUserName        = "";
     private String              selectedUserThumbImage  = "";
+    private String              selectedUserStatus      = "";
 
     public FriendsFragment() {
         // Required empty public constructor
@@ -54,6 +59,10 @@ public class FriendsFragment extends Fragment {
                              ViewGroup      container,
                              Bundle         savedInstanceState) {
 
+        Log.e("LOG", "FriendsFragment: onCreateView()");
+
+        init();
+
         view = inflater.inflate(R.layout.fragment_friends,
                                 container,
                                 false);
@@ -62,13 +71,13 @@ public class FriendsFragment extends Fragment {
         friendsRecyclerVIew.setHasFixedSize(true);
         friendsRecyclerVIew.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        currentUserId           = FirebaseAuth.getInstance().getCurrentUser().getUid();
+//        currentUserId           = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        rootFBDatabaseRef       = FirebaseDatabase.getInstance().getReference();
-        friendsFBDatabaseRef    = rootFBDatabaseRef.child(CONST.FIREBASE_FRIENDS_CHILD).child(currentUserId);
-        friendsFBDatabaseRef.keepSynced(true);
-        usersFBDatabaseRef      = rootFBDatabaseRef.child(CONST.FIREBASE_USERS_CHILD);
-        usersFBDatabaseRef.keepSynced(true);
+//        rootFBDatabaseRef       = FirebaseDatabase.getInstance().getReference();
+//        friendsFBDatabaseRef    = rootFBDatabaseRef.child(CONST.FIREBASE_FRIENDS_CHILD).child(currentUserId);
+//        friendsFBDatabaseRef.keepSynced(true);
+//        usersFBDatabaseRef      = rootFBDatabaseRef.child(CONST.FIREBASE_USERS_CHILD);
+//        usersFBDatabaseRef.keepSynced(true);
 
         return view;
     }
@@ -77,56 +86,189 @@ public class FriendsFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        FirebaseRecyclerAdapter<Friends, FriendsViewHolder> friendsRecyclerViewAdapter = new FirebaseRecyclerAdapter<Friends, FriendsViewHolder>(
-                Friends.class,
-                R.layout.user_row,
-                FriendsViewHolder.class,
-                friendsFBDatabaseRef) {
+        Log.e("LOG", "FriendsFragment: onStart()");
 
-            @Override
-            protected void populateViewHolder(final FriendsViewHolder friendsViewHolder,
-                                              Friends           model,
-                                              int               position) {
+        initCurrentUser();
 
-//                friendsViewHolder.setDate(model.getFriendshipStartDate());
-                friendsViewHolder.setStatus("");
+        populateFriendsList();
+    }
 
-                //String listUserId = getRef(position).getKey();
-                selectedUserId = getRef(position).getKey();
+    private void init() {
+        Log.e("LOG", "FriendsFragment: init()");
 
-                usersFBDatabaseRef.child(selectedUserId).addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
+        rootFBDatabaseRef       = FirebaseDatabase.getInstance().getReference();
+        usersFBDatabaseRef      = rootFBDatabaseRef.child(CONST.FIREBASE_USERS_CHILD);
+        usersFBDatabaseRef.keepSynced(true);
 
-                        //String userName             = dataSnapshot.child(CONST.USER_NAME).getValue().toString();
-                        selectedUserName        = dataSnapshot.child(CONST.USER_NAME).getValue().toString();
-                        //String userThumbImageUrl    = dataSnapshot.child(CONST.USER_THUMB_IMAGE).getValue().toString();
-                        selectedUserThumbImage  = dataSnapshot.child(CONST.USER_THUMB_IMAGE).getValue().toString();
+        fbAuth = FirebaseAuth.getInstance();
+    }
 
-                        if(dataSnapshot.hasChild(CONST.USER_IS_ONLINE)) {
-                            Boolean userIsOnline = (boolean) dataSnapshot.child(CONST.USER_IS_ONLINE).getValue();
-                            friendsViewHolder.setOnlineStatus(userIsOnline);
+    private void initCurrentUser() {
+        Log.e("LOG", "FriendsFragment: initCurrentUser()");
 
-                            //Log.e();
+        currentUserId = fbAuth.getCurrentUser().getUid();
+
+        if(!TextUtils.isEmpty(currentUserId)) {
+            friendsFBDatabaseRef    = rootFBDatabaseRef.child(CONST.FIREBASE_FRIENDS_CHILD).child(currentUserId);
+            friendsFBDatabaseRef.keepSynced(true);
+        }
+        else {
+            Log.e("LOG", "FriendsFragment: currentUserId is empty or null");
+        }
+    }
+
+    private void populateFriendsList() {
+        Log.e("LOG", "FriendsFragment: populateFriendsList()");
+
+        if(friendsFBDatabaseRef != null) {
+            FirebaseRecyclerAdapter<User, UserViewHolder> friendsRecyclerViewAdapter = new FirebaseRecyclerAdapter<User, UserViewHolder>(
+                    User.class,
+                    R.layout.user_row,
+                    UserViewHolder.class,
+                    friendsFBDatabaseRef) {
+
+                @Override
+                protected void populateViewHolder(final UserViewHolder  viewHolder,
+                                                  User                  model,
+                                                  int                   position) {
+
+                    selectedUserId = getRef(position).getKey();
+
+                    usersFBDatabaseRef.child(selectedUserId).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+
+                            selectedUserName        = dataSnapshot.child(CONST.USER_NAME).getValue().toString();
+                            selectedUserThumbImage  = dataSnapshot.child(CONST.USER_THUMB_IMAGE).getValue().toString();
+                            selectedUserStatus      = dataSnapshot.child(CONST.USER_STATUS).getValue().toString();
+
+                            if(dataSnapshot.hasChild(CONST.USER_IS_ONLINE)) {
+                                Boolean userIsOnline = (boolean) dataSnapshot.child(CONST.USER_IS_ONLINE).getValue();
+                                viewHolder.setOnlineStatus(userIsOnline);
+                            }
+
+                            viewHolder.setName(selectedUserName);
+                            viewHolder.setStatus(selectedUserStatus);
+                            viewHolder.setAvatar(selectedUserThumbImage);
+
+                            viewHolder.itemView.setOnClickListener(friendClickListener);
+
                         }
 
-                        friendsViewHolder.setName(selectedUserName);
-                        friendsViewHolder.setAvatar(selectedUserThumbImage);
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
 
-                        friendsViewHolder.itemView.setOnClickListener(friendClickListener);
+                        }
+                    });
+                }
+            };
 
-                    }
+            friendsRecyclerVIew.setAdapter(friendsRecyclerViewAdapter);
+        }
+        else {
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-            }
-        };
-
-        friendsRecyclerVIew.setAdapter(friendsRecyclerViewAdapter);
+            Log.e("LOG", "FriendsFragment: populateFriendsList(): friendsFBDatabaseRef is null");
+        }
     }
+
+    private void showSelectOptionDialog() {
+
+        String openProfileText      = getResources().getString(R.string.text_open_profile);
+        String sendMessageText      = getResources().getString(R.string.text_send_message);
+        String selectOptionsText    = getResources().getString(R.string.text_select_options);
+
+        int alertDialogDividerColorResId        = getResources().getColor(R.color.colorAccent);
+
+        CharSequence[] optionsArr               = new CharSequence[] {  openProfileText,
+                                                                        sendMessageText};
+
+        AlertDialog.Builder alertDialogBuilder  = new AlertDialog.Builder(  getContext(),
+                                                                            R.style.Theme_Sphinx_Dialog_Alert);
+
+        alertDialogBuilder.setTitle(selectOptionsText);
+
+        alertDialogBuilder.setItems(optionsArr,
+                                    optionClickListener);
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+
+        // Set title divider color
+        int titleDividerId = getResources().getIdentifier(  "titleDivider",
+                                                            "id",
+                                                            "android");
+
+        View titleDivider = alertDialog.findViewById(titleDividerId);
+
+        if (titleDivider != null)
+            titleDivider.setBackgroundColor(alertDialogDividerColorResId);
+    }
+
+    private void moveToProfileActivity(){
+
+        Intent profileIntent = new Intent(  getContext(),
+                                            ProfileActivity.class);
+        profileIntent.putExtra( CONST.USER_ID,
+                                selectedUserId);
+        startActivity(profileIntent);
+    }
+
+    private void moveToChatActivity(){
+
+        Intent chatIntent = new Intent( getContext(),
+                                        ChatActivity.class);
+        chatIntent.putExtra(CONST.USER_ID,
+                            selectedUserId);
+        chatIntent.putExtra(CONST.USER_NAME,
+                            selectedUserName);
+        chatIntent.putExtra(CONST.USER_THUMB_IMAGE,
+                            selectedUserThumbImage);
+        startActivity(chatIntent);
+    }
+
+    // ------------------------ ADAPTERS ------------------------------------ //
+
+//    FirebaseRecyclerAdapter<User, UserViewHolder> friendsRecyclerViewAdapter = new FirebaseRecyclerAdapter<User, UserViewHolder>(
+//            User.class,
+//            R.layout.user_row,
+//            UserViewHolder.class,
+//            friendsFBDatabaseRef) {
+//
+//        @Override
+//        protected void populateViewHolder(final UserViewHolder  viewHolder,
+//                                          User                  model,
+//                                          int                   position) {
+//
+//            selectedUserId = getRef(position).getKey();
+//
+//            usersFBDatabaseRef.child(selectedUserId).addListenerForSingleValueEvent(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(DataSnapshot dataSnapshot) {
+//
+//                    selectedUserName        = dataSnapshot.child(CONST.USER_NAME).getValue().toString();
+//                    selectedUserThumbImage  = dataSnapshot.child(CONST.USER_THUMB_IMAGE).getValue().toString();
+//                    selectedUserStatus      = dataSnapshot.child(CONST.USER_STATUS).getValue().toString();
+//
+//                    if(dataSnapshot.hasChild(CONST.USER_IS_ONLINE)) {
+//                        Boolean userIsOnline = (boolean) dataSnapshot.child(CONST.USER_IS_ONLINE).getValue();
+//                        viewHolder.setOnlineStatus(userIsOnline);
+//                    }
+//
+//                    viewHolder.setName(selectedUserName);
+//                    viewHolder.setStatus(selectedUserStatus);
+//                    viewHolder.setAvatar(selectedUserThumbImage);
+//
+//                    viewHolder.itemView.setOnClickListener(friendClickListener);
+//
+//                }
+//
+//                @Override
+//                public void onCancelled(DatabaseError databaseError) {
+//
+//                }
+//            });
+//        }
+//    };
 
     // ------------------------ VALUE EVENT LISTENERS ------------------------------------ //
 
@@ -134,31 +276,7 @@ public class FriendsFragment extends Fragment {
         @Override
         public void onClick(View v) {
 
-            String openProfileText      = getResources().getString(R.string.text_open_profile);
-            String sendMessageText      = getResources().getString(R.string.text_send_message);
-            String selectOptionsText    = getResources().getString(R.string.text_select_options);
-
-            int alertDialogDividerColorResId = getResources().getColor(R.color.colorAccent);
-
-            CharSequence[] optionsArr = new CharSequence[] {openProfileText, sendMessageText};
-
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(   getContext(),
-                                                                                R.style.Theme_Sphinx_Dialog_Alert);
-            alertDialogBuilder.setTitle(selectOptionsText);
-            alertDialogBuilder.setItems(optionsArr,
-                                        optionClickListener);
-//            alertDialogBuilder.show();
-
-            AlertDialog alertDialog = alertDialogBuilder.create();
-//            alertDialog.setTitle(alertDialogHeaderResId);
-            alertDialog.show();
-
-            // Set title divider color
-            int titleDividerId = getResources().getIdentifier("titleDivider", "id", "android");
-            View titleDivider = alertDialog.findViewById(titleDividerId);
-
-            if (titleDivider != null)
-                titleDivider.setBackgroundColor(alertDialogDividerColorResId);
+            showSelectOptionDialog();
         }
     };
 
@@ -170,22 +288,10 @@ public class FriendsFragment extends Fragment {
             switch(which) {
 
                 case CONST.OPEN_PROFILE_TYPE:
-                    Intent profileIntent = new Intent(  getContext(),
-                                                        ProfileActivity.class);
-                    profileIntent.putExtra( CONST.USER_ID,
-                                            selectedUserId);
-                    startActivity(profileIntent);
+                    moveToProfileActivity();
                     break;
                 case CONST.SEND_MESSAGE_TYPE:
-                    Intent chatIntent = new Intent( getContext(),
-                                                    ChatActivity.class);
-                    chatIntent.putExtra(CONST.USER_ID,
-                                        selectedUserId);
-                    chatIntent.putExtra(CONST.USER_NAME,
-                                        selectedUserName);
-                    chatIntent.putExtra(CONST.USER_THUMB_IMAGE,
-                                        selectedUserThumbImage);
-                    startActivity(chatIntent);
+                    moveToChatActivity();
                     break;
             }
         }

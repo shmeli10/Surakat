@@ -7,10 +7,9 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
+
 import com.shmeli.surakat.ui.fragments.AllUsersFragment;
-import com.shmeli.surakat.ui.fragments.ChatsFragment;
 import com.shmeli.surakat.ui.fragments.FriendsFragment;
-import com.shmeli.surakat.ui.fragments.RequestsFragment;
 
 /**
  * Created by Serghei Ostrovschi on 10/18/17.
