@@ -8,6 +8,9 @@ import android.os.Bundle;
 
 import android.app.Fragment;
 
+import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
+import android.text.TextUtils;
 import android.util.Log;
 
 import android.view.LayoutInflater;
@@ -18,7 +21,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 import com.shmeli.surakat.R;
+import com.shmeli.surakat.ui.new_version.ExternalActivity;
 import com.shmeli.surakat.utils.UiUtils;
 
 /**
@@ -41,7 +48,9 @@ public class SignInFragment extends Fragment {
     private Button          singInButton;
     private Button          registerButton;
 
-    private ProgressDialog  progressDialog;
+    private ExternalActivity externalActivity;
+
+    private static SignInFragment  instance;
 
     public SignInFragment() {
         // Required empty public constructor
@@ -56,9 +65,14 @@ public class SignInFragment extends Fragment {
     public static SignInFragment newInstance() {
         Bundle args = new Bundle();
 
-        SignInFragment fragment = new SignInFragment();
-        fragment.setArguments(args);
-        return fragment;
+        if(instance == null) {
+            instance = new SignInFragment();
+        }
+
+//        SignInFragment fragment = new SignInFragment();
+        instance.setArguments(args);
+
+        return instance;
     }
 
     @Override
@@ -74,6 +88,8 @@ public class SignInFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_sign_in,
                                 container,
                                 false);
+
+        externalActivity = (ExternalActivity) getActivity();
 
         signInContainer     = UiUtils.findView(view, R.id.signInContainer);
         emailEditText       = UiUtils.findView(view, R.id.emailEditText);
@@ -152,6 +168,68 @@ public class SignInFragment extends Fragment {
         }
     };
 
+    // ------------------------------ ON COMPLETE LISTENERS ----------------------------------- //
+
+    OnCompleteListener<AuthResult> signInCompleteListener = new OnCompleteListener<AuthResult>() {
+        @Override
+        public void onComplete(@NonNull Task<AuthResult> task) {
+
+            Log.e("LOG", "SignInFragment: onSignInCompleteListener: onComplete(): task.isSuccessful(): " +task.isSuccessful());
+
+            if(task.isSuccessful()) {
+
+                externalActivity.dismissProgressDialog();
+
+                // user initialized successfully
+                if(externalActivity.initCurrentUser()) {
+                    Log.e("LOG", "SignInFragment: onSignInCompleteListener: onComplete(): user initialized successfully");
+
+                    // user exists in DB
+                    if(externalActivity.currentUserExistsInFBDB()) {
+                        Log.e("LOG", "SignInFragment: onSignInCompleteListener: onComplete(): move to InternalActivity");
+
+                        externalActivity.moveToInternalActivity();
+
+                        /*
+                        String deviceToken  = FirebaseInstanceId.getInstance().getToken();
+                        currentUserId       = fbAuth.getCurrentUser().getUid();
+
+                        if(!TextUtils.isEmpty(currentUserId)) {
+
+                            currentUserFBDatabaseRef = usersFBDatabaseRef.child(currentUserId);
+                            currentUserFBDatabaseRef.child(CONST.USER_DEVICE_TOKEN)
+                                    .setValue(deviceToken)
+                                    .addOnCompleteListener(setDeviceTokenCompleteListener);
+                        }*/
+
+                        //externalActivity.setCurrentUserIsOnline(true);
+                    }
+                    // user does not exist in DB
+                    else {
+                        Log.e("LOG", "SignInFragment: onSignInCompleteListener: onComplete(): move to FillAccountFragment");
+                    }
+                }
+                // user initialize error
+                else {
+                    Log.e("LOG", "SignInFragment: onSignInCompleteListener: onComplete(): user initialize error");
+
+                    externalActivity.showSnackBar(  signInContainer,
+                                                    R.string.error_sign_in,
+                                                    Snackbar.LENGTH_LONG);
+                }
+            }
+            else {
+                Log.e("LOG", "SignInFragment: startSignIn(): FBAuth is null: " +(externalActivity.getFBAuth() == null));
+
+                externalActivity.hideProgressDialog();
+
+                externalActivity.showSnackBar(  signInContainer,
+                                                R.string.error_sign_in,
+                                                Snackbar.LENGTH_LONG);
+            }
+        }
+    };
+
     // ------------------------------ OTHER --------------------------------------------------- //
 
     private void moveToRegisterFragment() {
@@ -161,24 +239,27 @@ public class SignInFragment extends Fragment {
     private void startSignIn() {
         Log.e("LOG", "SignInFragment: startSignIn()");
 
-//        String email    = emailEditText.getText().toString();
-//        String password = passwordEditText.getText().toString();
-//
-//        if(TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
-//
-//            Snackbar.make(  signInContainer,
-//                    R.string.error_empty_field,
-//                    Snackbar.LENGTH_LONG).show();
-//        }
-//        else {
-//
+        String email    = emailEditText.getText().toString();
+        String password = passwordEditText.getText().toString();
+
+        if(TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
+
+            externalActivity.showSnackBar(  signInContainer,
+                                            R.string.error_empty_field,
+                                            Snackbar.LENGTH_LONG);
+        }
+        else {
+
 //            progressDialog.setTitle(getResources().getString(R.string.message_checking_sign_in));
 //            progressDialog.setMessage(getResources().getString(R.string.message_check_account_wait));
 //            progressDialog.setCanceledOnTouchOutside(false);
 //            progressDialog.show();
-//
-//            // -------------------------------------------------------------------------------- //
-//
+
+            externalActivity.showProgressDialog(getResources().getString(R.string.message_checking_sign_in),
+                                                getResources().getString(R.string.message_check_account_wait));
+
+            // -------------------------------------------------------------------------------- //
+
 //            // Set title divider color
 //            int titleDividerId = getResources().getIdentifier(  "titleDivider",
 //                                                                "id",
@@ -187,11 +268,16 @@ public class SignInFragment extends Fragment {
 //
 //            if (titleDivider != null)
 //                titleDivider.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-//
-//            // -------------------------------------------------------------------------------- //
-//
-//            fbAuth.signInWithEmailAndPassword(email, password)
-//                    .addOnCompleteListener(signInCompleteListener);
-//        }
+
+            // -------------------------------------------------------------------------------- //
+
+            Log.e("LOG", "SignInFragment: startSignIn(): FBAuth is null: " +(externalActivity.getFBAuth() == null));
+
+            if(externalActivity.getFBAuth() != null) {
+
+                externalActivity.getFBAuth().signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(signInCompleteListener);
+            }
+        }
     }
 }
