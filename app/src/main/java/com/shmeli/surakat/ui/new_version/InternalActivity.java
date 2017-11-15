@@ -83,6 +83,11 @@ public class InternalActivity   extends     ParentActivity
     }*/
 
     @Override
+    public void setFragment(int fragmentCode, boolean animate, boolean addToBackStack) {
+
+    }
+
+    @Override
     public void setToolbarTitle(int titleResId) {
         Log.e("LOG", "InternalActivity: setToolbarTitle()");
 

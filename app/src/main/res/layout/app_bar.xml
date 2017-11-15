@@ -7,20 +7,21 @@
     android:background="@color/colorPrimaryDark"
     android:theme="@style/Base.ThemeOverlay.AppCompat.Dark.ActionBar">
 
-    <FrameLayout
-        style="@style/WM"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_centerVertical="true"
-        android:padding="@dimen/spacing_2x"
-        android:layout_marginRight="@dimen/spacing_2x">
+    <!--<FrameLayout-->
+        <!--android:id="@+id/appToolbarBackButton"-->
+        <!--style="@style/WM"-->
+        <!--android:layout_alignParentLeft="true"-->
+        <!--android:layout_alignParentStart="true"-->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:padding="@dimen/spacing_2x"-->
+        <!--android:layout_marginRight="@dimen/spacing_2x"-->
+        <!--android:clickable="true">-->
 
-        <ImageButton
-            android:id="@+id/MainActivity_Toolbar_NavButton"
-            style="@style/ActionButton"
-            android:src="@drawable/arrow_back_icon"/>
+        <!--<ImageButton-->
+            <!--style="@style/ActionButton"-->
+            <!--android:src="@drawable/arrow_back_icon"/>-->
 
-    </FrameLayout>
+    <!--</FrameLayout>-->
     <TextView
         android:id="@+id/appToolbarTitleTextView"
         style="@style/MW"

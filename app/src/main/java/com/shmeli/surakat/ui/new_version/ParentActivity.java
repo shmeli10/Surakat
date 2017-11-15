@@ -21,6 +21,9 @@ import com.google.firebase.database.ServerValue;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
+import com.shmeli.surakat.ui.new_version.fragments.FillAccountFragment;
+import com.shmeli.surakat.ui.new_version.fragments.RegisterFragment;
+import com.shmeli.surakat.ui.new_version.fragments.SignInFragment;
 
 /**
  * Created by Serghei Ostrovschi on 11/14/17.
@@ -76,31 +79,92 @@ public abstract class ParentActivity extends AppCompatActivity {
 
     // ------------------------------ SETTERS -------------------------------- //
 
-    public void setFragment(Fragment    fragment,
-                            boolean     animate,
-                            boolean     addToBackStack) {
+    protected void changeFragmentTo(Fragment    fragment,
+                                    boolean     animate,
+                                    boolean     addToBackStack) {
+        Log.e("LOG", "ParentActivity: changeFragmentTo()");
 
-        FragmentManager fragmentManager = getFragmentManager();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
+//        if(fragment != null) {
 
-        if (animate) {
-            transaction.setCustomAnimations(R.animator.slide_in,
-                    R.animator.slide_out,
-                    R.animator.slide_in,
-                    R.animator.slide_out);
-        } else {
-            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        }
+            FragmentManager fragmentManager = getFragmentManager();
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
 
-        transaction.replace(R.id.externalActivityFragmentsContainer,
-                fragment,
-                fragment.getClass().getName());
+            if (animate) {
+                transaction.setCustomAnimations(R.animator.slide_in,
+                        R.animator.slide_out,
+                        R.animator.slide_in,
+                        R.animator.slide_out);
+            } else {
+                transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+            }
 
-        if(addToBackStack)
-            transaction.addToBackStack(fragment.getClass().getName());
+            transaction.replace(R.id.externalActivityFragmentsContainer,
+                    fragment,
+                    fragment.getClass().getName());
 
-        transaction.commit();
+            if (addToBackStack)
+                transaction.addToBackStack(fragment.getClass().getName());
+
+            transaction.commit();
+//        }
+//        else {
+//            Log.e("LOG", "ParentActivity: changeFragmentTo(): fragment is null");
+//        }
     }
+
+    public abstract void setFragment(int         fragmentCode,
+                                     boolean     animate,
+                                     boolean     addToBackStack);
+
+//    public void setFragment(Fragment    fragment,
+//    public void setFragment(int         fragmentCode,
+//                            boolean     animate,
+//                            boolean     addToBackStack) {
+//
+//        Fragment fragment = null;
+//
+//        switch(fragmentCode) {
+//
+//            case CONST.FILL_ACCOUNT_FRAGMENT:
+//                fragment = FillAccountFragment.newInstance();
+//                break;
+//            case CONST.REGISTER_FRAGMENT:
+//                fragment = RegisterFragment.newInstance();
+//                break;
+//            case CONST.SIGN_IN_FRAGMENT:
+//                fragment = SignInFragment.newInstance();
+//                break;
+//            default:
+//                Log.e("LOG", "ParentActivity: setFragment(): undefined fragment code: " +fragmentCode);
+//        }
+//
+//        if(fragment != null) {
+//
+//            FragmentManager fragmentManager = getFragmentManager();
+//            FragmentTransaction transaction = fragmentManager.beginTransaction();
+//
+//            if (animate) {
+//                transaction.setCustomAnimations(R.animator.slide_in,
+//                        R.animator.slide_out,
+//                        R.animator.slide_in,
+//                        R.animator.slide_out);
+//            } else {
+//                transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+//            }
+//
+//            transaction.replace(R.id.externalActivityFragmentsContainer,
+//                                fragment,
+//                                fragment.getClass().getName());
+//
+//            if (addToBackStack)
+//                transaction.addToBackStack(fragment.getClass().getName());
+//
+//            transaction.commit();
+//        }
+//        else {
+//            Log.e("LOG", "ParentActivity: setFragment(): fragment is null");
+//        }
+//    }
 
     public abstract void setToolbarTitle(final int titleResId);
 

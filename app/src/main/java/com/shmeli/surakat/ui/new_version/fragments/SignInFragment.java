@@ -2,7 +2,6 @@ package com.shmeli.surakat.ui.new_version.fragments;
 
 import android.content.Context;
 
-import android.net.Uri;
 import android.os.Bundle;
 
 import android.app.Fragment;
@@ -24,15 +23,14 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.shmeli.surakat.R;
+import com.shmeli.surakat.data.CONST;
 import com.shmeli.surakat.ui.new_version.ExternalActivity;
 import com.shmeli.surakat.utils.UiUtils;
 
 /**
- * A simple {@link Fragment} subclass.
- * Use the {@link SignInFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * Created by Serghei Ostrovschi on 11/14/17.
  */
-public class SignInFragment extends Fragment {
+public class SignInFragment extends ParentFragment {
 
     private static SignInFragment  instance;
 
@@ -80,12 +78,17 @@ public class SignInFragment extends Fragment {
                              ViewGroup      container,
                              Bundle         savedInstanceState) {
 
+        Log.e("LOG", "SignInFragment: onCreateView()");
+
         view = inflater.inflate(R.layout.fragment_sign_in,
                                 container,
                                 false);
 
         externalActivity = (ExternalActivity) getActivity();
-        externalActivity.setToolbarTitle(R.string.text_sign_in);
+//        externalActivity.setToolbarTitle(R.string.text_sign_in);
+
+
+
 
         signInContainer     = UiUtils.findView( view,
                                                 R.id.signInContainer);
@@ -111,6 +114,8 @@ public class SignInFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+
+        Log.e("LOG", "SignInFragment: onAttach()");
     }
 
     @Override
@@ -210,7 +215,8 @@ public class SignInFragment extends Fragment {
     private void moveToRegisterFragment() {
         Log.e("LOG", "SignInFragment: moveToRegisterFragment()");
 
-        externalActivity.setFragment(   RegisterFragment.newInstance(),
+//        externalActivity.setFragment(   RegisterFragment.newInstance(),
+        externalActivity.setFragment(   CONST.REGISTER_FRAGMENT,
                                         true,
                                         true);
     }

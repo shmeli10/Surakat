@@ -16,7 +16,7 @@ import com.shmeli.surakat.R;
  * Use the {@link FillAccountFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FillAccountFragment extends Fragment {
+public class FillAccountFragment extends ParentFragment {
 
     private View            view;
 
