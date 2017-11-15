@@ -1,9 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.Toolbar
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/appToolbar"
     style="@style/MW"
-    android:background="@color/colorPrimary"
+    android:minHeight="?attr/actionBarSize"
+    android:background="@color/colorPrimaryDark"
     android:theme="@style/Base.ThemeOverlay.AppCompat.Dark.ActionBar">
 
+    <FrameLayout
+        style="@style/WM"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:padding="@dimen/spacing_2x"
+        android:layout_marginRight="@dimen/spacing_2x">
+
+        <ImageButton
+            android:id="@+id/MainActivity_Toolbar_NavButton"
+            style="@style/ActionButton"
+            android:src="@drawable/arrow_back_icon"/>
+
+    </FrameLayout>
+    <TextView
+        android:id="@+id/appToolbarTitleTextView"
+        style="@style/MW"
+        android:gravity="center"
+        android:paddingRight="@dimen/spacing_6x"
+        android:layout_marginRight="@dimen/spacing_1x"
+        android:textSize="@dimen/text_size_2.5x"
+        android:textColor="@color/white"
+        android:layout_gravity="center"/>
 
 </android.support.v7.widget.Toolbar>

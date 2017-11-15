@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/registerContainer"
+    style="@style/MM"
+    android:padding="@dimen/spacing_2x"
+    android:background="@color/colorPrimary">
+
+    <EditText
+        android:id="@+id/registerFragmentNameEditText"
+        style="@style/MW"
+        android:layout_marginTop="@dimen/spacing_6x"
+        android:layout_alignParentTop="true"
+        android:padding="@dimen/spacing_3x"
+        android:ems="10"
+        android:inputType="text"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="@dimen/text_size_1.5x"
+        android:textColorHint="@color/colorPrimary"
+        android:hint="@string/hint_name"
+        android:background="@drawable/input_background"/>
+
+    <EditText
+        android:id="@+id/registerFragmentEmailEditText"
+        style="@style/MW"
+        android:layout_below="@+id/registerFragmentNameEditText"
+        android:layout_marginTop="@dimen/spacing_2x"
+        android:padding="@dimen/spacing_3x"
+        android:ems="10"
+        android:inputType="textEmailAddress"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="@dimen/text_size_1.5x"
+        android:textColorHint="@color/colorPrimary"
+        android:hint="@string/hint_email"
+        android:background="@drawable/input_background"/>
+
+    <EditText
+        android:id="@+id/registerFragmentPasswordEditText"
+        style="@style/MW"
+        android:layout_below="@+id/registerFragmentEmailEditText"
+        android:layout_marginTop="@dimen/spacing_2x"
+        android:padding="@dimen/spacing_3x"
+        android:ems="10"
+        android:inputType="textPassword"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="@dimen/text_size_1.5x"
+        android:textColorHint="@color/colorPrimary"
+        android:hint="@string/hint_password"
+        android:background="@drawable/input_background"/>
+
+    <Button
+        android:id="@+id/registerFragmentCreateButton"
+        style="@style/MW"
+        android:layout_below="@+id/registerFragmentPasswordEditText"
+        android:layout_marginTop="@dimen/spacing_2x"
+        android:background="@drawable/button_green"
+        android:textColor="@color/colorPrimary"
+        android:textSize="@dimen/text_size_1.5x"
+        android:text="@string/button_create"/>
+
+</RelativeLayout>

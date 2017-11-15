@@ -79,7 +79,7 @@ public class RegisterActivity extends AppCompatActivity {
         registerContainer   = UiUtils.findView(this, R.id.registerContainer);
         registerPageToolbar = UiUtils.findView(this, R.id.registerPageToolbar);
         setSupportActionBar(registerPageToolbar);
-        getSupportActionBar().setTitle(R.string.text_create_account);
+        getSupportActionBar().setTitle(R.string.text_create_an_account);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
@@ -149,8 +149,8 @@ public class RegisterActivity extends AppCompatActivity {
                 progressDialog.hide();
 
                 Snackbar.make(  registerContainer,
-                        R.string.error_register_user,
-                        Snackbar.LENGTH_LONG).show();
+                                R.string.error_create_an_account,
+                                Snackbar.LENGTH_LONG).show();
             }
         }
     };
@@ -176,7 +176,7 @@ public class RegisterActivity extends AppCompatActivity {
                 progressDialog.hide();
 
                 Snackbar.make(  registerContainer,
-                                R.string.error_register_user,
+                                R.string.error_create_an_account,
                                 Snackbar.LENGTH_LONG).show();
             }
         }

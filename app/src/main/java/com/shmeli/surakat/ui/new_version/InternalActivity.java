@@ -83,11 +83,11 @@ public class InternalActivity   extends     ParentActivity
     }*/
 
     @Override
-    public void setToolbarTitle(String title) {
+    public void setToolbarTitle(int titleResId) {
         Log.e("LOG", "InternalActivity: setToolbarTitle()");
 
-        if((actionBar != null) && (!TextUtils.isEmpty(title))) {
-            actionBar.setTitle(title);
+        if((actionBar != null) && (titleResId > 0)) { //(!TextUtils.isEmpty(title))) {
+            actionBar.setTitle(titleResId);
         }
     }
 

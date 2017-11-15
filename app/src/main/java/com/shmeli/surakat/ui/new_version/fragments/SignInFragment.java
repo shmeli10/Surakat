@@ -1,6 +1,5 @@
 package com.shmeli.surakat.ui.new_version.fragments;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 
 import android.net.Uri;
@@ -30,13 +29,12 @@ import com.shmeli.surakat.utils.UiUtils;
 
 /**
  * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link SignInFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
  * Use the {@link SignInFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
 public class SignInFragment extends Fragment {
+
+    private static SignInFragment  instance;
 
     private View            view;
 
@@ -49,8 +47,6 @@ public class SignInFragment extends Fragment {
     private Button          registerButton;
 
     private ExternalActivity externalActivity;
-
-    private static SignInFragment  instance;
 
     public SignInFragment() {
         // Required empty public constructor
@@ -69,7 +65,6 @@ public class SignInFragment extends Fragment {
             instance = new SignInFragment();
         }
 
-//        SignInFragment fragment = new SignInFragment();
         instance.setArguments(args);
 
         return instance;
@@ -90,57 +85,37 @@ public class SignInFragment extends Fragment {
                                 false);
 
         externalActivity = (ExternalActivity) getActivity();
+        externalActivity.setToolbarTitle(R.string.text_sign_in);
 
-        signInContainer     = UiUtils.findView(view, R.id.signInContainer);
-        emailEditText       = UiUtils.findView(view, R.id.emailEditText);
-        passwordEditText    = UiUtils.findView(view, R.id.passwordEditText);
+        signInContainer     = UiUtils.findView( view,
+                                                R.id.signInContainer);
 
-        singInButton        = UiUtils.findView(view, R.id.signInButton);
+        emailEditText       = UiUtils.findView( view,
+                                                R.id.emailEditText);
+
+        passwordEditText    = UiUtils.findView( view,
+                                                R.id.passwordEditText);
+
+        singInButton        = UiUtils.findView( view,
+                                                R.id.signInButton);
         singInButton.setOnClickListener(signInClickListener);
 
-        registerButton      = UiUtils.findView(view, R.id.registerButton);
+        registerButton      = UiUtils.findView( view,
+                                                R.id.registerButton);
         registerButton.setOnClickListener(registerClickListener);
 
         // Inflate the layout for this fragment
         return view;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-//        if (mListener != null) {
-//            mListener.onFragmentInteraction(uri);
-//        }
-    }
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-//        if (context instanceof OnFragmentInteractionListener) {
-//            mListener = (OnFragmentInteractionListener) context;
-//        } else {
-//            throw new RuntimeException(context.toString()
-//                    + " must implement OnFragmentInteractionListener");
-//        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
     }
 
     // ------------------------------ ON CLICK LISTENERS -------------------------------------- //
@@ -182,11 +157,11 @@ public class SignInFragment extends Fragment {
 
                 // user initialized successfully
                 if(externalActivity.initCurrentUser()) {
-                    Log.e("LOG", "SignInFragment: onSignInCompleteListener: onComplete(): user initialized successfully");
+                    Log.e("LOG", "SignInFragment: signInCompleteListener: user initialized successfully");
 
                     // user exists in DB
                     if(externalActivity.currentUserExistsInFBDB()) {
-                        Log.e("LOG", "SignInFragment: onSignInCompleteListener: onComplete(): move to InternalActivity");
+                        Log.e("LOG", "SignInFragment: signInCompleteListener: move to InternalActivity");
 
                         externalActivity.moveToInternalActivity();
 
@@ -206,12 +181,12 @@ public class SignInFragment extends Fragment {
                     }
                     // user does not exist in DB
                     else {
-                        Log.e("LOG", "SignInFragment: onSignInCompleteListener: onComplete(): move to FillAccountFragment");
+                        Log.e("LOG", "SignInFragment: signInCompleteListener: move to FillAccountFragment");
                     }
                 }
                 // user initialize error
                 else {
-                    Log.e("LOG", "SignInFragment: onSignInCompleteListener: onComplete(): user initialize error");
+                    Log.e("LOG", "SignInFragment: signInCompleteListener: user initialize error");
 
                     externalActivity.showSnackBar(  signInContainer,
                                                     R.string.error_sign_in,
@@ -234,6 +209,10 @@ public class SignInFragment extends Fragment {
 
     private void moveToRegisterFragment() {
         Log.e("LOG", "SignInFragment: moveToRegisterFragment()");
+
+        externalActivity.setFragment(   RegisterFragment.newInstance(),
+                                        true,
+                                        true);
     }
 
     private void startSignIn() {
@@ -242,7 +221,8 @@ public class SignInFragment extends Fragment {
         String email    = emailEditText.getText().toString();
         String password = passwordEditText.getText().toString();
 
-        if(TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
+        if( TextUtils.isEmpty(email)    ||
+            TextUtils.isEmpty(password)) {
 
             externalActivity.showSnackBar(  signInContainer,
                                             R.string.error_empty_field,

@@ -9,10 +9,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
+
 import android.util.Log;
 
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.shmeli.surakat.R;
 import com.shmeli.surakat.ui.new_version.fragments.SignInFragment;
@@ -23,8 +24,10 @@ public class ExternalActivity   extends     ParentActivity
 
     private RelativeLayout  rootContainer;
 
-    private ActionBar       actionBar;
+//    private ActionBar       actionBar;
     private Toolbar         toolbar;
+
+    private TextView        toolbarTitleTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,9 +41,12 @@ public class ExternalActivity   extends     ParentActivity
 
         toolbar         = UiUtils.findView( this,
                                             R.id.externalActivityToolbar);
-        setSupportActionBar(toolbar);
+//        setSupportActionBar(toolbar);
 
-        actionBar       = getSupportActionBar();
+        toolbarTitleTextView = UiUtils.findView(toolbar,
+                                                R.id.appToolbarTitleTextView);
+
+//        actionBar       = getSupportActionBar();
 
         init();
     }
@@ -82,11 +88,15 @@ public class ExternalActivity   extends     ParentActivity
     }*/
 
     @Override
-    public void setToolbarTitle(String title) {
+    public void setToolbarTitle(int titleResId) {
         Log.e("LOG", "ExternalActivity: setToolbarTitle()");
 
-        if((actionBar != null) && (!TextUtils.isEmpty(title))) {
-            actionBar.setTitle(title);
+//        if((actionBar != null) && (titleResId > 0)) {//(!TextUtils.isEmpty(title))) {
+//            actionBar.setTitle(titleResId);
+//        }
+
+        if(titleResId > 0) {
+            toolbarTitleTextView.setText(titleResId);
         }
     }
 

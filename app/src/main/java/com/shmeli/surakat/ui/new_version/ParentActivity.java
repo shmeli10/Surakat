@@ -18,6 +18,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
 
@@ -27,7 +28,9 @@ import com.shmeli.surakat.data.CONST;
 
 public abstract class ParentActivity extends AppCompatActivity {
 
-    private String currentUserId = "";
+    private String currentUserId    = "";
+
+    private String deviceToken      = "";
 
     private DatabaseReference rootFBDatabaseRef;
     private DatabaseReference usersFBDatabaseRef;
@@ -41,6 +44,14 @@ public abstract class ParentActivity extends AppCompatActivity {
 
     public String getCurrentUserId() {
         return currentUserId;
+    }
+
+    public String getDeviceToken() {
+
+        if(TextUtils.isEmpty(deviceToken))
+            deviceToken = FirebaseInstanceId.getInstance().getToken();
+
+        return deviceToken;
     }
 
     public DatabaseReference getRootFBDatabaseRef() {
@@ -91,7 +102,7 @@ public abstract class ParentActivity extends AppCompatActivity {
         transaction.commit();
     }
 
-    public abstract void setToolbarTitle(final String title);
+    public abstract void setToolbarTitle(final int titleResId);
 
     public void setCurrentUserIsOnline(boolean isOnline) {
 

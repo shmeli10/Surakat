@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/externalActivityContainer"
     style="@style/MM"
+    android:background="@color/colorPrimary"
     android:theme="@style/Base.ThemeOverlay.AppCompat.Dark.ActionBar"
     tools:context="com.shmeli.surakat.ui.new_version.ExternalActivity">
 

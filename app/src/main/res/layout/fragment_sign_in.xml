@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/signInContainer"
     style="@style/MM"
     android:padding="@dimen/spacing_2x"
-    tools:context="com.shmeli.surakat.ui.LoginActivity"
     android:background="@color/colorPrimary">
 
     <ImageView
@@ -73,6 +71,6 @@
         android:background="@drawable/button_yellow"
         android:textColor="@color/colorPrimary"
         android:textSize="@dimen/text_size_1.5x"
-        android:text="@string/text_create_account"/>
+        android:text="@string/text_create_an_account"/>
 
 </RelativeLayout>

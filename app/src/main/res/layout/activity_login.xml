@@ -74,7 +74,7 @@
         android:background="@drawable/button_yellow"
         android:textColor="@color/colorPrimary"
         android:textSize="@dimen/text_size_1.5x"
-        android:text="@string/text_create_account"/>
+        android:text="@string/text_create_an_account"/>
 
 
 </RelativeLayout>
