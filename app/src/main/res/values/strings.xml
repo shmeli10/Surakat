@@ -75,6 +75,7 @@
     <string name="text_settings">Settings</string>
     <string name="text_sign_in">Sign In</string>
     <string name="text_status">Status</string>
+    <string name="text_tabs_fragment">Choose a friend for chat</string>
     <string name="text_total_friends">Total friends:</string>
     <string name="text_unfriend_request">Unfriend request</string>
     <string name="text_user">User</string>

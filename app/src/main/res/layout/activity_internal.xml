@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/internalActivityContainer"
     style="@style/MM"
+    android:background="@color/colorPrimary"
     android:theme="@style/Base.ThemeOverlay.AppCompat.Dark.ActionBar"
     tools:context="com.shmeli.surakat.ui.new_version.InternalActivity">
 
@@ -12,7 +13,7 @@
         layout="@layout/app_bar"/>
 
     <FrameLayout
-        android:id="@+id/internalActivityFragmentsContainer"
+        android:id="@+id/fragmentsContainer"
         style="@style/MM"
         android:layout_below="@+id/internalActivityToolbar"/>
 

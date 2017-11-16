@@ -39,12 +39,6 @@ public class MainPageViewPagerAdapter extends FragmentPagerAdapter {
 
         switch(position) {
 
-//            case REQUESTS_TAB_ID:
-//                RequestsFragment requestsFragment = new RequestsFragment();
-//                return requestsFragment;
-//            case CHATS_TAB_ID:
-//                ChatsFragment chatsFragment = new ChatsFragment();
-//                return chatsFragment;
             case ALL_USERS_TAB_ID:
                 AllUsersFragment allUsersFragment = new AllUsersFragment();
                 return allUsersFragment;

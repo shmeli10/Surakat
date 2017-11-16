@@ -281,7 +281,7 @@ public class RegisterFragment extends ParentFragment {
 //    private void moveToFillAccountFragment() {
 //        Log.e("LOG", "RegisterFragment: moveToFillAccountFragment()");
 //
-//        externalActivity.setFragment(   CONST.FILL_ACCOUNT_FRAGMENT,
+//        externalActivity.setFirstLayerFragment(   CONST.FILL_ACCOUNT_FRAGMENT,
 //                                        true,
 //                                        true);
 //    }

@@ -4,8 +4,6 @@ import android.content.Context;
 
 import android.os.Bundle;
 
-import android.app.Fragment;
-
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
@@ -219,15 +217,18 @@ public class SignInFragment extends ParentFragment {
     private void moveToRegisterFragment() {
         Log.e("LOG", "SignInFragment: moveToRegisterFragment()");
 
-        externalActivity.setFragment(   CONST.REGISTER_FRAGMENT,
-                                        true,
-                                        true);
+        externalActivity.setSecondLayerFragment(CONST.REGISTER_FRAGMENT,
+                                                null);
+
+//        externalActivity.setFirstLayerFragment(   CONST.REGISTER_FRAGMENT,
+//                                        true,
+//                                        true);
     }
 
 /*    private void moveToFillAccountFragment() {
         Log.e("LOG", "SignInFragment: moveToFillAccountFragment()");
 
-        externalActivity.setFragment(   CONST.FILL_ACCOUNT_FRAGMENT,
+        externalActivity.setFirstLayerFragment(   CONST.FILL_ACCOUNT_FRAGMENT,
                                         true,
                                         true);
     }*/

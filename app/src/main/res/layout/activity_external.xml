@@ -13,7 +13,7 @@
         layout="@layout/app_bar"/>
 
     <FrameLayout
-        android:id="@+id/externalActivityFragmentsContainer"
+        android:id="@+id/fragmentsContainer"
         style="@style/MM"
         android:layout_below="@+id/externalActivityToolbar"/>
 

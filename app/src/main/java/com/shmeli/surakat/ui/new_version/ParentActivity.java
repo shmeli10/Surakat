@@ -4,13 +4,14 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
-import android.database.Cursor;
-import android.support.annotation.StringRes;
-import android.support.design.widget.BaseTransientBottomBar;
+
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+
 import android.text.TextUtils;
+
 import android.util.Log;
+
 import android.view.View;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -19,11 +20,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.iid.FirebaseInstanceId;
+
 import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
-import com.shmeli.surakat.ui.new_version.fragments.FillAccountFragment;
-import com.shmeli.surakat.ui.new_version.fragments.RegisterFragment;
-import com.shmeli.surakat.ui.new_version.fragments.SignInFragment;
 
 /**
  * Created by Serghei Ostrovschi on 11/14/17.
@@ -34,6 +33,8 @@ public abstract class ParentActivity extends AppCompatActivity {
     private String currentUserId    = "";
 
     private String deviceToken      = "";
+
+    private int currentFragmentCode;
 
     private DatabaseReference rootFBDatabaseRef;
     private DatabaseReference usersFBDatabaseRef;
@@ -55,6 +56,14 @@ public abstract class ParentActivity extends AppCompatActivity {
             deviceToken = FirebaseInstanceId.getInstance().getToken();
 
         return deviceToken;
+    }
+
+    public int getCurrentFragmentCode() {
+
+        if(currentFragmentCode > 0)
+            return currentFragmentCode;
+        else
+            return 0;
     }
 
     public DatabaseReference getRootFBDatabaseRef() {
@@ -79,92 +88,18 @@ public abstract class ParentActivity extends AppCompatActivity {
 
     // ------------------------------ SETTERS -------------------------------- //
 
-    protected void changeFragmentTo(Fragment    fragment,
-                                    boolean     animate,
-                                    boolean     addToBackStack) {
-        Log.e("LOG", "ParentActivity: changeFragmentTo()");
+    public abstract void setFirstLayerFragment(int         fragmentCode); //,
+//                                               boolean     animate,
+//                                               boolean     addToBackStack);
 
-//        if(fragment != null) {
+    public abstract void setSecondLayerFragment(int     fragmentCode,
+                                                String  selectedUserId);
 
-            FragmentManager fragmentManager = getFragmentManager();
-            FragmentTransaction transaction = fragmentManager.beginTransaction();
+    public void setCurrentFragmentCode(int currentFragmentCode) {
 
-            if (animate) {
-                transaction.setCustomAnimations(R.animator.slide_in,
-                        R.animator.slide_out,
-                        R.animator.slide_in,
-                        R.animator.slide_out);
-            } else {
-                transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-            }
-
-            transaction.replace(R.id.externalActivityFragmentsContainer,
-                    fragment,
-                    fragment.getClass().getName());
-
-            if (addToBackStack)
-                transaction.addToBackStack(fragment.getClass().getName());
-
-            transaction.commit();
-//        }
-//        else {
-//            Log.e("LOG", "ParentActivity: changeFragmentTo(): fragment is null");
-//        }
+        if(currentFragmentCode > 0)
+            this.currentFragmentCode = currentFragmentCode;
     }
-
-    public abstract void setFragment(int         fragmentCode,
-                                     boolean     animate,
-                                     boolean     addToBackStack);
-
-//    public void setFragment(Fragment    fragment,
-//    public void setFragment(int         fragmentCode,
-//                            boolean     animate,
-//                            boolean     addToBackStack) {
-//
-//        Fragment fragment = null;
-//
-//        switch(fragmentCode) {
-//
-//            case CONST.FILL_ACCOUNT_FRAGMENT:
-//                fragment = FillAccountFragment.newInstance();
-//                break;
-//            case CONST.REGISTER_FRAGMENT:
-//                fragment = RegisterFragment.newInstance();
-//                break;
-//            case CONST.SIGN_IN_FRAGMENT:
-//                fragment = SignInFragment.newInstance();
-//                break;
-//            default:
-//                Log.e("LOG", "ParentActivity: setFragment(): undefined fragment code: " +fragmentCode);
-//        }
-//
-//        if(fragment != null) {
-//
-//            FragmentManager fragmentManager = getFragmentManager();
-//            FragmentTransaction transaction = fragmentManager.beginTransaction();
-//
-//            if (animate) {
-//                transaction.setCustomAnimations(R.animator.slide_in,
-//                        R.animator.slide_out,
-//                        R.animator.slide_in,
-//                        R.animator.slide_out);
-//            } else {
-//                transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-//            }
-//
-//            transaction.replace(R.id.externalActivityFragmentsContainer,
-//                                fragment,
-//                                fragment.getClass().getName());
-//
-//            if (addToBackStack)
-//                transaction.addToBackStack(fragment.getClass().getName());
-//
-//            transaction.commit();
-//        }
-//        else {
-//            Log.e("LOG", "ParentActivity: setFragment(): fragment is null");
-//        }
-//    }
 
     public abstract void setToolbarTitle(final int titleResId);
 
@@ -186,7 +121,58 @@ public abstract class ParentActivity extends AppCompatActivity {
 
     // ------------------------------ OTHER ---------------------------------- //
 
-    public abstract void changeFragment(Fragment fragment);
+    protected void replaceFirstLayerFragment(Fragment    fragment) { //,
+//                                             boolean     animate,
+//                                             boolean     addToBackStack) {
+        Log.e("LOG", "ParentActivity: replaceFirstLayerFragment()");
+
+//        if(fragment != null) {
+
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+//        if (animate) {
+//            transaction.setCustomAnimations(R.animator.slide_in,
+//                    R.animator.slide_out,
+//                    R.animator.slide_in,
+//                    R.animator.slide_out);
+//        } else {
+            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+//        }
+
+        transaction.replace(R.id.fragmentsContainer,
+                fragment,
+                fragment.getClass().getName());
+
+//        if (addToBackStack)
+            transaction.addToBackStack(fragment.getClass().getName());
+
+        transaction.commit();
+//        }
+//        else {
+//            Log.e("LOG", "ParentActivity: replaceFirstLayerFragment(): fragment is null");
+//        }
+    }
+
+    protected void addSecondLayerFragment(Fragment fragment) {
+        Log.e("LOG", "ParentActivity: addSecondLayerFragment()");
+
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+        transaction.setCustomAnimations(R.animator.slide_in,
+                                        R.animator.slide_out,
+                                        R.animator.slide_in,
+                                        R.animator.slide_out);
+
+        transaction.add(R.id.fragmentsContainer,
+                        fragment,
+                        fragment.getClass().getName());
+
+        transaction.addToBackStack(fragment.getClass().getName());
+
+        transaction.commit();
+    }
 
 //    public abstract void toggleLoadingProgress(final boolean show);
 
@@ -199,6 +185,7 @@ public abstract class ParentActivity extends AppCompatActivity {
 
             rootFBDatabaseRef   = FirebaseDatabase.getInstance().getReference();
             usersFBDatabaseRef  = rootFBDatabaseRef.child(CONST.FIREBASE_USERS_CHILD);
+            usersFBDatabaseRef.keepSynced(true);
 
             FirebaseUser currentUser = getFBAuth().getCurrentUser();
 
