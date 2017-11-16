@@ -5,10 +5,9 @@ import android.content.Context;
 
 import android.os.Bundle;
 
-import android.app.Fragment;
-
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+
 import android.text.TextUtils;
 
 import android.util.Log;
@@ -23,43 +22,38 @@ import android.widget.RelativeLayout;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.iid.FirebaseInstanceId;
+
 import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
-import com.shmeli.surakat.ui.MainActivity;
-import com.shmeli.surakat.ui.RegisterActivity;
 import com.shmeli.surakat.ui.new_version.ExternalActivity;
 import com.shmeli.surakat.utils.UiUtils;
 
 import java.util.HashMap;
 
 /**
- * A simple {@link Fragment} subclass.
- * Use the {@link RegisterFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * Created by Serghei Ostrovschi on 11/14/17.
  */
+
 public class RegisterFragment extends ParentFragment {
 
     private static RegisterFragment  instance;
 
-    private View            view;
+    private View                view;
 
-    private RelativeLayout  registerContainer;
+    private RelativeLayout      registerContainer;
 
-    private EditText        emailEditText;
-    private EditText        nameEditText;
-    private EditText        passwordEditText;
+    private EditText            emailEditText;
+    private EditText            nameEditText;
+    private EditText            passwordEditText;
 
-    private Button          createButton;
+    private Button              createButton;
 
-    private ExternalActivity externalActivity;
+    private ExternalActivity    externalActivity;
 
-    private String          name        = "";
-    private String          email       = "";
-    private String          password    = "";
+    private String name = "";
 
     public RegisterFragment() {
         // Required empty public constructor
@@ -99,7 +93,6 @@ public class RegisterFragment extends ParentFragment {
                                 false);
 
         externalActivity    = (ExternalActivity) getActivity();
-        externalActivity.setToolbarTitle(R.string.text_create_an_account);
 
         registerContainer   = UiUtils.findView( view,
                                                 R.id.registerContainer);
@@ -159,11 +152,15 @@ public class RegisterFragment extends ParentFragment {
 
                     // user exists in DB
                     if(externalActivity.currentUserExistsInFBDB()) {
+                    //if(!externalActivity.currentUserExistsInFBDB()) {   // ONLY FOR TEST
+
+                        Log.e("LOG", "RegisterFragment: createAccountCompleteListener: current user exists in Firebase DB");
 
                         DatabaseReference currentUserFBDBRef = externalActivity.getCurrentUserFBDatabaseRef();
 
                         // if current user Firebase DB reference link is not null
                         if(currentUserFBDBRef != null) {
+                        //if(currentUserFBDBRef == null) { // ONLY FOR TEST
 
                             HashMap<String, String> userMap = new HashMap<>();
                             userMap.put(CONST.USER_IMAGE,           CONST.DEFAULT_VALUE);
@@ -191,7 +188,7 @@ public class RegisterFragment extends ParentFragment {
                     }
                     // user does not exist in DB
                     else {
-                        Log.e("LOG", "RegisterFragment: createAccountCompleteListener: move to FillAccountFragment(0)");
+                        Log.e("LOG", "RegisterFragment: createAccountCompleteListener: current user does not exist in Firebase DB");
                     }
                 }
                 // user initialize error
@@ -243,9 +240,10 @@ public class RegisterFragment extends ParentFragment {
     private void startRegister() {
         Log.e("LOG", "RegisterFragment: startRegister()");
 
-        name        = nameEditText.getText().toString();
-        email       = emailEditText.getText().toString();
-        password    = passwordEditText.getText().toString();
+        name            = nameEditText.getText().toString();
+
+        String email    = emailEditText.getText().toString();
+        String password = passwordEditText.getText().toString();
 
         if( TextUtils.isEmpty(name)    ||
             TextUtils.isEmpty(email)   ||
@@ -279,4 +277,12 @@ public class RegisterFragment extends ParentFragment {
 //                    .addOnCompleteListener(onCreateUserCompleteListener);
         }
     }
+
+//    private void moveToFillAccountFragment() {
+//        Log.e("LOG", "RegisterFragment: moveToFillAccountFragment()");
+//
+//        externalActivity.setFragment(   CONST.FILL_ACCOUNT_FRAGMENT,
+//                                        true,
+//                                        true);
+//    }
 }

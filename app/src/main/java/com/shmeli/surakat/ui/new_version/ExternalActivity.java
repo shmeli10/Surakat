@@ -26,6 +26,10 @@ import com.shmeli.surakat.ui.new_version.fragments.SignInFragment;
 
 import com.shmeli.surakat.utils.UiUtils;
 
+/**
+ * Created by Serghei Ostrovschi on 11/14/17.
+ */
+
 public class ExternalActivity   extends     ParentActivity
                                 implements  FragmentManager.OnBackStackChangedListener {
 
@@ -107,10 +111,10 @@ public class ExternalActivity   extends     ParentActivity
 
         switch(currentFragmentCode) {
 
-            case CONST.FILL_ACCOUNT_FRAGMENT:
+/*            case CONST.FILL_ACCOUNT_FRAGMENT:
                 setToolbarTitle(R.string.text_fill_account);
                 showToolbarBackButton();
-                break;
+                break;*/
             case CONST.REGISTER_FRAGMENT:
                 setToolbarTitle(R.string.text_create_an_account);
                 showToolbarBackButton();
@@ -149,12 +153,12 @@ public class ExternalActivity   extends     ParentActivity
 
         switch(fragmentCode) {
 
-            case CONST.FILL_ACCOUNT_FRAGMENT:
+/*            case CONST.FILL_ACCOUNT_FRAGMENT:
                 fragment = FillAccountFragment.newInstance();
                 fragment.setFragmentTitleResId(R.string.text_fill_account);
 
                 showToolbarBackButton();
-                break;
+                break;*/
             case CONST.REGISTER_FRAGMENT:
                 fragment = RegisterFragment.newInstance();
                 fragment.setFragmentTitleResId(R.string.text_create_an_account);
@@ -197,6 +201,27 @@ public class ExternalActivity   extends     ParentActivity
         else {
             super.onBackPressed();
         }
+
+//        FragmentManager fragmentManager = getFragmentManager();
+//
+//        if(currentFragmentCode == CONST.FILL_ACCOUNT_FRAGMENT) {
+//
+//            Log.e("LOG", "ExternalActivity: onBackPressed(): go to SignInFragment");
+//
+//            for (int i = 0; i<fragmentManager.getBackStackEntryCount(); i++)
+//                fragmentManager.popBackStack();
+//        }
+//        else {
+//
+//            Log.e("LOG", "ExternalActivity: onBackPressed(): go back");
+//
+//            if (getFragmentManager().getBackStackEntryCount() > 0) {
+//                getFragmentManager().popBackStack();
+//            }
+//            else {
+//                super.onBackPressed();
+//            }
+//        }
     }
 
     // ----------------------------------- TOOLBAR ----------------------------------------- //

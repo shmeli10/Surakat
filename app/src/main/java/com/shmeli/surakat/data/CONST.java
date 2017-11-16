@@ -89,6 +89,6 @@ public class CONST {
 
     public static final int SIGN_IN_FRAGMENT                    = 1000;
     public static final int REGISTER_FRAGMENT                   = 1001;
-    public static final int FILL_ACCOUNT_FRAGMENT               = 1002;
+//    public static final int FILL_ACCOUNT_FRAGMENT               = 1002;
 
 }

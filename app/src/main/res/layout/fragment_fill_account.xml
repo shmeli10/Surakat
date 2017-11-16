@@ -1,13 +1,43 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.shmeli.surakat.ui.new_version.fragments.FillAccountFragment">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fillAccountContainer"
+    style="@style/MM"
+    tools:context="com.shmeli.surakat.ui.SetAccountActivity"
+    android:padding="@dimen/spacing_2x"
+    android:background="@color/colorPrimary">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+    <!--<TextView-->
+        <!--android:id="@+id/setAccountTextView"-->
+        <!--style="@style/MW"-->
+        <!--android:layout_marginTop="@dimen/spacing_2x"-->
+        <!--android:gravity="center"-->
+        <!--android:textSize="@dimen/text_size_2.5x"-->
+        <!--android:textColor="@color/white"-->
+        <!--android:text="@string/text_set_account"/>-->
 
-</FrameLayout>
+    <EditText
+        android:id="@+id/fillAccountFragmentNameEditText"
+        style="@style/MW"
+        android:layout_marginTop="@dimen/spacing_6x"
+        android:layout_alignParentTop="true"
+        android:padding="@dimen/spacing_3x"
+        android:ems="10"
+        android:inputType="text"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="@dimen/text_size_1.5x"
+        android:textColorHint="@color/colorPrimary"
+        android:hint="@string/hint_name"
+        android:background="@drawable/input_background"/>
+
+    <Button
+        android:id="@+id/fillAccountFragmentSetButton"
+        style="@style/MW"
+        android:layout_below="@+id/fillAccountFragmentNameEditText"
+        android:layout_marginTop="@dimen/spacing_2x"
+        android:background="@drawable/button_green"
+        android:textColor="@color/colorPrimary"
+        android:textSize="@dimen/text_size_1.5x"
+        android:text="@string/button_set"/>
+
+</RelativeLayout>

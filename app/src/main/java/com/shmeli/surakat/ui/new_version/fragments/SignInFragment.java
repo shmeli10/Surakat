@@ -17,11 +17,13 @@ import android.view.ViewGroup;
 
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
+
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
 import com.shmeli.surakat.ui.new_version.ExternalActivity;
@@ -30,13 +32,14 @@ import com.shmeli.surakat.utils.UiUtils;
 /**
  * Created by Serghei Ostrovschi on 11/14/17.
  */
+
 public class SignInFragment extends ParentFragment {
 
     private static SignInFragment  instance;
 
     private View            view;
 
-    private RelativeLayout  signInContainer;
+    private LinearLayout    signInContainer;
 
     private EditText        emailEditText;
     private EditText        passwordEditText;
@@ -84,11 +87,7 @@ public class SignInFragment extends ParentFragment {
                                 container,
                                 false);
 
-        externalActivity = (ExternalActivity) getActivity();
-//        externalActivity.setToolbarTitle(R.string.text_sign_in);
-
-
-
+        externalActivity    = (ExternalActivity) getActivity();
 
         signInContainer     = UiUtils.findView( view,
                                                 R.id.signInContainer);
@@ -114,8 +113,6 @@ public class SignInFragment extends ParentFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-
-        Log.e("LOG", "SignInFragment: onAttach()");
     }
 
     @Override
@@ -129,7 +126,7 @@ public class SignInFragment extends ParentFragment {
         @Override
         public void onClick(View v) {
 
-            Log.e("LOG", "SignInFragment: signInClickListener: onClick()");
+//            Log.e("LOG", "SignInFragment: signInClickListener: onClick()");
 
             startSignIn();
         }
@@ -139,12 +136,9 @@ public class SignInFragment extends ParentFragment {
         @Override
         public void onClick(View v) {
 
-            Log.e("LOG", "SignInFragment: registerClickListener: onClick()");
+//            Log.e("LOG", "SignInFragment: registerClickListener: onClick()");
 
             moveToRegisterFragment();
-
-//            startActivity(new Intent(   LoginActivity.this,
-//                                        RegisterActivity.class));
         }
     };
 
@@ -154,7 +148,7 @@ public class SignInFragment extends ParentFragment {
         @Override
         public void onComplete(@NonNull Task<AuthResult> task) {
 
-            Log.e("LOG", "SignInFragment: onSignInCompleteListener: onComplete(): task.isSuccessful(): " +task.isSuccessful());
+//            Log.e("LOG", "SignInFragment: onSignInCompleteListener: onComplete(): task.isSuccessful(): " +task.isSuccessful());
 
             if(task.isSuccessful()) {
 
@@ -162,31 +156,24 @@ public class SignInFragment extends ParentFragment {
 
                 // user initialized successfully
                 if(externalActivity.initCurrentUser()) {
-                    Log.e("LOG", "SignInFragment: signInCompleteListener: user initialized successfully");
+//                    Log.e("LOG", "SignInFragment: signInCompleteListener: user initialized successfully");
 
                     // user exists in DB
                     if(externalActivity.currentUserExistsInFBDB()) {
-                        Log.e("LOG", "SignInFragment: signInCompleteListener: move to InternalActivity");
+                    //if(!externalActivity.currentUserExistsInFBDB()) {   // ONLY FOR TEST
+//                        Log.e("LOG", "SignInFragment: signInCompleteListener: user exists in DB");
+
+                        setDeviceToken();
 
                         externalActivity.moveToInternalActivity();
-
-                        /*
-                        String deviceToken  = FirebaseInstanceId.getInstance().getToken();
-                        currentUserId       = fbAuth.getCurrentUser().getUid();
-
-                        if(!TextUtils.isEmpty(currentUserId)) {
-
-                            currentUserFBDatabaseRef = usersFBDatabaseRef.child(currentUserId);
-                            currentUserFBDatabaseRef.child(CONST.USER_DEVICE_TOKEN)
-                                    .setValue(deviceToken)
-                                    .addOnCompleteListener(setDeviceTokenCompleteListener);
-                        }*/
-
-                        //externalActivity.setCurrentUserIsOnline(true);
                     }
                     // user does not exist in DB
                     else {
-                        Log.e("LOG", "SignInFragment: signInCompleteListener: move to FillAccountFragment");
+                        Log.e("LOG", "SignInFragment: signInCompleteListener: user does not exist in DB");
+
+                        externalActivity.showSnackBar(  signInContainer,
+                                                        R.string.error_sign_in,
+                                                        Snackbar.LENGTH_LONG);
                     }
                 }
                 // user initialize error
@@ -199,7 +186,7 @@ public class SignInFragment extends ParentFragment {
                 }
             }
             else {
-                Log.e("LOG", "SignInFragment: startSignIn(): FBAuth is null: " +(externalActivity.getFBAuth() == null));
+                Log.e("LOG", "SignInFragment: onSignInCompleteListener: task is not successful");
 
                 externalActivity.hideProgressDialog();
 
@@ -210,16 +197,40 @@ public class SignInFragment extends ParentFragment {
         }
     };
 
+    OnCompleteListener<Void> setDeviceTokenCompleteListener = new OnCompleteListener<Void>() {
+        @Override
+        public void onComplete(@NonNull Task<Void> task) {
+
+//            Log.e("LOG", "SignInFragment: setDeviceTokenCompleteListener: task.isSuccessful(): " +task.isSuccessful());
+
+            if(task.isSuccessful()) {
+
+                Log.e("LOG", "LoginActivity: setDeviceTokenCompleteListener: send notifications");
+            }
+            else {
+
+                Log.e("LOG", "LoginActivity: setDeviceTokenCompleteListener: do not send notifications");
+            }
+        }
+    };
+
     // ------------------------------ OTHER --------------------------------------------------- //
 
     private void moveToRegisterFragment() {
         Log.e("LOG", "SignInFragment: moveToRegisterFragment()");
 
-//        externalActivity.setFragment(   RegisterFragment.newInstance(),
         externalActivity.setFragment(   CONST.REGISTER_FRAGMENT,
                                         true,
                                         true);
     }
+
+/*    private void moveToFillAccountFragment() {
+        Log.e("LOG", "SignInFragment: moveToFillAccountFragment()");
+
+        externalActivity.setFragment(   CONST.FILL_ACCOUNT_FRAGMENT,
+                                        true,
+                                        true);
+    }*/
 
     private void startSignIn() {
         Log.e("LOG", "SignInFragment: startSignIn()");
@@ -236,34 +247,32 @@ public class SignInFragment extends ParentFragment {
         }
         else {
 
-//            progressDialog.setTitle(getResources().getString(R.string.message_checking_sign_in));
-//            progressDialog.setMessage(getResources().getString(R.string.message_check_account_wait));
-//            progressDialog.setCanceledOnTouchOutside(false);
-//            progressDialog.show();
-
             externalActivity.showProgressDialog(getResources().getString(R.string.message_checking_sign_in),
                                                 getResources().getString(R.string.message_check_account_wait));
 
-            // -------------------------------------------------------------------------------- //
-
-//            // Set title divider color
-//            int titleDividerId = getResources().getIdentifier(  "titleDivider",
-//                                                                "id",
-//                                                                "android");
-//            View titleDivider = progressDialog.findViewById(titleDividerId);
-//
-//            if (titleDivider != null)
-//                titleDivider.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-
-            // -------------------------------------------------------------------------------- //
-
-            Log.e("LOG", "SignInFragment: startSignIn(): FBAuth is null: " +(externalActivity.getFBAuth() == null));
+//            Log.e("LOG", "SignInFragment: startSignIn(): FBAuth is null: " +(externalActivity.getFBAuth() == null));
 
             if(externalActivity.getFBAuth() != null) {
 
                 externalActivity.getFBAuth().signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(signInCompleteListener);
             }
+        }
+    }
+
+    private void setDeviceToken() {
+        Log.e("LOG", "SignInFragment: setDeviceToken()");
+
+        String deviceToken = FirebaseInstanceId.getInstance().getToken();
+
+        if(!TextUtils.isEmpty(deviceToken)) {
+
+            externalActivity.getCurrentUserFBDatabaseRef().child(CONST.USER_DEVICE_TOKEN)
+                    .setValue(deviceToken)
+                    .addOnCompleteListener(setDeviceTokenCompleteListener);
+        }
+        else {
+            Log.e("LOG", "SignInFragment: setDeviceToken(): error: deviceToken is empty or null");
         }
     }
 }
