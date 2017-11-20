@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import android.view.MenuItem;
@@ -17,6 +18,8 @@ import android.widget.TextView;
 
 import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
+import com.shmeli.surakat.interfaces.TransferSelectedUser;
+import com.shmeli.surakat.model.User;
 import com.shmeli.surakat.ui.new_version.fragments.ParentFragment;
 import com.shmeli.surakat.ui.new_version.fragments.TabsFragment;
 import com.shmeli.surakat.ui.new_version.fragments.UserProfileFragment;
@@ -27,7 +30,8 @@ import com.shmeli.surakat.utils.UiUtils;
  */
 
 public class InternalActivity   extends     ParentActivity
-                                implements  FragmentManager.OnBackStackChangedListener {
+                                implements  FragmentManager.OnBackStackChangedListener,
+                                            TransferSelectedUser {
 
     private ActionBar       actionBar;
     private Toolbar         toolbar;
@@ -88,6 +92,41 @@ public class InternalActivity   extends     ParentActivity
     }
 
     // ----------------------------------- FRAGMENTS ----------------------------------------- //
+
+    @Override
+    public void onTransferSelectedUserSuccess(int       targetFragmentCode,
+                                              String    selectedUserKey,
+                                              User      selectedUser) {
+//        Log.e("LOG", "InternalActivity: onTransferSelectedUserSuccess()");
+
+        Log.e("LOG", "InternalActivity: onTransferSelectedUserSuccess(): targetFragmentCode: " +targetFragmentCode);
+
+        if(targetFragmentCode <= 0) {
+            Log.e("LOG", "InternalActivity: onTransferSelectedUserSuccess(): incorrect targetFragmentCode: " +targetFragmentCode);
+
+            return;
+        }
+
+        if(!TextUtils.isEmpty(selectedUserKey)) {
+            Log.e("LOG", "InternalActivity: onTransferSelectedUserSuccess(): selectedUserKey: " + selectedUserKey);
+
+            setSecondLayerFragment( targetFragmentCode,
+                                    selectedUserKey);
+        }
+
+        if(selectedUser != null) {
+
+            if(!TextUtils.isEmpty(selectedUser.getUserName()))
+                Log.e("LOG", "InternalActivity: onTransferSelectedUserSuccess(): selectedUser name: " + selectedUser.getUserName());
+            else
+                Log.e("LOG", "InternalActivity: onTransferSelectedUserSuccess(): selectedUser name is empty or null");
+        }
+    }
+
+    @Override
+    public void onTransferSelectedUserError(String error) {
+        Log.e("LOG", "InternalActivity: onBackStackChanged()");
+    }
 
     @Override
     public void onBackStackChanged() {
@@ -313,5 +352,4 @@ public class InternalActivity   extends     ParentActivity
             actionBar.setDisplayShowHomeEnabled(false);
         }
     }
-
 }

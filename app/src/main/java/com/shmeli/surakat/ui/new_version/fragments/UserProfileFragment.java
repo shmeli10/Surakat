@@ -41,6 +41,8 @@ public class UserProfileFragment extends ParentFragment {
             instance = new UserProfileFragment();
         }
 
+        Log.e("LOG", "UserProfileFragment: newInstance(): selectedUserId= " +selectedUserId);
+
         if(!TextUtils.isEmpty(selectedUserId)) {
             args.putString("selectedUserId", selectedUserId);
         }
@@ -61,13 +63,14 @@ public class UserProfileFragment extends ParentFragment {
                                 container,
                                 false);
 
-        if((savedInstanceState != null) &&
-            savedInstanceState.containsKey("selectedUserId")) {
+//        Log.e("LOG", "UserProfileFragment: onCreateView(): getArguments().containsKey(\"selectedUserId\"): " +(getArguments().containsKey("selectedUserId")));
 
-            this.selectedUserId = selectedUserId;
+        if(getArguments().containsKey("selectedUserId")) {
+
+            this.selectedUserId = getArguments().getString("selectedUserId");
+
+//            Log.e("LOG", "UserProfileFragment: onCreateView(): selectedUserId= " +selectedUserId);
         }
-
-        Log.e("LOG", "UserProfileFragment: onCreateView(): selectedUserId= " +selectedUserId);
 
         // Inflate the layout for this fragment
         return view;

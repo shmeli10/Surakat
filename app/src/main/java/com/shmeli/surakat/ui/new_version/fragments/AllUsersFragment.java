@@ -1,8 +1,6 @@
 package com.shmeli.surakat.ui.new_version.fragments;
 
 
-import android.content.Intent;
-
 import android.os.Bundle;
 
 import android.support.v4.app.Fragment;
@@ -21,8 +19,8 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
 import com.shmeli.surakat.holders.UserViewHolder;
+import com.shmeli.surakat.interfaces.TransferSelectedUser;
 import com.shmeli.surakat.model.User;
-import com.shmeli.surakat.ui.ProfileActivity;
 import com.shmeli.surakat.ui.new_version.InternalActivity;
 import com.shmeli.surakat.utils.UiUtils;
 
@@ -37,7 +35,8 @@ public class AllUsersFragment extends Fragment {
     private View                view;
     private RecyclerView        allUsersRecyclerVIew;
 
-    private InternalActivity    internalActivity;
+    private InternalActivity        internalActivity;
+    private TransferSelectedUser    transferSelectedUserListener;
 
     public AllUsersFragment() {
         // Required empty public constructor
@@ -72,6 +71,10 @@ public class AllUsersFragment extends Fragment {
 
         internalActivity    = (InternalActivity) getActivity();
 
+        if(internalActivity != null) {
+            transferSelectedUserListener = (TransferSelectedUser) internalActivity;
+        }
+
         allUsersRecyclerVIew = UiUtils.findView(view, R.id.allUsersRecyclerVIew);
         allUsersRecyclerVIew.setHasFixedSize(true);
         allUsersRecyclerVIew.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -100,7 +103,7 @@ public class AllUsersFragment extends Fragment {
                                                                                                                     internalActivity.getUsersFBDatabaseRef()) {
             @Override
             protected void populateViewHolder(UserViewHolder    viewHolder,
-                                              User              model,
+                                              final User        model,
                                               int               position) {
 
                 viewHolder.setName(model.getUserName());
@@ -115,7 +118,17 @@ public class AllUsersFragment extends Fragment {
 
                         Log.e("LOG", "AllUsersFragment: userClickListener: selectedUserId= " +selectedUserId);
 
-                        moveToUserProfileFragment(selectedUserId);
+                        //moveToUserProfileFragment(selectedUserId);
+
+                        if(transferSelectedUserListener != null) {
+
+                            transferSelectedUserListener.onTransferSelectedUserSuccess( CONST.USER_PROFILE_FRAGMENT,
+                                                                                        selectedUserId,
+                                                                                        model);
+                        }
+                        else {
+                            Log.e("LOG", "AllUsersFragment: userClickListener: transferSelectedUserListener is null");
+                        }
 
 //                        Intent profileIntent = new Intent(  getContext(),
 //                                                            ProfileActivity.class);
