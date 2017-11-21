@@ -9,7 +9,7 @@ import com.shmeli.surakat.model.User;
 public interface TransferSelectedUser {
 
     void onTransferSelectedUserSuccess(int      targetFragmentCode,
-                                       String   selectedUserKey,
+                                       String   selectedUserId,
                                        User     selectedUser);
 
     void onTransferSelectedUserError(String error);

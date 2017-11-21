@@ -1,13 +1,70 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.shmeli.surakat.ui.new_version.fragments.UserProfileFragment">
+    android:id="@+id/userProfileContainer"
+    style="@style/MM"
+    android:padding="@dimen/spacing_2x"
+    android:background="@color/colorPrimary">
 
-    <!-- TODO: Update blank fragment layout -->
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/userProfileAvatar"
+        style="@style/WW"
+        android:layout_width="@dimen/avatar_big_size"
+        android:layout_height="@dimen/avatar_big_size"
+        android:layout_marginTop="@dimen/spacing_4x"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/default_avatar"/>
+
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:id="@+id/userProfileName"
+        style="@style/MW"
+        android:layout_below="@+id/userProfileAvatar"
+        android:layout_marginTop="@dimen/spacing_2x"
+        android:gravity="center"
+        android:textSize="@dimen/text_size_2.5x"
+        android:textColor="@color/white"
+        android:hint="@string/hint_name"/>
 
-</FrameLayout>
+    <TextView
+        android:id="@+id/userProfileStatus"
+        style="@style/MW"
+        android:layout_below="@+id/userProfileName"
+        android:layout_marginTop="@dimen/spacing_2x"
+        android:gravity="center"
+        android:textSize="@dimen/text_size_2.0x"
+        android:textColor="@color/white"
+        android:hint="@string/hint_status"/>
+
+    <TextView
+        android:id="@+id/userProfileFriendsCount"
+        style="@style/MW"
+        android:layout_above="@+id/userProfileSendRequest"
+        android:layout_marginBottom="@dimen/spacing_2x"
+        android:gravity="center"
+        android:textSize="@dimen/text_size_2.0x"
+        android:textColor="@color/white"
+        android:text="@string/text_total_friends"/>
+
+    <Button
+        android:id="@+id/userProfileSendRequest"
+        style="@style/MW"
+        android:layout_above="@+id/userProfileDeclineRequest"
+        android:layout_marginBottom="@dimen/spacing_2x"
+        android:background="@drawable/button_green"
+        android:textColor="@color/colorPrimary"
+        android:textSize="@dimen/text_size_1.5x"
+        android:visibility="invisible"/>
+
+    <Button
+        android:id="@+id/userProfileDeclineRequest"
+        style="@style/MW"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/button_yellow"
+        android:visibility="invisible"
+        android:enabled="false"
+        android:textColor="@color/colorPrimary"
+        android:textSize="@dimen/text_size_1.5x"
+        android:text="@string/text_decline_friend_request"/>
+
+</RelativeLayout>

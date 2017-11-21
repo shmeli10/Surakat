@@ -3,14 +3,32 @@ package com.shmeli.surakat.ui.new_version.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.shmeli.surakat.R;
+import com.shmeli.surakat.data.CONST;
+import com.shmeli.surakat.ui.new_version.InternalActivity;
+import com.shmeli.surakat.utils.UiUtils;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.Picasso;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Created by Serghei Ostrovschi on 11/16/17.
@@ -20,9 +38,30 @@ public class UserProfileFragment extends ParentFragment {
 
     private static UserProfileFragment  instance;
 
-    private View            view;
+    private View                view;
 
-    private String          selectedUserId = "";
+    private RelativeLayout      userProfileContainer;
+
+    private CircleImageView     avatarImageView;
+
+    private TextView            nameTextView;
+    private TextView            statusTextView;
+    private TextView            friendsCountTextView;
+
+    private Button              sendRequestButton;
+    private Button              declineRequestButton;
+
+    private DatabaseReference   friendRequestFBDatabaseRef;
+    private DatabaseReference   friendsFBDatabaseRef;
+    private DatabaseReference   notificationsFBDatabaseRef;
+    private DatabaseReference   selectedUserFBDatabaseRef;
+
+    private InternalActivity    internalActivity;
+
+    private String              selectedUserId          = "";
+    private String              selectedUserImageUrl    = "";
+
+    private int     friendshipState = -1;
 
     public UserProfileFragment() {
         // Required empty public constructor
@@ -44,7 +83,8 @@ public class UserProfileFragment extends ParentFragment {
         Log.e("LOG", "UserProfileFragment: newInstance(): selectedUserId= " +selectedUserId);
 
         if(!TextUtils.isEmpty(selectedUserId)) {
-            args.putString("selectedUserId", selectedUserId);
+            args.putString( CONST.USER_ID,
+                            selectedUserId);
         }
 
         instance.setArguments(args);
@@ -65,11 +105,39 @@ public class UserProfileFragment extends ParentFragment {
 
 //        Log.e("LOG", "UserProfileFragment: onCreateView(): getArguments().containsKey(\"selectedUserId\"): " +(getArguments().containsKey("selectedUserId")));
 
-        if(getArguments().containsKey("selectedUserId")) {
+        if(getArguments().containsKey(CONST.USER_ID)) {
 
-            this.selectedUserId = getArguments().getString("selectedUserId");
+            this.selectedUserId = getArguments().getString(CONST.USER_ID);
+
+            userProfileContainer    = UiUtils.findView( view,
+                                                        R.id.profileContainer);
+
+            avatarImageView         = UiUtils.findView( view,
+                                                        R.id.userProfileAvatar);
+
+            nameTextView            = UiUtils.findView( view,
+                                                        R.id.userProfileName);
+
+            statusTextView          = UiUtils.findView( view,
+                                                        R.id.userProfileStatus);
+
+            friendsCountTextView    = UiUtils.findView( view,
+                                                        R.id.userProfileFriendsCount);
+
+            sendRequestButton       = UiUtils.findView( view,
+                                                        R.id.userProfileSendRequest);
+            sendRequestButton.setOnClickListener(sendRequestClickListener);
+
+            declineRequestButton    = UiUtils.findView( view,
+                                                        R.id.userProfileDeclineRequest);
+            declineRequestButton.setOnClickListener(declineRequestClickListener);
+
+            init();
 
 //            Log.e("LOG", "UserProfileFragment: onCreateView(): selectedUserId= " +selectedUserId);
+        }
+        else {
+            Log.e("LOG", "UserProfileFragment: onCreateView(): parameter selectedUserId does not exist in Bundle");
         }
 
         // Inflate the layout for this fragment
@@ -86,4 +154,651 @@ public class UserProfileFragment extends ParentFragment {
         super.onDetach();
     }
 
+    // ----------------------------------- INIT ----------------------------------------- //
+
+    private void init() {
+        Log.e("LOG", "UserProfileFragment: init()");
+
+        internalActivity    = (InternalActivity) getActivity();
+
+        friendshipState     = CONST.IS_NOT_A_FRIEND_STATE;
+
+        if(!internalActivity.getCurrentUserId().equals(selectedUserId)) {
+            showSendRequestButton(R.string.text_send_friend_request);
+
+//            hideDeclineButton();
+        }
+
+        friendsFBDatabaseRef        = internalActivity.getRootFBDatabaseRef()
+                                                        .child(CONST.FIREBASE_FRIENDS_CHILD);
+
+        friendRequestFBDatabaseRef  = internalActivity.getRootFBDatabaseRef()
+                                                        .child(CONST.FIREBASE_FRIEND_REQUEST_CHILD);
+
+        selectedUserFBDatabaseRef   = internalActivity.getRootFBDatabaseRef()
+                                                        .child(CONST.FIREBASE_USERS_CHILD)
+                                                        .child(selectedUserId);
+
+        if(selectedUserFBDatabaseRef != null) {
+
+            selectedUserFBDatabaseRef.keepSynced(true);
+            selectedUserFBDatabaseRef.addValueEventListener(selectedUserProfileValueListener);
+        }
+        else {
+            Log.e("LOG", "UserProfileFragment: init(): selectedUserFBDatabaseRef is null");
+        }
+
+        notificationsFBDatabaseRef  = internalActivity.getRootFBDatabaseRef()
+                                                        .child(CONST.FIREBASE_NOTIFICATIONS_CHILD)
+                                                        .child(selectedUserId);
+    }
+
+    // ------------------------------ VALUE EVENT LISTENERS ----------------------------------- //
+
+    ValueEventListener selectedUserProfileValueListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+
+            if(dataSnapshot != null) {
+                //Log.e("LOG", "ProfileActivity: valueEventListener: dataSnapshot: " +dataSnapshot.toString());
+
+                String selectedUserName     = dataSnapshot.child(CONST.USER_NAME).getValue().toString();
+                String selectedUserStatus   = dataSnapshot.child(CONST.USER_STATUS).getValue().toString();
+
+                selectedUserImageUrl        = dataSnapshot.child(CONST.USER_IMAGE).getValue().toString();
+
+                nameTextView.setText(selectedUserName);
+                statusTextView.setText(selectedUserStatus);
+
+                if (!selectedUserImageUrl.equals(CONST.DEFAULT_VALUE)) {
+                    Picasso.with(getActivity())
+                            .load(selectedUserImageUrl)
+                            .networkPolicy(NetworkPolicy.OFFLINE)
+                            .placeholder(R.drawable.default_avatar)
+                            .into(  avatarImageView,
+                                    loadImageCallback);
+                }
+
+                // GET LIST OF FRIEND REQUESTS
+                friendRequestFBDatabaseRef.child(internalActivity.getCurrentUserId())
+                                            .addListenerForSingleValueEvent(friendRequestsListValueListener);
+            }
+            else {
+                Log.e("LOG", "UserProfileFragment: selectedUserProfileValueListener: dataSnapshot is null");
+            }
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) { }
+    };
+
+    ValueEventListener friendRequestsListValueListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+
+            if(dataSnapshot.hasChild(selectedUserId)) {
+
+                int requestTypeId = Integer.valueOf(dataSnapshot.child(selectedUserId).child(CONST.REQUEST_TYPE_ID).getValue().toString());
+
+                switch (requestTypeId) {
+
+                    // ACCEPT FRIEND REQUEST
+                    case CONST.RECEIVED_REQUEST_STATE:
+
+                        friendshipState = CONST.RECEIVED_REQUEST_STATE;
+
+                        showSendRequestButton(R.string.text_accept_friend_request);
+//                        profilePageSendRequest.setText(R.string.text_accept_friend_request);
+
+                        showDeclineButton();
+                        break;
+                    // CANCEL SENT FRIEND REQUEST
+                    case CONST.SENT_REQUEST_STATE:
+
+                        friendshipState = CONST.SENT_REQUEST_STATE;
+
+                        showSendRequestButton(R.string.text_cancel_friend_request);
+//                        profilePageSendRequest.setText(R.string.text_cancel_friend_request);
+
+                        hideDeclineButton();
+                        break;
+                }
+            }
+            else {
+
+                friendsFBDatabaseRef.child(internalActivity.getCurrentUserId())
+                                        .addListenerForSingleValueEvent(currentUserFriendsListValueListener);
+            }
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) { }
+    };
+
+    ValueEventListener currentUserFriendsListValueListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+
+            if(dataSnapshot.hasChild(selectedUserId)) {
+
+                friendshipState = CONST.IS_A_FRIEND_STATE;
+
+                showSendRequestButton(R.string.text_unfriend_request);
+//                profilePageSendRequest.setText(R.string.text_unfriend_request);
+
+                hideDeclineButton();
+                //showSendRequestButton();
+            }
+//            else {
+//
+//                hideSendRequestButton();
+//            }
+
+            //hideDeclineButton();
+            //progressDialog.dismiss();
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+            //progressDialog.dismiss();
+        }
+    };
+
+    // ------------------------------ BUTTON CLICK LISTENER ------------------------------------- //
+
+    View.OnClickListener sendRequestClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
+            disableSendRequestButton();
+
+            Log.e("LOG", "UserProfileFragment: sendRequestClickListener: friendshipState= " +friendshipState);
+
+            switch(friendshipState) {
+
+                // NOT FRIENDS, SEND FRIEND REQUEST
+                case CONST.IS_NOT_A_FRIEND_STATE:
+                    Log.e("LOG", "UserProfileFragment: sendRequestClickListener: IS_NOT_A_FRIEND_STATE");
+
+                    sendFriendRequest();
+                    break;
+                // NOT FRIENDS, CANCEL SENT FRIEND REQUEST
+                case CONST.SENT_REQUEST_STATE:
+                    Log.e("LOG", "UserProfileFragment: sendRequestClickListener: SENT_REQUEST_STATE");
+
+                    cancelSentFriendRequest();
+                    break;
+                // NOT FRIENDS, ACCEPT FRIEND REQUEST
+                case CONST.RECEIVED_REQUEST_STATE:
+                    Log.e("LOG", "UserProfileFragment: sendRequestClickListener: RECEIVED_REQUEST_STATE");
+
+                    acceptFriendRequest();
+                    break;
+                // FRIENDS, SEND UN FRIEND REQUEST
+                case CONST.IS_A_FRIEND_STATE:
+                    Log.e("LOG", "UserProfileFragment: sendRequestClickListener: IS_A_FRIEND_STATE");
+
+                    sendUnFriendRequest();
+                    break;
+            }
+        }
+    };
+
+    View.OnClickListener declineRequestClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
+            declineFriendRequest();
+        }
+    };
+
+    // ----------------------------------- FRIEND REQUEST ------------------------------------- //
+
+    private void sendFriendRequest() {
+
+        Log.e("LOG", "UserProfileFragment: sendFriendRequest()");
+
+        DatabaseReference getNotificationPushKeyFBDatabaseRef = notificationsFBDatabaseRef.push();
+
+        String notificationId = getNotificationPushKeyFBDatabaseRef.getKey();
+
+//        DatabaseReference getNotificationPushKeyFBDatabaseRef = rootFBDatabaseRef.child(CONST.FIREBASE_NOTIFICATIONS_CHILD)
+//                .child(selectedUserId).push();
+
+        StringBuilder friendRequest = new StringBuilder("");
+        friendRequest.append(CONST.FIREBASE_FRIEND_REQUEST_CHILD);
+        friendRequest.append("/");
+        friendRequest.append(internalActivity.getCurrentUserId());
+        friendRequest.append("/");
+        friendRequest.append(selectedUserId);
+        friendRequest.append("/");
+        friendRequest.append(CONST.REQUEST_TYPE_TEXT);
+
+        Map requestMap = new HashMap();
+        requestMap.put(friendRequest.toString(),  CONST.SENT_REQUEST_TEXT);
+        friendRequest.setLength(0);
+
+        // --------------------------------------------------------------------- //
+
+        friendRequest.append(CONST.FIREBASE_FRIEND_REQUEST_CHILD);
+        friendRequest.append("/");
+        friendRequest.append(internalActivity.getCurrentUserId());
+        friendRequest.append("/");
+        friendRequest.append(selectedUserId);
+        friendRequest.append("/");
+        friendRequest.append(CONST.REQUEST_TYPE_ID);
+
+        requestMap.put(friendRequest.toString(),  CONST.SENT_REQUEST_STATE);
+        friendRequest.setLength(0);
+
+        // --------------------------------------------------------------------- //
+
+        friendRequest.append(CONST.FIREBASE_FRIEND_REQUEST_CHILD);
+        friendRequest.append("/");
+        friendRequest.append(selectedUserId);
+        friendRequest.append("/");
+        friendRequest.append(internalActivity.getCurrentUserId());
+        friendRequest.append("/");
+        friendRequest.append(CONST.NOTIFICATION_ID);
+
+        requestMap.put(friendRequest.toString(),  notificationId);
+        friendRequest.setLength(0);
+
+        // --------------------------------------------------------------------- //
+
+        friendRequest.append(CONST.FIREBASE_FRIEND_REQUEST_CHILD);
+        friendRequest.append("/");
+        friendRequest.append(selectedUserId);
+        friendRequest.append("/");
+        friendRequest.append(internalActivity.getCurrentUserId());
+        friendRequest.append("/");
+        friendRequest.append(CONST.REQUEST_TYPE_TEXT);
+
+        requestMap.put(friendRequest.toString(),  CONST.RECEIVED_REQUEST_TEXT);
+        friendRequest.setLength(0);
+
+        // --------------------------------------------------------------------- //
+
+        friendRequest.append(CONST.FIREBASE_FRIEND_REQUEST_CHILD);
+        friendRequest.append("/");
+        friendRequest.append(selectedUserId);
+        friendRequest.append("/");
+        friendRequest.append(internalActivity.getCurrentUserId());
+        friendRequest.append("/");
+        friendRequest.append(CONST.REQUEST_TYPE_ID);
+
+        requestMap.put(friendRequest.toString(),  CONST.RECEIVED_REQUEST_STATE);
+        friendRequest.setLength(0);
+
+        // --------------------------------------------------------------------- //
+
+        HashMap<String, String> notificationDataMap = new HashMap<>();
+        notificationDataMap.put(CONST.NOTIFICATION_SENDER_ID,   internalActivity.getCurrentUserId());
+        notificationDataMap.put(CONST.NOTIFICATION_TYPE,        CONST.NOTIFICATION_REQUEST_TYPE);
+
+        friendRequest.append(CONST.FIREBASE_NOTIFICATIONS_CHILD);
+        friendRequest.append("/");
+        friendRequest.append(selectedUserId);
+        friendRequest.append("/");
+        friendRequest.append(notificationId);
+
+        requestMap.put(friendRequest.toString(),  notificationDataMap);
+        friendRequest.setLength(0);
+
+        internalActivity.getRootFBDatabaseRef().updateChildren( requestMap,
+                                                                sendFriendRequestCompletionListener);
+    }
+
+    private void cancelSentFriendRequest() {
+
+        final StringBuilder friendRequest = new StringBuilder("");
+        friendRequest.append(CONST.FIREBASE_FRIEND_REQUEST_CHILD);
+        friendRequest.append("/");
+        friendRequest.append(internalActivity.getCurrentUserId());
+        friendRequest.append("/");
+        friendRequest.append(selectedUserId);
+
+        final Map requestMap = new HashMap();
+        requestMap.put(friendRequest.toString(),  null);
+        friendRequest.setLength(0);
+
+        // --------------------------------------------------------------------- //
+
+        friendRequest.append(CONST.FIREBASE_FRIEND_REQUEST_CHILD);
+        friendRequest.append("/");
+        friendRequest.append(selectedUserId);
+        friendRequest.append("/");
+        friendRequest.append(internalActivity.getCurrentUserId());
+
+        requestMap.put(friendRequest.toString(),  null);
+        friendRequest.setLength(0);
+
+        // --------------------------------------------------------------------- //
+
+        friendRequestFBDatabaseRef.child(selectedUserId)
+                                    .child(internalActivity.getCurrentUserId())
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                String notificationId = dataSnapshot.child(CONST.NOTIFICATION_ID).getValue().toString();
+
+                //Log.e("LOG", "ProfileActivity: cancelSentFriendRequest(): notificationId= " +notificationId);
+
+                if(!TextUtils.isEmpty(notificationId)) {
+
+                    Log.e("LOG", "ProfileActivity: cancelSentFriendRequest(): remove notification!");
+
+                    friendRequest.append(CONST.FIREBASE_NOTIFICATIONS_CHILD);
+                    friendRequest.append("/");
+                    friendRequest.append(selectedUserId);
+                    friendRequest.append("/");
+                    friendRequest.append(notificationId);
+
+                    requestMap.put(friendRequest.toString(),  null);
+                    friendRequest.setLength(0);
+
+                    internalActivity.getRootFBDatabaseRef().updateChildren( requestMap,
+                                                                            declineFriendRequestCompletionListener);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) { }
+        });
+
+//        friendRequest.append(CONST.FIREBASE_NOTIFICATIONS_CHILD);
+//        friendRequest.append("/");
+//        friendRequest.append(selectedUserId);
+//        friendRequest.append("/");
+//        friendRequest.append(currentUserId);
+//
+//        requestMap.put(friendRequest.toString(),  null);
+//        friendRequest.setLength(0);
+//
+//        rootFBDatabaseRef.updateChildren(requestMap, cancelSentFriendRequestCompletionListener);
+    }
+
+    private void sendUnFriendRequest(){
+
+        StringBuilder friendRequest = new StringBuilder("");
+        friendRequest.append(CONST.FIREBASE_FRIENDS_CHILD);
+        friendRequest.append("/");
+        friendRequest.append(internalActivity.getCurrentUserId());
+        friendRequest.append("/");
+        friendRequest.append(selectedUserId);
+
+        Map requestMap = new HashMap();
+        requestMap.put(friendRequest.toString(),  null);
+        friendRequest.setLength(0);
+
+        // --------------------------------------------------------------------- //
+
+        friendRequest.append(CONST.FIREBASE_FRIENDS_CHILD);
+        friendRequest.append("/");
+        friendRequest.append(selectedUserId);
+        friendRequest.append("/");
+        friendRequest.append(internalActivity.getCurrentUserId());
+
+        requestMap.put(friendRequest.toString(),  null);
+        friendRequest.setLength(0);
+
+//        internalActivity.getRootFBDatabaseRef().updateChildren(requestMap, unFriendRequestCompletionListener);
+    }
+
+    private void acceptFriendRequest() {
+
+        final StringBuilder friendRequest = new StringBuilder("");
+        friendRequest.append(CONST.FIREBASE_FRIENDS_CHILD);
+        friendRequest.append("/");
+        friendRequest.append(internalActivity.getCurrentUserId());
+        friendRequest.append("/");
+        friendRequest.append(selectedUserId);
+        friendRequest.append("/");
+        friendRequest.append(CONST.FRIENDSHIP_START_DATE);
+
+        final Map requestMap = new HashMap();
+        requestMap.put( friendRequest.toString(),
+                        internalActivity.getCurrentUserId());
+        friendRequest.setLength(0);
+
+        // --------------------------------------------------------------------- //
+
+        friendRequest.append(CONST.FIREBASE_FRIENDS_CHILD);
+        friendRequest.append("/");
+        friendRequest.append(selectedUserId);
+        friendRequest.append("/");
+        friendRequest.append(internalActivity.getCurrentUserId());
+        friendRequest.append("/");
+        friendRequest.append(CONST.FRIENDSHIP_START_DATE);
+
+//        requestMap.put(friendRequest.toString(),  getCurrentDate());
+        friendRequest.setLength(0);
+
+        // --------------------------------------------------------------------- //
+
+        friendRequest.append(CONST.FIREBASE_FRIEND_REQUEST_CHILD);
+        friendRequest.append("/");
+        friendRequest.append(internalActivity.getCurrentUserId());
+        friendRequest.append("/");
+        friendRequest.append(selectedUserId);
+//        friendRequest.append("/");
+//        friendRequest.append(CONST.REQUEST_TYPE_TEXT);
+
+        requestMap.put(friendRequest.toString(),  null);
+        friendRequest.setLength(0);
+
+        // --------------------------------------------------------------------- //
+
+        friendRequest.append(CONST.FIREBASE_FRIEND_REQUEST_CHILD);
+        friendRequest.append("/");
+        friendRequest.append(selectedUserId);
+        friendRequest.append("/");
+        friendRequest.append(internalActivity.getCurrentUserId());
+//        friendRequest.append("/");
+//        friendRequest.append(CONST.REQUEST_TYPE_TEXT);
+
+        requestMap.put(friendRequest.toString(),  null);
+        friendRequest.setLength(0);
+
+        // rootFBDatabaseRef.updateChildren(requestMap, acceptRequestCompletionListener);
+
+        // --------------------------------------------------------------------- //
+
+/*        friendRequestFBDatabaseRef.child(currentUserId).child(selectedUserId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                String notificationId = dataSnapshot.child(CONST.NOTIFICATION_ID).getValue().toString();
+
+                //Log.e("LOG", "ProfileActivity: acceptFriendRequest(): notificationId= " +notificationId);
+
+                if(!TextUtils.isEmpty(notificationId)) {
+
+                    //Log.e("LOG", "ProfileActivity: acceptFriendRequest(): remove notification!");
+
+                    friendRequest.append(CONST.FIREBASE_NOTIFICATIONS_CHILD);
+                    friendRequest.append("/");
+                    friendRequest.append(currentUserId);
+                    friendRequest.append("/");
+                    friendRequest.append(notificationId);
+
+                    requestMap.put(friendRequest.toString(),  null);
+                    friendRequest.setLength(0);
+
+                    rootFBDatabaseRef.updateChildren(requestMap, acceptRequestCompletionListener);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) { }
+        });*/
+    }
+
+    private void declineFriendRequest() {
+
+        final StringBuilder friendRequest = new StringBuilder("");
+        friendRequest.append(CONST.FIREBASE_FRIEND_REQUEST_CHILD);
+        friendRequest.append("/");
+        friendRequest.append(internalActivity.getCurrentUserId());
+        friendRequest.append("/");
+        friendRequest.append(selectedUserId);
+
+        final Map requestMap = new HashMap();
+        requestMap.put(friendRequest.toString(),  null);
+        friendRequest.setLength(0);
+
+        friendRequest.append(CONST.FIREBASE_FRIEND_REQUEST_CHILD);
+        friendRequest.append("/");
+        friendRequest.append(selectedUserId);
+        friendRequest.append("/");
+        friendRequest.append(internalActivity.getCurrentUserId());
+
+        requestMap.put(friendRequest.toString(),  null);
+        friendRequest.setLength(0);
+
+        //rootFBDatabaseRef.updateChildren(requestMap, declineFriendRequestCompletionListener);
+
+        // --------------------------------------------------------------------- //
+
+/*        friendRequestFBDatabaseRef.child(currentUserId).child(selectedUserId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                String notificationId = dataSnapshot.child(CONST.NOTIFICATION_ID).getValue().toString();
+
+                Log.e("LOG", "ProfileActivity: declineFriendRequest(): notificationId= " +notificationId);
+
+                if(!TextUtils.isEmpty(notificationId)) {
+
+                    Log.e("LOG", "ProfileActivity: declineFriendRequest(): remove notification!");
+
+                    friendRequest.append(CONST.FIREBASE_NOTIFICATIONS_CHILD);
+                    friendRequest.append("/");
+                    friendRequest.append(currentUserId);
+                    friendRequest.append("/");
+                    friendRequest.append(notificationId);
+
+                    requestMap.put(friendRequest.toString(),  null);
+                    friendRequest.setLength(0);
+
+                    rootFBDatabaseRef.updateChildren(requestMap, declineFriendRequestCompletionListener);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) { }
+        });*/
+    }
+
+    // ------------------------------ ON COMPLETE LISTENERS ----------------------------------- //
+
+    DatabaseReference.CompletionListener sendFriendRequestCompletionListener = new DatabaseReference.CompletionListener() {
+        @Override
+        public void onComplete(DatabaseError        databaseError,
+                               DatabaseReference    databaseReference) {
+
+            if(databaseError != null) {
+
+                internalActivity.showSnackBar(  userProfileContainer,
+                                                R.string.error_send_friend_request,
+                                                Snackbar.LENGTH_LONG);
+            }
+
+            friendshipState = CONST.SENT_REQUEST_STATE;
+
+            showSendRequestButton(R.string.text_cancel_friend_request);
+        }
+    };
+
+
+    DatabaseReference.CompletionListener declineFriendRequestCompletionListener = new DatabaseReference.CompletionListener() {
+        @Override
+        public void onComplete(DatabaseError        databaseError,
+                               DatabaseReference    databaseReference) {
+
+            if(databaseError == null) {
+
+                friendshipState = CONST.IS_NOT_A_FRIEND_STATE;
+
+                showSendRequestButton(R.string.text_send_friend_request);
+//                profilePageSendRequest.setText(R.string.text_send_friend_request);
+
+                hideDeclineButton();
+            }
+            else {
+
+                String error  = databaseError.getMessage();
+
+                if(!TextUtils.isEmpty(error)) {
+
+                    internalActivity.showSnackBar(  userProfileContainer,
+                                                    error,
+                                                    Snackbar.LENGTH_LONG);
+                }
+                else {
+
+                    internalActivity.showSnackBar(  userProfileContainer,
+                                                    R.string.error_decline_friend_request,
+                                                    Snackbar.LENGTH_LONG);
+                }
+
+                showSendRequestButton(R.string.text_cancel_friend_request);
+            }
+
+//            showSendRequestButton();
+        }
+    };
+
+    // ----------------------------------- OTHER ----------------------------------------------//
+
+    private void showDeclineButton() {
+
+        // enable and show decline button
+//        profilePageDeclineRequest.setVisibility(View.VISIBLE);
+//        profilePageDeclineRequest.setEnabled(true);
+    }
+
+    private void hideDeclineButton() {
+
+        // disable and hide decline button
+        declineRequestButton.setVisibility(View.INVISIBLE);
+        declineRequestButton.setEnabled(false);
+    }
+
+    private void showSendRequestButton(int titleResId) {
+
+        // enable and show send request button
+        sendRequestButton.setText(titleResId);
+        sendRequestButton.setVisibility(View.VISIBLE);
+        sendRequestButton.setEnabled(true);
+    }
+
+    private void disableSendRequestButton() {
+
+        // disable send request button
+        sendRequestButton.setEnabled(false);
+    }
+
+    private void hideSendRequestButton() {
+
+        // disable and hide send request button
+        sendRequestButton.setVisibility(View.INVISIBLE);
+    }
+
+    Callback loadImageCallback = new Callback() {
+        @Override
+        public void onSuccess() {
+
+        }
+
+        @Override
+        public void onError() {
+
+            Picasso.with(getActivity())
+                    .load(selectedUserImageUrl)
+                    .placeholder(R.drawable.default_avatar)
+                    .into(avatarImageView);
+        }
+    };
 }

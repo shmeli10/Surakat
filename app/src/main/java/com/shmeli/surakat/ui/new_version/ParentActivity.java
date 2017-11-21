@@ -218,16 +218,30 @@ public abstract class ParentActivity extends AppCompatActivity {
     }
 
     public void showSnackBar(   View view,
-                                int  resId,
+                                int  messageResId,
                                 int  duration) {
 
         if( (view != null)  &&
-            (resId > 0)     &&
+            (messageResId > 0)     &&
             (duration >= 0)) {
 
             Snackbar.make(view,
-                    resId,
+                    messageResId,
                     duration).show();
+        }
+    }
+
+    public void showSnackBar(   View    view,
+                                String  messageText,
+                                int     duration) {
+
+        if( (view != null)                          &&
+                (!TextUtils.isEmpty(messageText))   &&
+                (duration >= 0)) {
+
+            Snackbar.make(  view,
+                            messageText,
+                            duration).show();
         }
     }
 
