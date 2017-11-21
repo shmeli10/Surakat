@@ -25,6 +25,9 @@ import com.shmeli.surakat.ui.new_version.fragments.TabsFragment;
 import com.shmeli.surakat.ui.new_version.fragments.UserProfileFragment;
 import com.shmeli.surakat.utils.UiUtils;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by Serghei Ostrovschi on 11/14/17.
  */
@@ -89,6 +92,14 @@ public class InternalActivity   extends     ParentActivity
         startActivity(internalActivityIntent);
 
         finish();
+    }
+
+    public String getCurrentDate() {
+
+        SimpleDateFormat simpleDateFormat   = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        String currentDate                  = simpleDateFormat.format(new Date());
+
+        return currentDate;
     }
 
     // ----------------------------------- FRAGMENTS ----------------------------------------- //

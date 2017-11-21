@@ -23,8 +23,8 @@
         android:layout_marginTop="@dimen/spacing_2x"
         android:gravity="center"
         android:textSize="@dimen/text_size_2.5x"
-        android:textColor="@color/white"
-        android:hint="@string/hint_name"/>
+        android:textColor="@color/white"/>
+        <!--android:hint="@string/hint_name"/>-->
 
     <TextView
         android:id="@+id/userProfileStatus"
@@ -33,18 +33,29 @@
         android:layout_marginTop="@dimen/spacing_2x"
         android:gravity="center"
         android:textSize="@dimen/text_size_2.0x"
-        android:textColor="@color/white"
-        android:hint="@string/hint_status"/>
+        android:textColor="@color/white" />
+        <!--android:hint="@string/hint_status"/>-->
 
     <TextView
-        android:id="@+id/userProfileFriendsCount"
-        style="@style/MW"
+        android:id="@+id/userProfileFriendsCountTitle"
+        style="@style/WW"
         android:layout_above="@+id/userProfileSendRequest"
         android:layout_marginBottom="@dimen/spacing_2x"
-        android:gravity="center"
+        android:layout_centerHorizontal="true"
         android:textSize="@dimen/text_size_2.0x"
         android:textColor="@color/white"
         android:text="@string/text_total_friends"/>
+
+    <TextView
+        android:id="@+id/userProfileFriendsCountValue"
+        style="@style/WW"
+        android:layout_above="@+id/userProfileSendRequest"
+        android:layout_toRightOf="@+id/userProfileFriendsCountTitle"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="@dimen/spacing_1x"
+        android:layout_marginBottom="@dimen/spacing_2x"
+        android:textSize="@dimen/text_size_2.0x"
+        android:textColor="@color/white"/>
 
     <Button
         android:id="@+id/userProfileSendRequest"

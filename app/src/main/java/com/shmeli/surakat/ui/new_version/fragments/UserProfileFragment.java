@@ -46,7 +46,8 @@ public class UserProfileFragment extends ParentFragment {
 
     private TextView            nameTextView;
     private TextView            statusTextView;
-    private TextView            friendsCountTextView;
+    private TextView            friendsCountTitleTextView;
+    private TextView            friendsCountValueTextView;
 
     private Button              sendRequestButton;
     private Button              declineRequestButton;
@@ -62,6 +63,8 @@ public class UserProfileFragment extends ParentFragment {
     private String              selectedUserImageUrl    = "";
 
     private int     friendshipState = -1;
+
+    private int     friendsCountValue = 0;
 
     public UserProfileFragment() {
         // Required empty public constructor
@@ -121,8 +124,11 @@ public class UserProfileFragment extends ParentFragment {
             statusTextView          = UiUtils.findView( view,
                                                         R.id.userProfileStatus);
 
-            friendsCountTextView    = UiUtils.findView( view,
-                                                        R.id.userProfileFriendsCount);
+            friendsCountTitleTextView = UiUtils.findView(   view,
+                                                            R.id.userProfileFriendsCountTitle);
+
+            friendsCountValueTextView = UiUtils.findView(   view,
+                                                            R.id.userProfileFriendsCountValue);
 
             sendRequestButton       = UiUtils.findView( view,
                                                         R.id.userProfileSendRequest);
@@ -200,15 +206,24 @@ public class UserProfileFragment extends ParentFragment {
         public void onDataChange(DataSnapshot dataSnapshot) {
 
             if(dataSnapshot != null) {
-                //Log.e("LOG", "ProfileActivity: valueEventListener: dataSnapshot: " +dataSnapshot.toString());
+                //Log.e("LOG", "UserProfileFragment: valueEventListener: dataSnapshot: " +dataSnapshot.toString());
 
                 String selectedUserName     = dataSnapshot.child(CONST.USER_NAME).getValue().toString();
                 String selectedUserStatus   = dataSnapshot.child(CONST.USER_STATUS).getValue().toString();
 
                 selectedUserImageUrl        = dataSnapshot.child(CONST.USER_IMAGE).getValue().toString();
 
-                nameTextView.setText(selectedUserName);
-                statusTextView.setText(selectedUserStatus);
+                if( (!TextUtils.isEmpty(selectedUserName)) &&
+                    (!selectedUserName.equals(CONST.DEFAULT_VALUE))) {
+
+                    nameTextView.setText(selectedUserName);
+                }
+
+                if( (!TextUtils.isEmpty(selectedUserStatus)) &&
+                        (!selectedUserStatus.equals(CONST.DEFAULT_VALUE))) {
+
+                    statusTextView.setText(selectedUserStatus);
+                }
 
                 if (!selectedUserImageUrl.equals(CONST.DEFAULT_VALUE)) {
                     Picasso.with(getActivity())
@@ -278,6 +293,18 @@ public class UserProfileFragment extends ParentFragment {
     ValueEventListener currentUserFriendsListValueListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
+
+            Log.e("LOG", "UserProfileFragment: currentUserFriendsListValueListener: friends sum = " +dataSnapshot.getChildrenCount());
+
+            if(dataSnapshot.getChildrenCount() >= 0) {
+
+                friendsCountValue = (int) dataSnapshot.getChildrenCount();
+            }
+            else{
+
+                friendsCountValue = 0;
+            }
+            friendsCountValueTextView.setText(String.valueOf(friendsCountValue));
 
             if(dataSnapshot.hasChild(selectedUserId)) {
 
@@ -483,11 +510,11 @@ public class UserProfileFragment extends ParentFragment {
 
                 String notificationId = dataSnapshot.child(CONST.NOTIFICATION_ID).getValue().toString();
 
-                //Log.e("LOG", "ProfileActivity: cancelSentFriendRequest(): notificationId= " +notificationId);
+                //Log.e("LOG", "UserProfileFragment: cancelSentFriendRequest(): notificationId= " +notificationId);
 
                 if(!TextUtils.isEmpty(notificationId)) {
 
-                    Log.e("LOG", "ProfileActivity: cancelSentFriendRequest(): remove notification!");
+                    Log.e("LOG", "UserProfileFragment: cancelSentFriendRequest(): remove notification!");
 
                     friendRequest.append(CONST.FIREBASE_NOTIFICATIONS_CHILD);
                     friendRequest.append("/");
@@ -543,7 +570,8 @@ public class UserProfileFragment extends ParentFragment {
         requestMap.put(friendRequest.toString(),  null);
         friendRequest.setLength(0);
 
-//        internalActivity.getRootFBDatabaseRef().updateChildren(requestMap, unFriendRequestCompletionListener);
+        internalActivity.getRootFBDatabaseRef().updateChildren( requestMap,
+                                                                unFriendRequestCompletionListener);
     }
 
     private void acceptFriendRequest() {
@@ -559,7 +587,7 @@ public class UserProfileFragment extends ParentFragment {
 
         final Map requestMap = new HashMap();
         requestMap.put( friendRequest.toString(),
-                        internalActivity.getCurrentUserId());
+                        internalActivity.getCurrentDate());
         friendRequest.setLength(0);
 
         // --------------------------------------------------------------------- //
@@ -572,7 +600,8 @@ public class UserProfileFragment extends ParentFragment {
         friendRequest.append("/");
         friendRequest.append(CONST.FRIENDSHIP_START_DATE);
 
-//        requestMap.put(friendRequest.toString(),  getCurrentDate());
+        requestMap.put( friendRequest.toString(),
+                        internalActivity.getCurrentDate());
         friendRequest.setLength(0);
 
         // --------------------------------------------------------------------- //
@@ -582,8 +611,6 @@ public class UserProfileFragment extends ParentFragment {
         friendRequest.append(internalActivity.getCurrentUserId());
         friendRequest.append("/");
         friendRequest.append(selectedUserId);
-//        friendRequest.append("/");
-//        friendRequest.append(CONST.REQUEST_TYPE_TEXT);
 
         requestMap.put(friendRequest.toString(),  null);
         friendRequest.setLength(0);
@@ -595,8 +622,6 @@ public class UserProfileFragment extends ParentFragment {
         friendRequest.append(selectedUserId);
         friendRequest.append("/");
         friendRequest.append(internalActivity.getCurrentUserId());
-//        friendRequest.append("/");
-//        friendRequest.append(CONST.REQUEST_TYPE_TEXT);
 
         requestMap.put(friendRequest.toString(),  null);
         friendRequest.setLength(0);
@@ -605,34 +630,37 @@ public class UserProfileFragment extends ParentFragment {
 
         // --------------------------------------------------------------------- //
 
-/*        friendRequestFBDatabaseRef.child(currentUserId).child(selectedUserId).addListenerForSingleValueEvent(new ValueEventListener() {
+        friendRequestFBDatabaseRef.child(internalActivity.getCurrentUserId())
+                                    .child(selectedUserId)
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
                 String notificationId = dataSnapshot.child(CONST.NOTIFICATION_ID).getValue().toString();
 
-                //Log.e("LOG", "ProfileActivity: acceptFriendRequest(): notificationId= " +notificationId);
+                //Log.e("LOG", "UserProfileFragment: acceptFriendRequest(): notificationId= " +notificationId);
 
                 if(!TextUtils.isEmpty(notificationId)) {
 
-                    //Log.e("LOG", "ProfileActivity: acceptFriendRequest(): remove notification!");
+                    //Log.e("LOG", "UserProfileFragment: acceptFriendRequest(): remove notification!");
 
                     friendRequest.append(CONST.FIREBASE_NOTIFICATIONS_CHILD);
                     friendRequest.append("/");
-                    friendRequest.append(currentUserId);
+                    friendRequest.append(internalActivity.getCurrentUserId());
                     friendRequest.append("/");
                     friendRequest.append(notificationId);
 
                     requestMap.put(friendRequest.toString(),  null);
                     friendRequest.setLength(0);
 
-                    rootFBDatabaseRef.updateChildren(requestMap, acceptRequestCompletionListener);
+                    internalActivity.getRootFBDatabaseRef().updateChildren( requestMap,
+                                                                            acceptRequestCompletionListener);
                 }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) { }
-        });*/
+        });
     }
 
     private void declineFriendRequest() {
@@ -661,34 +689,37 @@ public class UserProfileFragment extends ParentFragment {
 
         // --------------------------------------------------------------------- //
 
-/*        friendRequestFBDatabaseRef.child(currentUserId).child(selectedUserId).addListenerForSingleValueEvent(new ValueEventListener() {
+        friendRequestFBDatabaseRef.child(internalActivity.getCurrentUserId())
+                                    .child(selectedUserId)
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
                 String notificationId = dataSnapshot.child(CONST.NOTIFICATION_ID).getValue().toString();
 
-                Log.e("LOG", "ProfileActivity: declineFriendRequest(): notificationId= " +notificationId);
+                Log.e("LOG", "UserProfileFragment: declineFriendRequest(): notificationId= " +notificationId);
 
                 if(!TextUtils.isEmpty(notificationId)) {
 
-                    Log.e("LOG", "ProfileActivity: declineFriendRequest(): remove notification!");
+                    Log.e("LOG", "UserProfileFragment: declineFriendRequest(): remove notification!");
 
                     friendRequest.append(CONST.FIREBASE_NOTIFICATIONS_CHILD);
                     friendRequest.append("/");
-                    friendRequest.append(currentUserId);
+                    friendRequest.append(internalActivity.getCurrentUserId());
                     friendRequest.append("/");
                     friendRequest.append(notificationId);
 
                     requestMap.put(friendRequest.toString(),  null);
                     friendRequest.setLength(0);
 
-                    rootFBDatabaseRef.updateChildren(requestMap, declineFriendRequestCompletionListener);
+                    internalActivity.getRootFBDatabaseRef().updateChildren( requestMap,
+                                                                            declineFriendRequestCompletionListener);
                 }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) { }
-        });*/
+        });
     }
 
     // ------------------------------ ON COMPLETE LISTENERS ----------------------------------- //
@@ -698,7 +729,33 @@ public class UserProfileFragment extends ParentFragment {
         public void onComplete(DatabaseError        databaseError,
                                DatabaseReference    databaseReference) {
 
-            if(databaseError != null) {
+            if(databaseError == null) {
+
+                friendshipState = CONST.SENT_REQUEST_STATE;
+
+                showSendRequestButton(R.string.text_cancel_friend_request);
+            }
+            else {
+
+                String error  = databaseError.getMessage();
+
+                if(!TextUtils.isEmpty(error)) {
+
+                    internalActivity.showSnackBar(  userProfileContainer,
+                                                    error,
+                                                    Snackbar.LENGTH_LONG);
+                }
+                else {
+
+                    internalActivity.showSnackBar(  userProfileContainer,
+                                                    R.string.error_send_friend_request,
+                                                    Snackbar.LENGTH_LONG);
+                }
+
+                showSendRequestButton(R.string.text_send_friend_request);
+            }
+
+            /*if(databaseError != null) {
 
                 internalActivity.showSnackBar(  userProfileContainer,
                                                 R.string.error_send_friend_request,
@@ -707,10 +764,81 @@ public class UserProfileFragment extends ParentFragment {
 
             friendshipState = CONST.SENT_REQUEST_STATE;
 
-            showSendRequestButton(R.string.text_cancel_friend_request);
+            showSendRequestButton(R.string.text_cancel_friend_request);*/
         }
     };
 
+    DatabaseReference.CompletionListener unFriendRequestCompletionListener = new DatabaseReference.CompletionListener() {
+        @Override
+        public void onComplete(DatabaseError        databaseError,
+                               DatabaseReference    databaseReference) {
+
+            if(databaseError == null) {
+
+                friendshipState = CONST.IS_NOT_A_FRIEND_STATE;
+
+                showSendRequestButton(R.string.text_send_friend_request);
+//                profilePageSendRequest.setText(R.string.text_send_friend_request);
+
+                hideDeclineButton();
+            }
+            else {
+
+                String error  = databaseError.getMessage();
+
+                if(!TextUtils.isEmpty(error)) {
+
+                    internalActivity.showSnackBar(  userProfileContainer,
+                                                    error,
+                                                    Snackbar.LENGTH_LONG);
+                }
+                else {
+
+                    internalActivity.showSnackBar(  userProfileContainer,
+                                                    R.string.error_unfriend_request,
+                                                    Snackbar.LENGTH_LONG);
+                }
+
+                showSendRequestButton(R.string.text_unfriend_request);
+            }
+        }
+    };
+
+    DatabaseReference.CompletionListener acceptRequestCompletionListener = new DatabaseReference.CompletionListener() {
+        @Override
+        public void onComplete(DatabaseError        databaseError,
+                               DatabaseReference    databaseReference) {
+
+            if(databaseError == null) {
+
+                friendshipState = CONST.IS_A_FRIEND_STATE;
+
+                showSendRequestButton(R.string.text_unfriend_request);
+//                profilePageSendRequest.setText(R.string.text_unfriend_request);
+
+                hideDeclineButton();
+            }
+            else {
+
+                String error  = databaseError.getMessage();
+
+                if(!TextUtils.isEmpty(error)) {
+
+                    internalActivity.showSnackBar(  userProfileContainer,
+                                                    error,
+                                                    Snackbar.LENGTH_LONG);
+                }
+                else {
+
+                    internalActivity.showSnackBar(  userProfileContainer,
+                                                    R.string.error_accept_friend_request,
+                                                    Snackbar.LENGTH_LONG);
+                }
+
+                showSendRequestButton(R.string.text_accept_friend_request);
+            }
+        }
+    };
 
     DatabaseReference.CompletionListener declineFriendRequestCompletionListener = new DatabaseReference.CompletionListener() {
         @Override
@@ -755,8 +883,8 @@ public class UserProfileFragment extends ParentFragment {
     private void showDeclineButton() {
 
         // enable and show decline button
-//        profilePageDeclineRequest.setVisibility(View.VISIBLE);
-//        profilePageDeclineRequest.setEnabled(true);
+        declineRequestButton.setVisibility(View.VISIBLE);
+        declineRequestButton.setEnabled(true);
     }
 
     private void hideDeclineButton() {
