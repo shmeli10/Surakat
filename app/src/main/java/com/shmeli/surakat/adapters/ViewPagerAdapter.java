@@ -7,9 +7,10 @@ import android.support.v4.app.FragmentPagerAdapter;
 import com.shmeli.surakat.data.CONST;
 
 
-import com.shmeli.surakat.ui.fragments.FriendsFragment;
 
 import com.shmeli.surakat.ui.new_version.fragments.AllUsersFragment;
+import com.shmeli.surakat.ui.new_version.fragments.FriendsFragment;
+
 
 /**
  * Created by Serghei Ostrovschi on 11/16/17.
@@ -29,7 +30,7 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
             case CONST.ALL_USERS_TAB_ID:
                 return AllUsersFragment.newInstance();
             case CONST.FRIENDS_TAB_ID:
-                return new FriendsFragment();
+                return FriendsFragment.newInstance();
             default:
                 return null;
         }

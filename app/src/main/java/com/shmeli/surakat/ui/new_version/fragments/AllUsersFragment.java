@@ -65,7 +65,7 @@ public class AllUsersFragment extends Fragment {
                              ViewGroup      container,
                              Bundle         savedInstanceState) {
 
-        view                = inflater.inflate( R.layout.all_users_fragment,
+        view                = inflater.inflate( R.layout.fragment_all_users,
                                                 container,
                                                 false);
 
@@ -78,12 +78,6 @@ public class AllUsersFragment extends Fragment {
         allUsersRecyclerVIew = UiUtils.findView(view, R.id.allUsersRecyclerVIew);
         allUsersRecyclerVIew.setHasFixedSize(true);
         allUsersRecyclerVIew.setLayoutManager(new LinearLayoutManager(getContext()));
-
-//        currentUserId           = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-//        rootFBDatabaseRef       = FirebaseDatabase.getInstance().getReference();
-//        usersFBDatabaseRef      = rootFBDatabaseRef.child(CONST.FIREBASE_USERS_CHILD);
-//        usersFBDatabaseRef.keepSynced(true);
 
         return view;
     }
@@ -118,8 +112,6 @@ public class AllUsersFragment extends Fragment {
 
                         Log.e("LOG", "AllUsersFragment: userClickListener: selectedUserId= " +selectedUserId);
 
-                        //moveToUserProfileFragment(selectedUserId);
-
                         if(transferSelectedUserListener != null) {
 
                             transferSelectedUserListener.onTransferSelectedUserSuccess( CONST.USER_PROFILE_FRAGMENT,
@@ -129,25 +121,11 @@ public class AllUsersFragment extends Fragment {
                         else {
                             Log.e("LOG", "AllUsersFragment: userClickListener: transferSelectedUserListener is null");
                         }
-
-//                        Intent profileIntent = new Intent(  getContext(),
-//                                                            ProfileActivity.class);
-//                        profileIntent.putExtra(CONST.USER_ID, selectedUserId);
-//                        startActivity(profileIntent);
                     }
                 });
             }
         };
 
         allUsersRecyclerVIew.setAdapter(fbAdapter);
-    }
-
-    // ------------------------------ OTHER --------------------------------------------------- //
-
-    private void moveToUserProfileFragment(String selectedUserId) {
-        Log.e("LOG", "AllUsersFragment: moveToUserProfileFragment()");
-
-        internalActivity.setSecondLayerFragment(CONST.USER_PROFILE_FRAGMENT,
-                                                selectedUserId);
     }
 }

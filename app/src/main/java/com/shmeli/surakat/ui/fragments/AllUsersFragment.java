@@ -13,16 +13,12 @@ import android.view.ViewGroup;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
 import com.shmeli.surakat.holders.UserViewHolder;
 import com.shmeli.surakat.model.User;
-import com.shmeli.surakat.ui.MainActivity;
 import com.shmeli.surakat.ui.ProfileActivity;
 import com.shmeli.surakat.utils.UiUtils;
 
@@ -50,7 +46,7 @@ public class AllUsersFragment extends Fragment {
                              ViewGroup      container,
                              Bundle         savedInstanceState) {
 
-        view = inflater.inflate(R.layout.all_users_fragment,
+        view = inflater.inflate(R.layout.fragment_all_users,
                 container,
                 false);
 

@@ -36,9 +36,10 @@ public abstract class ParentActivity extends AppCompatActivity {
 
     private int currentFragmentCode;
 
+    private DatabaseReference currentUserFBDatabaseRef;
+    private DatabaseReference friendsFBDatabaseRef;
     private DatabaseReference rootFBDatabaseRef;
     private DatabaseReference usersFBDatabaseRef;
-    private DatabaseReference currentUserFBDatabaseRef;
 
     private FirebaseAuth fbAuth;
 
@@ -66,16 +67,20 @@ public abstract class ParentActivity extends AppCompatActivity {
             return 0;
     }
 
+    public DatabaseReference getCurrentUserFBDatabaseRef() {
+        return currentUserFBDatabaseRef;
+    }
+
+    public DatabaseReference getCurrentUserFriendsFBDatabaseRef() {
+        return friendsFBDatabaseRef;
+    }
+
     public DatabaseReference getRootFBDatabaseRef() {
         return rootFBDatabaseRef;
     }
 
     public DatabaseReference getUsersFBDatabaseRef() {
         return usersFBDatabaseRef;
-    }
-
-    public DatabaseReference getCurrentUserFBDatabaseRef() {
-        return currentUserFBDatabaseRef;
     }
 
     public FirebaseAuth getFBAuth() {
@@ -195,6 +200,9 @@ public abstract class ParentActivity extends AppCompatActivity {
 
                 if(!TextUtils.isEmpty(currentUserId)) {
 
+                    friendsFBDatabaseRef = rootFBDatabaseRef.child(CONST.FIREBASE_FRIENDS_CHILD)
+                                                                .child(currentUserId);
+
                     result = true;
 
                     //return setUserIsOnline(true);
@@ -287,7 +295,7 @@ public abstract class ParentActivity extends AppCompatActivity {
 
         if(!TextUtils.isEmpty(currentUserId)) {
 
-            currentUserFBDatabaseRef = usersFBDatabaseRef.child(currentUserId);
+            currentUserFBDatabaseRef    = usersFBDatabaseRef.child(currentUserId);
 
             return (currentUserFBDatabaseRef != null);
         }

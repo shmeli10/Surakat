@@ -20,6 +20,7 @@ import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
 import com.shmeli.surakat.interfaces.TransferSelectedUser;
 import com.shmeli.surakat.model.User;
+import com.shmeli.surakat.ui.new_version.fragments.ChatFragment;
 import com.shmeli.surakat.ui.new_version.fragments.ParentFragment;
 import com.shmeli.surakat.ui.new_version.fragments.TabsFragment;
 import com.shmeli.surakat.ui.new_version.fragments.UserProfileFragment;
@@ -218,6 +219,10 @@ public class InternalActivity   extends     ParentActivity
 
         switch(fragmentCode) {
 
+            case CONST.CHAT_FRAGMENT:
+                fragment = ChatFragment.newInstance(selectedUserId);
+                fragment.setFragmentTitleResId(R.string.text_chat);
+                break;
             case CONST.USER_PROFILE_FRAGMENT:
                 fragment = UserProfileFragment.newInstance(selectedUserId);
                 fragment.setFragmentTitleResId(R.string.text_profile);

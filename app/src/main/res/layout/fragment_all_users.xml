@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/allUsersContainer"
     style="@style/MM"
-    tools:context="com.shmeli.surakat.ui.fragments.AllUsersFragment">
+    tools:context="com.shmeli.surakat.ui.new_version.fragments.AllUsersFragment">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/allUsersRecyclerVIew"
