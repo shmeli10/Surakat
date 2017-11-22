@@ -251,6 +251,8 @@ public class UserProfileFragment extends ParentFragment {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
 
+            Log.e("LOG", "UserProfileFragment: friendRequestsListValueListener: dataSnapshot.hasChild(" +selectedUserId+"): " +(dataSnapshot.hasChild(selectedUserId)));
+
             if(dataSnapshot.hasChild(selectedUserId)) {
 
                 int requestTypeId = Integer.valueOf(dataSnapshot.child(selectedUserId).child(CONST.REQUEST_TYPE_ID).getValue().toString());
@@ -278,11 +280,23 @@ public class UserProfileFragment extends ParentFragment {
                         hideDeclineButton();
                         break;
                 }
+
+                friendsFBDatabaseRef.child(selectedUserId)
+                        .addListenerForSingleValueEvent(selectedUserFriendsListValueListener);
             }
             else {
 
-                friendsFBDatabaseRef.child(internalActivity.getCurrentUserId())
-                                        .addListenerForSingleValueEvent(currentUserFriendsListValueListener);
+                Log.e("LOG", "UserProfileFragment: friendRequestsListValueListener: friendsFBDatabaseRef.child(" +internalActivity.getCurrentUserId()+ ") is null: " +(friendsFBDatabaseRef.child(internalActivity.getCurrentUserId()) == null));
+
+                if(friendsFBDatabaseRef.child(internalActivity.getCurrentUserId()) != null) {
+                    friendsFBDatabaseRef.child(internalActivity.getCurrentUserId())
+                            .addListenerForSingleValueEvent(currentUserFriendsListValueListener);
+                }
+                else {
+
+                    friendsCountValue = 0;
+                    friendsCountValueTextView.setText(String.valueOf(friendsCountValue));
+                }
             }
         }
 
@@ -323,6 +337,29 @@ public class UserProfileFragment extends ParentFragment {
 
             //hideDeclineButton();
             //progressDialog.dismiss();
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+            //progressDialog.dismiss();
+        }
+    };
+
+    ValueEventListener selectedUserFriendsListValueListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+
+            Log.e("LOG", "UserProfileFragment: selectedUserFriendsListValueListener: friends sum = " +dataSnapshot.getChildrenCount());
+
+            if(dataSnapshot.getChildrenCount() >= 0) {
+
+                friendsCountValue = (int) dataSnapshot.getChildrenCount();
+            }
+            else{
+
+                friendsCountValue = 0;
+            }
+            friendsCountValueTextView.setText(String.valueOf(friendsCountValue));
         }
 
         @Override
@@ -781,6 +818,9 @@ public class UserProfileFragment extends ParentFragment {
 //                profilePageSendRequest.setText(R.string.text_send_friend_request);
 
                 hideDeclineButton();
+
+                friendsFBDatabaseRef.child(selectedUserId)
+                        .addListenerForSingleValueEvent(selectedUserFriendsListValueListener);
             }
             else {
 
@@ -817,6 +857,9 @@ public class UserProfileFragment extends ParentFragment {
 //                profilePageSendRequest.setText(R.string.text_unfriend_request);
 
                 hideDeclineButton();
+
+                friendsFBDatabaseRef.child(selectedUserId)
+                        .addListenerForSingleValueEvent(selectedUserFriendsListValueListener);
             }
             else {
 

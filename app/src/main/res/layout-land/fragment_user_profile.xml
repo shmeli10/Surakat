@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/userProfileContainer"
+    android:orientation="horizontal"
+    style="@style/MM"
+    android:weightSum="100"
+    android:background="@color/colorPrimary">
+
+    <LinearLayout
+        style="@style/MM"
+        android:orientation="vertical"
+        android:layout_weight="50"
+        android:gravity="center_horizontal|center_vertical">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/userProfileAvatar"
+            style="@style/WW"
+            android:layout_width="@dimen/avatar_big_size"
+            android:layout_height="@dimen/avatar_big_size"
+            android:layout_marginTop="@dimen/spacing_2x"
+            android:src="@drawable/default_avatar"/>
+
+        <TextView
+            android:id="@+id/userProfileName"
+            style="@style/MW"
+            android:layout_marginTop="@dimen/spacing_2x"
+            android:gravity="center"
+            android:textSize="@dimen/text_size_2.5x"
+            android:textColor="@color/white"/>
+
+        <TextView
+            android:id="@+id/userProfileStatus"
+            style="@style/MW"
+            android:layout_marginTop="@dimen/spacing_2x"
+            android:gravity="center"
+            android:textSize="@dimen/text_size_2.0x"
+            android:textColor="@color/white" />
+
+        <LinearLayout
+            style="@style/MW"
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/spacing_2x"
+            android:weightSum="100">
+
+            <TextView
+                android:id="@+id/userProfileFriendsCountTitle"
+                style="@style/MM"
+                android:layout_weight="50"
+                android:gravity="right"
+                android:textSize="@dimen/text_size_2.0x"
+                android:textColor="@color/white"
+                android:text="@string/text_total_friends"/>
+
+            <TextView
+                android:id="@+id/userProfileFriendsCountValue"
+                style="@style/MM"
+                android:layout_weight="50"
+                android:layout_marginLeft="@dimen/spacing_1x"
+                android:textSize="@dimen/text_size_2.0x"
+                android:textColor="@color/white"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+    <LinearLayout
+        style="@style/MM"
+        android:orientation="vertical"
+        android:layout_weight="50"
+        android:gravity="center_horizontal"
+        android:padding="@dimen/spacing_2x">
+
+        <Button
+            android:id="@+id/userProfileSendRequest"
+            style="@style/MW"
+            android:layout_marginTop="@dimen/spacing_2x"
+            android:background="@drawable/button_green"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/text_size_1.5x"
+            android:visibility="invisible"/>
+
+        <Button
+            android:id="@+id/userProfileDeclineRequest"
+            style="@style/MW"
+            android:layout_marginTop="@dimen/spacing_2x"
+            android:background="@drawable/button_yellow"
+            android:visibility="invisible"
+            android:enabled="false"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/text_size_1.5x"
+            android:text="@string/text_decline_friend_request"/>
+
+    </LinearLayout>
+
+</LinearLayout>
