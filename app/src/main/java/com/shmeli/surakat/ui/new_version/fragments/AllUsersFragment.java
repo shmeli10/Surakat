@@ -114,7 +114,7 @@ public class AllUsersFragment extends Fragment {
 
                         if(transferSelectedUserListener != null) {
 
-                            transferSelectedUserListener.onTransferSelectedUserSuccess( CONST.USER_PROFILE_FRAGMENT,
+                            transferSelectedUserListener.onTransferSelectedUserSuccess( CONST.USER_PROFILE_FRAGMENT_CODE,
                                                                                         selectedUserId,
                                                                                         model);
                         }

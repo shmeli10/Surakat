@@ -23,6 +23,7 @@ import com.google.firebase.iid.FirebaseInstanceId;
 
 import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
+import com.shmeli.surakat.ui.new_version.fragments.ParentFragment;
 
 /**
  * Created by Serghei Ostrovschi on 11/14/17.
@@ -101,6 +102,9 @@ public abstract class ParentActivity extends AppCompatActivity {
                                                 String  selectedUserId);
 
     public void setCurrentFragmentCode(int currentFragmentCode) {
+        Log.e("LOG", "ParentActivity; setCurrentFragmentCode()");
+
+        Log.e("LOG", "ParentActivity; setCurrentFragmentCode(): currentFragmentCode= " +currentFragmentCode);
 
         if(currentFragmentCode > 0)
             this.currentFragmentCode = currentFragmentCode;
@@ -131,8 +135,6 @@ public abstract class ParentActivity extends AppCompatActivity {
 //                                             boolean     addToBackStack) {
         Log.e("LOG", "ParentActivity: replaceFirstLayerFragment()");
 
-//        if(fragment != null) {
-
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
 
@@ -150,7 +152,7 @@ public abstract class ParentActivity extends AppCompatActivity {
                             fragment.getClass().getName());
 
 //        if (addToBackStack)
-            transaction.addToBackStack(fragment.getClass().getName());
+        transaction.addToBackStack(fragment.getClass().getName());
 
         transaction.commit();
 //        }

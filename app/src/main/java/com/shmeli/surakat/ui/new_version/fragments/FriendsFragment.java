@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DataSnapshot;
@@ -197,7 +196,7 @@ public class FriendsFragment extends Fragment {
                                                     case CONST.OPEN_PROFILE_TYPE:
                                                         if(transferSelectedUserListener != null) {
 
-                                                            transferSelectedUserListener.onTransferSelectedUserSuccess( CONST.USER_PROFILE_FRAGMENT,
+                                                            transferSelectedUserListener.onTransferSelectedUserSuccess( CONST.USER_PROFILE_FRAGMENT_CODE,
                                                                                                                         selectedUserId,
                                                                                                                         model);
                                                         }
@@ -207,7 +206,7 @@ public class FriendsFragment extends Fragment {
                                                         break;
                                                     case CONST.SEND_MESSAGE_TYPE:
                                                         // moveToChatActivity();
-                                                        transferSelectedUserListener.onTransferSelectedUserSuccess( CONST.CHAT_FRAGMENT,
+                                                        transferSelectedUserListener.onTransferSelectedUserSuccess( CONST.CHAT_FRAGMENT_CODE,
                                                                                                                     selectedUserId,
                                                                                                                     model);
                                                         break;

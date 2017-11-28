@@ -71,9 +71,8 @@ public class RegisterFragment extends ParentFragment {
 
         if(instance == null) {
             instance = new RegisterFragment();
+            instance.setArguments(args);
         }
-
-        instance.setArguments(args);
 
         return instance;
     }

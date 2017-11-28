@@ -1,6 +1,5 @@
 package com.shmeli.surakat.ui.new_version;
 
-import android.app.Fragment;
 import android.app.FragmentManager;
 
 import android.content.Intent;
@@ -37,6 +36,8 @@ public class InternalActivity   extends     ParentActivity
                                 implements  FragmentManager.OnBackStackChangedListener,
                                             TransferSelectedUser {
 
+    private TabsFragment    tabsFragment;
+
     private ActionBar       actionBar;
     private Toolbar         toolbar;
 
@@ -70,11 +71,38 @@ public class InternalActivity   extends     ParentActivity
 
             Log.e("LOG", "InternalActivity: init(): initCurrentUser success");
 
-            getFragmentManager().addOnBackStackChangedListener(this);
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.addOnBackStackChangedListener(this);
 
-            setFirstLayerFragment(CONST.TABS_FRAGMENT);
+            Log.e("LOG", "InternalActivity: init(): tabsFragment name: " +(TabsFragment.newInstance().getClass().getName()));
 
-//            setFirstLayerFragment(CONST.TABS_FRAGMENT,
+            tabsFragment = (TabsFragment) fragmentManager.findFragmentByTag(TabsFragment.newInstance().getClass().getName()); //CONST.TABS_FRAGMENT_NAME);
+
+            Log.e("LOG", "InternalActivity: init(): tabsFragment is null: " +(tabsFragment == null));
+
+            // create the fragment and data the first time
+            if (tabsFragment == null) {
+
+                // add the fragment
+                tabsFragment = TabsFragment.newInstance();
+                tabsFragment.setFragmentCode(CONST.TABS_FRAGMENT_CODE);
+                tabsFragment.setFragmentTitleResId(R.string.text_tabs_fragment);
+
+                setCurrentFragmentCode(CONST.TABS_FRAGMENT_CODE);
+
+                replaceFirstLayerFragment(tabsFragment);
+
+                //setFirstLayerFragment(CONST.TABS_FRAGMENT_CODE);
+            }
+
+            setToolbarTitle(tabsFragment.getFragmentTitleResId());
+
+//            getFragmentManager().addOnBackStackChangedListener(this);
+//
+//            setFirstLayerFragment(CONST.TABS_FRAGMENT_CODE);
+
+
+//            setFirstLayerFragment(CONST.TABS_FRAGMENT_CODE,
 //                    false,
 //                    false);
         }
@@ -148,6 +176,8 @@ public class InternalActivity   extends     ParentActivity
 
         int backStackSize = fragmentManager.getBackStackEntryCount();
 
+        Log.e("LOG", "InternalActivity: onBackStackChanged(): backStackSize= " +backStackSize);
+
         if(backStackSize > 0) {
 
             ParentFragment fragment = (ParentFragment) fragmentManager.findFragmentByTag(fragmentManager.getBackStackEntryAt(backStackSize - 1).getName());
@@ -155,21 +185,21 @@ public class InternalActivity   extends     ParentActivity
 
             switch (fragment.getFragmentCode()) {
 
-                case CONST.TABS_FRAGMENT:
+                case CONST.TABS_FRAGMENT_CODE:
 
-                    Log.e("LOG", "InternalActivity: onBackStackChanged(): backStackSize= " +backStackSize);
+//                    Log.e("LOG", "InternalActivity: onBackStackChanged(): backStackSize= " +backStackSize);
 
-                    if(backStackSize == 2) {
-
-                        Log.e("LOG", "InternalActivity: onBackStackChanged(): pop last version fragment");
-
-                        fragmentManager.popBackStack(   fragmentManager.getBackStackEntryAt(fragmentManager.getBackStackEntryCount()-1).getId(),
-                                                        FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                    }
+//                    if(backStackSize == 2) {
+//
+//                        Log.e("LOG", "InternalActivity: onBackStackChanged(): pop last version fragment");
+//
+//                        fragmentManager.popBackStack(   fragmentManager.getBackStackEntryAt(fragmentManager.getBackStackEntryCount()-1).getId(),
+//                                                        FragmentManager.POP_BACK_STACK_INCLUSIVE);
+//                    }
 
                     hideToolbarBackButton();
                     break;
-                case CONST.USER_PROFILE_FRAGMENT:
+                case CONST.USER_PROFILE_FRAGMENT_CODE:
                     showToolbarBackButton();
                     break;
                 default:
@@ -197,11 +227,11 @@ public class InternalActivity   extends     ParentActivity
     public void setFirstLayerFragment(int fragmentCode) {
         Log.e("LOG", "InternalActivity: setFirstLayerFragment()");
 
-        ParentFragment fragment = null;
+/*        ParentFragment fragment = null;
 
         switch(fragmentCode) {
 
-            case CONST.TABS_FRAGMENT:
+            case CONST.TABS_FRAGMENT_CODE:
                 fragment = TabsFragment.newInstance();
                 fragment.setFragmentTitleResId(R.string.text_tabs_fragment);
                 break;
@@ -219,7 +249,7 @@ public class InternalActivity   extends     ParentActivity
         }
         else {
             Log.e("LOG", "InternalActivity: setFirstLayerFragment(): fragment is null");
-        }
+        }*/
     }
 
     @Override
@@ -231,11 +261,11 @@ public class InternalActivity   extends     ParentActivity
 
         switch(fragmentCode) {
 
-            case CONST.CHAT_FRAGMENT:
+            case CONST.CHAT_FRAGMENT_CODE:
                 fragment = ChatFragment.newInstance(selectedUserId);
                 fragment.setFragmentTitleResId(R.string.text_chat);
                 break;
-            case CONST.USER_PROFILE_FRAGMENT:
+            case CONST.USER_PROFILE_FRAGMENT_CODE:
                 fragment = UserProfileFragment.newInstance(selectedUserId);
                 fragment.setFragmentTitleResId(R.string.text_profile);
                 break;
@@ -266,7 +296,7 @@ public class InternalActivity   extends     ParentActivity
 
         switch(fragmentCode) {
 
-            case CONST.TABS_FRAGMENT:
+            case CONST.TABS_FRAGMENT_CODE:
                 fragment = TabsFragment.newInstance();
                 fragment.setFragmentTitleResId(R.string.text_tabs_fragment);
 
@@ -279,13 +309,13 @@ public class InternalActivity   extends     ParentActivity
 
                 showToolbarBackButton();
                 break;*//*
-//            case CONST.REGISTER_FRAGMENT:
+//            case CONST.REGISTER_FRAGMENT_CODE:
 //                fragment = RegisterFragment.newInstance();
 //                fragment.setFragmentTitleResId(R.string.text_create_an_account);
 //
 //                showToolbarBackButton();
 //                break;
-//            case CONST.SIGN_IN_FRAGMENT:
+//            case CONST.SIGN_IN_FRAGMENT_CODE:
 //                fragment = SignInFragment.newInstance();
 //                fragment.setFragmentTitleResId(R.string.text_sign_in);
 //

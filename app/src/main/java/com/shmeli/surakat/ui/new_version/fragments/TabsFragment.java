@@ -49,9 +49,8 @@ public class TabsFragment extends ParentFragment {
 
         if(instance == null) {
             instance = new TabsFragment();
+            instance.setArguments(args);
         }
-
-        instance.setArguments(args);
 
         return instance;
     }

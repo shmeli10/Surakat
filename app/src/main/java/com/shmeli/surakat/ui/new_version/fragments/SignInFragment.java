@@ -62,9 +62,8 @@ public class SignInFragment extends ParentFragment {
 
         if(instance == null) {
             instance = new SignInFragment();
+            instance.setArguments(args);
         }
-
-        instance.setArguments(args);
 
         return instance;
     }
@@ -217,12 +216,8 @@ public class SignInFragment extends ParentFragment {
     private void moveToRegisterFragment() {
         Log.e("LOG", "SignInFragment: moveToRegisterFragment()");
 
-        externalActivity.setSecondLayerFragment(CONST.REGISTER_FRAGMENT,
+        externalActivity.setSecondLayerFragment(CONST.REGISTER_FRAGMENT_CODE,
                                                 null);
-
-//        externalActivity.setFirstLayerFragment(   CONST.REGISTER_FRAGMENT,
-//                                        true,
-//                                        true);
     }
 
 /*    private void moveToFillAccountFragment() {

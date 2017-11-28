@@ -1,6 +1,5 @@
 package com.shmeli.surakat.ui.new_version;
 
-import android.app.Fragment;
 import android.app.FragmentManager;
 
 import android.content.Intent;
@@ -31,6 +30,8 @@ import com.shmeli.surakat.utils.UiUtils;
 public class ExternalActivity   extends     ParentActivity
                                 implements  FragmentManager.OnBackStackChangedListener {
 
+    private SignInFragment  signInFragment;
+
     private ActionBar       actionBar;
     private Toolbar         toolbar;
 
@@ -60,13 +61,64 @@ public class ExternalActivity   extends     ParentActivity
     private void init() {
         Log.e("LOG", "ExternalActivity: init()");
 
-        getFragmentManager().addOnBackStackChangedListener(this);
+        int toolbarTitleResId = 0;
 
-        setFirstLayerFragment(CONST.SIGN_IN_FRAGMENT);
+        FragmentManager fragmentManager = getFragmentManager();
+        fragmentManager.addOnBackStackChangedListener(this);
 
-//        setFirstLayerFragment(CONST.SIGN_IN_FRAGMENT,
-//                false,
-//                false);
+        //Log.e("LOG", "ExternalActivity: init(): signInFragment name: " +(SignInFragment.newInstance().getClass().getName()));
+
+        signInFragment = (SignInFragment) fragmentManager.findFragmentByTag(SignInFragment.newInstance().getClass().getName());
+
+        //Log.e("LOG", "ExternalActivity: init(): signInFragment is null: " +(signInFragment == null));
+
+        // first start of app and need to create the signInFragment
+        if (signInFragment == null) {
+
+            // create the signInFragment
+            signInFragment = SignInFragment.newInstance();
+            signInFragment.setFragmentCode(CONST.SIGN_IN_FRAGMENT_CODE);
+            signInFragment.setFragmentTitleResId(R.string.text_sign_in);
+
+            setCurrentFragmentCode(CONST.SIGN_IN_FRAGMENT_CODE);
+
+            replaceFirstLayerFragment(signInFragment);
+
+            toolbarTitleResId = signInFragment.getFragmentTitleResId();
+        }
+        // app is started again and signInFragment exists
+        else {
+
+            int backStackSize = fragmentManager.getBackStackEntryCount();
+
+//            Log.e("LOG", "ExternalActivity: init(): backStackSize= " +backStackSize);
+
+            // if back stack contains not only signInFragment
+            if(backStackSize > 1) {
+
+//                Log.e("LOG", "ExternalActivity: init(): fragment name: " +fragmentManager.getBackStackEntryAt(backStackSize - 1).getName());
+
+                // get the last back stack fragments
+                ParentFragment fragment = (ParentFragment) fragmentManager.findFragmentByTag(fragmentManager.getBackStackEntryAt(backStackSize - 1).getName());
+                toolbarTitleResId = fragment.getFragmentTitleResId();
+
+                showOrHideToolbarBackButton(fragment.getFragmentCode());
+            }
+            // if back stack contains only signInFragment
+            else {
+
+                toolbarTitleResId = signInFragment.getFragmentTitleResId();
+            }
+        }
+
+        // if resource identifier for toolbar title is correct
+        if(toolbarTitleResId > 0) {
+            setToolbarTitle(toolbarTitleResId);
+        }
+        // if resource identifier for toolbar title is incorrect
+        else {
+            Log.e("LOG", "ExternalActivity: init(): toolbarTitleResId has incorrect value= " +toolbarTitleResId);
+        }
     }
 
     public void moveToInternalActivity() {
@@ -78,7 +130,6 @@ public class ExternalActivity   extends     ParentActivity
         startActivity(internalActivityIntent);
 
         finish();
-
     }
 
     // ----------------------------------- FRAGMENTS ----------------------------------------- //
@@ -91,26 +142,16 @@ public class ExternalActivity   extends     ParentActivity
 
         int backStackSize = fragmentManager.getBackStackEntryCount();
 
+//        Log.e("LOG", "ExternalActivity: onBackStackChanged(): backStackSize= " +backStackSize);
+
         if(backStackSize > 0) {
+
+//            Log.e("LOG", "ExternalActivity: onBackStackChanged(): fragment name: " +fragmentManager.getBackStackEntryAt(backStackSize - 1).getName());
 
             ParentFragment fragment = (ParentFragment) fragmentManager.findFragmentByTag(fragmentManager.getBackStackEntryAt(backStackSize - 1).getName());
             setToolbarTitle(fragment.getFragmentTitleResId());
 
-            switch (fragment.getFragmentCode()) {
-
-/*            case CONST.FILL_ACCOUNT_FRAGMENT:
-                setToolbarTitle(R.string.text_fill_account);
-                showToolbarBackButton();
-                break;*/
-                case CONST.REGISTER_FRAGMENT:
-                    showToolbarBackButton();
-                    break;
-                case CONST.SIGN_IN_FRAGMENT:
-                    hideToolbarBackButton();
-                    break;
-                default:
-                    Log.e("LOG", "ExternalActivity: onBackStackChanged(): undefined fragment code: " + getCurrentFragmentCode());
-            }
+            showOrHideToolbarBackButton(fragment.getFragmentCode());
         }
         else {
 
@@ -132,11 +173,11 @@ public class ExternalActivity   extends     ParentActivity
     public void setFirstLayerFragment(int fragmentCode) {
         Log.e("LOG", "ExternalActivity: setFirstLayerFragment()");
 
-        ParentFragment fragment = null;
+        /*ParentFragment fragment = null;
 
         switch(fragmentCode) {
 
-            case CONST.SIGN_IN_FRAGMENT:
+            case CONST.SIGN_IN_FRAGMENT_CODE:
                 fragment = SignInFragment.newInstance();
                 fragment.setFragmentTitleResId(R.string.text_sign_in);
                 break;
@@ -158,7 +199,7 @@ public class ExternalActivity   extends     ParentActivity
         }
         else {
             Log.e("LOG", "ExternalActivity: setFirstLayerFragment(): fragment is null");
-        }
+        }*/
     }
 
     @Override
@@ -170,7 +211,7 @@ public class ExternalActivity   extends     ParentActivity
 
         switch(fragmentCode) {
 
-            case CONST.REGISTER_FRAGMENT:
+            case CONST.REGISTER_FRAGMENT_CODE:
                 fragment = RegisterFragment.newInstance();
                 fragment.setFragmentTitleResId(R.string.text_create_an_account);
                 break;
@@ -184,70 +225,12 @@ public class ExternalActivity   extends     ParentActivity
 
             setCurrentFragmentCode(fragmentCode);
 
-//            replaceFirstLayerFragment(   fragment,
-//                                        animate,
-//                                        addToBackStack);
-
             addSecondLayerFragment(fragment);
         }
         else {
             Log.e("LOG", "ExternalActivity: setSecondLayerFragment(): fragment is null");
         }
     }
-
-//    @Override
-//    public void setFirstLayerFragment(int     fragmentCode,
-//                                      boolean animate,
-//                                      boolean addToBackStack) {
-//        Log.e("LOG", "ExternalActivity: setFirstLayerFragment()");
-//
-//        ParentFragment fragment = null;
-//
-//        switch(fragmentCode) {
-//
-///*            case CONST.FILL_ACCOUNT_FRAGMENT:
-//                fragment = FillAccountFragment.newInstance();
-//                fragment.setFragmentTitleResId(R.string.text_fill_account);
-//
-//                showToolbarBackButton();
-//                break;*/
-//            case CONST.REGISTER_FRAGMENT:
-//                fragment = RegisterFragment.newInstance();
-//                fragment.setFragmentTitleResId(R.string.text_create_an_account);
-//
-//                showToolbarBackButton();
-//                break;
-//            case CONST.SIGN_IN_FRAGMENT:
-//                fragment = SignInFragment.newInstance();
-//                fragment.setFragmentTitleResId(R.string.text_sign_in);
-//
-//                hideToolbarBackButton();
-//                break;
-//            default:
-//                Log.e("LOG", "ExternalActivity: setFirstLayerFragment(): undefined fragment code: " +fragmentCode);
-//        }
-//
-//        if(fragment != null) {
-//
-//            fragment.setFragmentCode(fragmentCode);
-//
-//            setCurrentFragmentCode(fragmentCode);
-//
-////            replaceFirstLayerFragment(   fragment,
-////                                        animate,
-////                                        addToBackStack);
-//
-//            setToolbarTitle(fragment.getFragmentTitleResId());
-//        }
-//        else {
-//            Log.e("LOG", "ExternalActivity: setFirstLayerFragment(): fragment is null");
-//        }
-//    }
-//
-//    @Override
-//    public void changeFragment(Fragment fragment) {
-//        Log.e("LOG", "ExternalActivity: setSecondLayerFragment()");
-//    }
 
     @Override
     public void onBackPressed() {
@@ -259,27 +242,6 @@ public class ExternalActivity   extends     ParentActivity
         else {
             super.onBackPressed();
         }
-
-//        FragmentManager fragmentManager = getFragmentManager();
-//
-//        if(currentFragmentCode == CONST.FILL_ACCOUNT_FRAGMENT) {
-//
-//            Log.e("LOG", "ExternalActivity: onBackPressed(): go to SignInFragment");
-//
-//            for (int i = 0; i<fragmentManager.getBackStackEntryCount(); i++)
-//                fragmentManager.popBackStack();
-//        }
-//        else {
-//
-//            Log.e("LOG", "ExternalActivity: onBackPressed(): go back");
-//
-//            if (getFragmentManager().getBackStackEntryCount() > 0) {
-//                getFragmentManager().popBackStack();
-//            }
-//            else {
-//                super.onBackPressed();
-//            }
-//        }
     }
 
     // ----------------------------------- TOOLBAR ----------------------------------------- //
@@ -293,7 +255,23 @@ public class ExternalActivity   extends     ParentActivity
         }
     }
 
-    public void showToolbarBackButton() {
+    private void showOrHideToolbarBackButton(int fragmentCode) {
+        Log.e("LOG", "ExternalActivity: showOrHideToolbarBackButton()");
+
+        switch (fragmentCode) {
+
+            case CONST.REGISTER_FRAGMENT_CODE:
+                showToolbarBackButton();
+                break;
+            case CONST.SIGN_IN_FRAGMENT_CODE:
+                hideToolbarBackButton();
+                break;
+            default:
+                Log.e("LOG", "ExternalActivity: showOrHideToolbarBackButton(): undefined fragment code: " +fragmentCode);
+        }
+    }
+
+    private void showToolbarBackButton() {
         Log.e("LOG", "ExternalActivity: showToolbarBackButton()");
 
         if(actionBar != null) {
@@ -303,7 +281,7 @@ public class ExternalActivity   extends     ParentActivity
         }
     }
 
-    public void hideToolbarBackButton() {
+    private void hideToolbarBackButton() {
         Log.e("LOG", "ExternalActivity: hideToolbarBackButton()");
 
         if(actionBar != null) {
