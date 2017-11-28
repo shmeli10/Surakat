@@ -146,8 +146,8 @@ public abstract class ParentActivity extends AppCompatActivity {
 //        }
 
         transaction.replace(R.id.fragmentsContainer,
-                fragment,
-                fragment.getClass().getName());
+                            fragment,
+                            fragment.getClass().getName());
 
 //        if (addToBackStack)
             transaction.addToBackStack(fragment.getClass().getName());

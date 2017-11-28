@@ -1,6 +1,7 @@
 package com.shmeli.surakat.holders;
 
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -44,12 +45,20 @@ public class UserViewHolder extends RecyclerView.ViewHolder {
 
     public void setName(String userName) {
 
-        userNameTextView.setText(userName);
+        if( (!TextUtils.isEmpty(userName)) &&
+            (!userName.equals(CONST.DEFAULT_VALUE))) {
+
+            userNameTextView.setText(userName);
+        }
     }
 
     public void setStatus(String userStatus) {
 
-        userStatusTextView.setText(userStatus);
+        if( (!TextUtils.isEmpty(userStatus)) &&
+            (!userStatus.equals(CONST.DEFAULT_VALUE))) {
+
+            userStatusTextView.setText(userStatus);
+        }
     }
 
     public void setAvatar(String imageUrl) {

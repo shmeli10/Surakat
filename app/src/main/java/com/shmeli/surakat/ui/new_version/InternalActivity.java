@@ -156,13 +156,25 @@ public class InternalActivity   extends     ParentActivity
             switch (fragment.getFragmentCode()) {
 
                 case CONST.TABS_FRAGMENT:
+
+                    Log.e("LOG", "InternalActivity: onBackStackChanged(): backStackSize= " +backStackSize);
+
+                    if(backStackSize == 2) {
+
+                        Log.e("LOG", "InternalActivity: onBackStackChanged(): pop last version fragment");
+
+                        fragmentManager.popBackStack(   fragmentManager.getBackStackEntryAt(fragmentManager.getBackStackEntryCount()-1).getId(),
+                                                        FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                    }
+
                     hideToolbarBackButton();
                     break;
                 case CONST.USER_PROFILE_FRAGMENT:
                     showToolbarBackButton();
                     break;
                 default:
-                    Log.e("LOG", "InternalActivity: onBackStackChanged(): undefined fragment code: " + getCurrentFragmentCode());
+                    //Log.e("LOG", "InternalActivity: onBackStackChanged(): undefined fragment code: " + getCurrentFragmentCode());
+                    Log.e("LOG", "InternalActivity: onBackStackChanged(): undefined fragment code: " +fragment.getFragmentCode());
             }
         }
         else {
