@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -48,7 +49,7 @@ public class UserProfileFragment extends ParentFragment {
 
     private View                view;
 
-    private RelativeLayout      userProfileContainer;
+    private LinearLayout        userProfileContainer;
 
     private CircleImageView     avatarImageView;
 
@@ -121,7 +122,7 @@ public class UserProfileFragment extends ParentFragment {
             this.selectedUserId = getArguments().getString(CONST.USER_ID);
 
             userProfileContainer    = UiUtils.findView( view,
-                                                        R.id.profileContainer);
+                                                        R.id.userProfileContainer);
 
             avatarImageView         = UiUtils.findView( view,
                                                         R.id.userProfileAvatar);

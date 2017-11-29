@@ -1,80 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/userProfileContainer"
+    android:orientation="vertical"
     style="@style/MM"
     android:padding="@dimen/spacing_2x"
     android:background="@color/colorPrimary">
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/userProfileAvatar"
-        style="@style/WW"
-        android:layout_width="@dimen/avatar_big_size"
-        android:layout_height="@dimen/avatar_big_size"
-        android:layout_marginTop="@dimen/spacing_4x"
-        android:layout_centerHorizontal="true"
-        android:src="@drawable/default_avatar"/>
-
-    <TextView
-        android:id="@+id/userProfileName"
+    <LinearLayout
         style="@style/MW"
-        android:layout_below="@+id/userProfileAvatar"
-        android:layout_marginTop="@dimen/spacing_2x"
-        android:gravity="center"
-        android:textSize="@dimen/text_size_2.5x"
-        android:textColor="@color/white"/>
-        <!--android:hint="@string/hint_name"/>-->
+        android:orientation="vertical"
+        android:layout_weight="1"
+        android:gravity="center_horizontal">
 
-    <TextView
-        android:id="@+id/userProfileStatus"
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/userProfileAvatar"
+            style="@style/WW"
+            android:layout_width="@dimen/avatar_big_size"
+            android:layout_height="@dimen/avatar_big_size"
+            android:layout_marginTop="@dimen/spacing_4x"
+            android:src="@drawable/default_avatar"/>
+
+        <TextView
+            android:id="@+id/userProfileName"
+            style="@style/MW"
+            android:layout_marginTop="@dimen/spacing_2x"
+            android:gravity="center"
+            android:textSize="@dimen/text_size_2.5x"
+            android:textColor="@color/white"/>
+
+        <TextView
+            android:id="@+id/userProfileStatus"
+            style="@style/MW"
+            android:layout_marginTop="@dimen/spacing_2x"
+            android:gravity="center"
+            android:textSize="@dimen/text_size_2.0x"
+            android:textColor="@color/white" />
+
+    </LinearLayout>
+    <LinearLayout
         style="@style/MW"
-        android:layout_below="@+id/userProfileName"
-        android:layout_marginTop="@dimen/spacing_2x"
-        android:gravity="center"
-        android:textSize="@dimen/text_size_2.0x"
-        android:textColor="@color/white" />
-        <!--android:hint="@string/hint_status"/>-->
+        android:orientation="vertical"
+        android:layout_weight="0"
+        android:gravity="center_horizontal">
 
-    <TextView
-        android:id="@+id/userProfileFriendsCountTitle"
-        style="@style/WW"
-        android:layout_above="@+id/userProfileSendRequest"
-        android:layout_marginBottom="@dimen/spacing_2x"
-        android:layout_centerHorizontal="true"
-        android:textSize="@dimen/text_size_2.0x"
-        android:textColor="@color/white"
-        android:text="@string/text_total_friends"/>
+        <LinearLayout
+            style="@style/MW"
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/spacing_2x"
+            android:weightSum="100">
 
-    <TextView
-        android:id="@+id/userProfileFriendsCountValue"
-        style="@style/WW"
-        android:layout_above="@+id/userProfileSendRequest"
-        android:layout_toRightOf="@+id/userProfileFriendsCountTitle"
-        android:layout_centerHorizontal="true"
-        android:layout_marginLeft="@dimen/spacing_1x"
-        android:layout_marginBottom="@dimen/spacing_2x"
-        android:textSize="@dimen/text_size_2.0x"
-        android:textColor="@color/white"/>
+            <TextView
+                android:id="@+id/userProfileFriendsCountTitle"
+                style="@style/MM"
+                android:layout_weight="50"
+                android:gravity="right"
+                android:textSize="@dimen/text_size_2.0x"
+                android:textColor="@color/white"
+                android:text="@string/text_total_friends"/>
 
-    <Button
-        android:id="@+id/userProfileSendRequest"
-        style="@style/MW"
-        android:layout_above="@+id/userProfileDeclineRequest"
-        android:layout_marginBottom="@dimen/spacing_2x"
-        android:background="@drawable/button_green"
-        android:textColor="@color/colorPrimary"
-        android:textSize="@dimen/text_size_1.5x"
-        android:visibility="invisible"/>
+            <TextView
+                android:id="@+id/userProfileFriendsCountValue"
+                style="@style/MM"
+                android:layout_weight="50"
+                android:layout_marginLeft="@dimen/spacing_1x"
+                android:textSize="@dimen/text_size_2.0x"
+                android:textColor="@color/white"/>
 
-    <Button
-        android:id="@+id/userProfileDeclineRequest"
-        style="@style/MW"
-        android:layout_alignParentBottom="true"
-        android:background="@drawable/button_yellow"
-        android:visibility="invisible"
-        android:enabled="false"
-        android:textColor="@color/colorPrimary"
-        android:textSize="@dimen/text_size_1.5x"
-        android:text="@string/text_decline_friend_request"/>
+        </LinearLayout>
 
-</RelativeLayout>
+        <Button
+            android:id="@+id/userProfileSendRequest"
+            style="@style/MW"
+            android:layout_marginTop="@dimen/spacing_2x"
+            android:background="@drawable/button_green"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/text_size_1.5x"
+            android:visibility="invisible"/>
+
+        <Button
+            android:id="@+id/userProfileDeclineRequest"
+            style="@style/MW"
+            android:layout_marginTop="@dimen/spacing_2x"
+            android:background="@drawable/button_yellow"
+            android:enabled="false"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/text_size_1.5x"
+            android:text="@string/text_decline_friend_request"
+            android:visibility="invisible"/>
+
+    </LinearLayout>
+
+</LinearLayout>

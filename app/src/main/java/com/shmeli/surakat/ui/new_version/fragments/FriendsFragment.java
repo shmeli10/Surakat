@@ -34,7 +34,7 @@ public class FriendsFragment extends Fragment {
     private static FriendsFragment  instance;
 
     private View                    view;
-    private RecyclerView            friendsRecyclerVIew;
+    private RecyclerView            friendsList;
 
     private InternalActivity        internalActivity;
 
@@ -77,9 +77,10 @@ public class FriendsFragment extends Fragment {
             transferSelectedUserListener = (TransferSelectedUser) internalActivity;
         }
 
-        friendsRecyclerVIew    = UiUtils.findView(view, R.id.friendsRecyclerVIew);
-        friendsRecyclerVIew.setHasFixedSize(true);
-        friendsRecyclerVIew.setLayoutManager(new LinearLayoutManager(getContext()));
+        friendsList = UiUtils.findView( view,
+                                        R.id.friendsRecyclerVIew);
+        friendsList.setHasFixedSize(true);
+        friendsList.setLayoutManager(new LinearLayoutManager(getContext()));
 
         return view;
     }
@@ -242,6 +243,6 @@ public class FriendsFragment extends Fragment {
             }
         };
 
-        friendsRecyclerVIew.setAdapter(fbAdapter);
+        friendsList.setAdapter(fbAdapter);
     }
 }

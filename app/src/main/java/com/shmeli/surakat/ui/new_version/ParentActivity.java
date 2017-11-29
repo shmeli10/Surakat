@@ -102,9 +102,9 @@ public abstract class ParentActivity extends AppCompatActivity {
                                                 String  selectedUserId);
 
     public void setCurrentFragmentCode(int currentFragmentCode) {
-        Log.e("LOG", "ParentActivity; setCurrentFragmentCode()");
+        Log.e("LOG", "ParentActivity: setCurrentFragmentCode()");
 
-        Log.e("LOG", "ParentActivity; setCurrentFragmentCode(): currentFragmentCode= " +currentFragmentCode);
+        Log.e("LOG", "ParentActivity: setCurrentFragmentCode(): currentFragmentCode= " +currentFragmentCode);
 
         if(currentFragmentCode > 0)
             this.currentFragmentCode = currentFragmentCode;

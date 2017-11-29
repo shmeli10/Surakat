@@ -438,6 +438,7 @@ public class InternalActivity   extends     ParentActivity
             case CONST.TABS_FRAGMENT_CODE:
                 hideToolbarBackButton();
                 break;
+            case CONST.CHAT_FRAGMENT_CODE:
             case CONST.USER_PROFILE_FRAGMENT_CODE:
                 showToolbarBackButton();
                 break;
