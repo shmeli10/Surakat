@@ -76,11 +76,11 @@ public class InternalActivity   extends     ParentActivity
             FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.addOnBackStackChangedListener(this);
 
-            Log.e("LOG", "InternalActivity: init(): tabsFragment name: " +(TabsFragment.newInstance().getClass().getName()));
+            //Log.e("LOG", "InternalActivity: init(): tabsFragment name: " +(TabsFragment.newInstance().getClass().getName()));
 
             tabsFragment = (TabsFragment) fragmentManager.findFragmentByTag(TabsFragment.newInstance().getClass().getName()); //CONST.TABS_FRAGMENT_NAME);
 
-            Log.e("LOG", "InternalActivity: init(): tabsFragment is null: " +(tabsFragment == null));
+            //Log.e("LOG", "InternalActivity: init(): tabsFragment is null: " +(tabsFragment == null));
 
             // first start of app and need to create the tabsFragment
             if (tabsFragment == null) {
@@ -95,20 +95,18 @@ public class InternalActivity   extends     ParentActivity
                 replaceFirstLayerFragment(tabsFragment);
 
                 toolbarTitleResId = tabsFragment.getFragmentTitleResId();
-
-                //setFirstLayerFragment(CONST.TABS_FRAGMENT_CODE);
             }
             // app is started again and tabsFragment exists
             else {
 
                 int backStackSize = fragmentManager.getBackStackEntryCount();
 
-                Log.e("LOG", "InternalActivity: init(): backStackSize= " +backStackSize);
+                //Log.e("LOG", "InternalActivity: init(): backStackSize= " +backStackSize);
 
                 // if back stack contains not only tabsFragment
                 if(backStackSize > 1) {
 
-                    Log.e("LOG", "InternalActivity: init(): fragment name: " +fragmentManager.getBackStackEntryAt(backStackSize - 1).getName());
+                    //Log.e("LOG", "InternalActivity: init(): fragment name: " +fragmentManager.getBackStackEntryAt(backStackSize - 1).getName());
 
                     // get the last back stack fragments
                     ParentFragment fragment = (ParentFragment) fragmentManager.findFragmentByTag(fragmentManager.getBackStackEntryAt(backStackSize - 1).getName());
@@ -120,6 +118,7 @@ public class InternalActivity   extends     ParentActivity
                 else {
 
                     toolbarTitleResId = tabsFragment.getFragmentTitleResId();
+                    setCurrentFragmentCode(CONST.TABS_FRAGMENT_CODE);
                 }
             }
 
@@ -131,17 +130,6 @@ public class InternalActivity   extends     ParentActivity
             else {
                 Log.e("LOG", "InternalActivity: init(): toolbarTitleResId has incorrect value= " +toolbarTitleResId);
             }
-
-//            setToolbarTitle(tabsFragment.getFragmentTitleResId());
-
-//            getFragmentManager().addOnBackStackChangedListener(this);
-//
-//            setFirstLayerFragment(CONST.TABS_FRAGMENT_CODE);
-
-
-//            setFirstLayerFragment(CONST.TABS_FRAGMENT_CODE,
-//                    false,
-//                    false);
         }
         else {
 
@@ -174,9 +162,9 @@ public class InternalActivity   extends     ParentActivity
     public void onTransferSelectedUserSuccess(int       targetFragmentCode,
                                               String    selectedUserKey,
                                               User      selectedUser) {
-//        Log.e("LOG", "InternalActivity: onTransferSelectedUserSuccess()");
+        //Log.e("LOG", "InternalActivity: onTransferSelectedUserSuccess()");
 
-        Log.e("LOG", "InternalActivity: onTransferSelectedUserSuccess(): targetFragmentCode: " +targetFragmentCode);
+        //Log.e("LOG", "InternalActivity: onTransferSelectedUserSuccess(): targetFragmentCode: " +targetFragmentCode);
 
         if(targetFragmentCode <= 0) {
             Log.e("LOG", "InternalActivity: onTransferSelectedUserSuccess(): incorrect targetFragmentCode: " +targetFragmentCode);
@@ -185,7 +173,8 @@ public class InternalActivity   extends     ParentActivity
         }
 
         if(!TextUtils.isEmpty(selectedUserKey)) {
-            Log.e("LOG", "InternalActivity: onTransferSelectedUserSuccess(): selectedUserKey: " + selectedUserKey);
+
+            //Log.e("LOG", "InternalActivity: onTransferSelectedUserSuccess(): selectedUserKey: " + selectedUserKey);
 
             setSecondLayerFragment( targetFragmentCode,
                                     selectedUserKey);
@@ -202,7 +191,7 @@ public class InternalActivity   extends     ParentActivity
 
     @Override
     public void onTransferSelectedUserError(String error) {
-        Log.e("LOG", "InternalActivity: onBackStackChanged()");
+        Log.e("LOG", "InternalActivity: onBackStackChanged(): error: " +error);
     }
 
     @Override
@@ -213,7 +202,7 @@ public class InternalActivity   extends     ParentActivity
 
         int backStackSize = fragmentManager.getBackStackEntryCount();
 
-        Log.e("LOG", "InternalActivity: onBackStackChanged(): backStackSize= " +backStackSize);
+        //Log.e("LOG", "InternalActivity: onBackStackChanged(): backStackSize= " +backStackSize);
 
         if(backStackSize > 0) {
 
@@ -221,30 +210,6 @@ public class InternalActivity   extends     ParentActivity
             setToolbarTitle(fragment.getFragmentTitleResId());
 
             showOrHideToolbarBackButton(fragment.getFragmentCode());
-
-            /*switch (fragment.getFragmentCode()) {
-
-                case CONST.TABS_FRAGMENT_CODE:
-
-//                    Log.e("LOG", "InternalActivity: onBackStackChanged(): backStackSize= " +backStackSize);
-
-//                    if(backStackSize == 2) {
-//
-//                        Log.e("LOG", "InternalActivity: onBackStackChanged(): pop last version fragment");
-//
-//                        fragmentManager.popBackStack(   fragmentManager.getBackStackEntryAt(fragmentManager.getBackStackEntryCount()-1).getId(),
-//                                                        FragmentManager.POP_BACK_STACK_INCLUSIVE);
-//                    }
-
-                    hideToolbarBackButton();
-                    break;
-                case CONST.USER_PROFILE_FRAGMENT_CODE:
-                    showToolbarBackButton();
-                    break;
-                default:
-                    //Log.e("LOG", "InternalActivity: onBackStackChanged(): undefined fragment code: " + getCurrentFragmentCode());
-                    Log.e("LOG", "InternalActivity: onBackStackChanged(): undefined fragment code: " +fragment.getFragmentCode());
-            }*/
         }
         else {
 
@@ -260,35 +225,6 @@ public class InternalActivity   extends     ParentActivity
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void setFirstLayerFragment(int fragmentCode) {
-        Log.e("LOG", "InternalActivity: setFirstLayerFragment()");
-
-/*        ParentFragment fragment = null;
-
-        switch(fragmentCode) {
-
-            case CONST.TABS_FRAGMENT_CODE:
-                fragment = TabsFragment.newInstance();
-                fragment.setFragmentTitleResId(R.string.text_tabs_fragment);
-                break;
-            default:
-                Log.e("LOG", "InternalActivity: setFirstLayerFragment(): undefined fragment code: " +fragmentCode);
-        }
-
-        if(fragment != null) {
-
-            fragment.setFragmentCode(fragmentCode);
-
-            setCurrentFragmentCode(fragmentCode);
-
-            replaceFirstLayerFragment(fragment);
-        }
-        else {
-            Log.e("LOG", "InternalActivity: setFirstLayerFragment(): fragment is null");
-        }*/
     }
 
     @Override
@@ -325,67 +261,6 @@ public class InternalActivity   extends     ParentActivity
         }
     }
 
-    /*@Override
-    public void setFirstLayerFragment(int     fragmentCode,
-                                      boolean animate,
-                                      boolean addToBackStack) {
-        Log.e("LOG", "InternalActivity: setFirstLayerFragment()");
-
-        ParentFragment fragment = null;
-
-        switch(fragmentCode) {
-
-            case CONST.TABS_FRAGMENT_CODE:
-                fragment = TabsFragment.newInstance();
-                fragment.setFragmentTitleResId(R.string.text_tabs_fragment);
-
-                hideToolbarBackButton();
-                break;
-
-*//*            case CONST.FILL_ACCOUNT_FRAGMENT:
-                fragment = FillAccountFragment.newInstance();
-                fragment.setFragmentTitleResId(R.string.text_fill_account);
-
-                showToolbarBackButton();
-                break;*//*
-//            case CONST.REGISTER_FRAGMENT_CODE:
-//                fragment = RegisterFragment.newInstance();
-//                fragment.setFragmentTitleResId(R.string.text_create_an_account);
-//
-//                showToolbarBackButton();
-//                break;
-//            case CONST.SIGN_IN_FRAGMENT_CODE:
-//                fragment = SignInFragment.newInstance();
-//                fragment.setFragmentTitleResId(R.string.text_sign_in);
-//
-//                hideToolbarBackButton();
-//                break;
-            default:
-                Log.e("LOG", "InternalActivity: setFirstLayerFragment(): undefined fragment code: " +fragmentCode);
-        }
-
-        if(fragment != null) {
-
-            fragment.setFragmentCode(fragmentCode);
-
-            setCurrentFragmentCode(fragmentCode);
-
-            replaceFirstLayerFragment(   fragment,
-                                animate,
-                                addToBackStack);
-
-            setToolbarTitle(fragment.getFragmentTitleResId());
-        }
-        else {
-            Log.e("LOG", "InternalActivity: setFirstLayerFragment(): fragment is null");
-        }
-    }
-
-    @Override
-    public void changeFragment(Fragment fragment) {
-        Log.e("LOG", "InternalActivity: setSecondLayerFragment()");
-    }*/
-
     @Override
     public void onBackPressed() {
         Log.e("LOG", "InternalActivity: onBackPressed()");
@@ -396,27 +271,6 @@ public class InternalActivity   extends     ParentActivity
         else {
             super.onBackPressed();
         }
-
-//        FragmentManager fragmentManager = getFragmentManager();
-//
-//        if(currentFragmentCode == CONST.FILL_ACCOUNT_FRAGMENT) {
-//
-//            Log.e("LOG", "InternalActivity: onBackPressed(): go to SignInFragment");
-//
-//            for (int i = 0; i<fragmentManager.getBackStackEntryCount(); i++)
-//                fragmentManager.popBackStack();
-//        }
-//        else {
-//
-//            Log.e("LOG", "InternalActivity: onBackPressed(): go back");
-//
-//            if (getFragmentManager().getBackStackEntryCount() > 0) {
-//                getFragmentManager().popBackStack();
-//            }
-//            else {
-//                super.onBackPressed();
-//            }
-//        }
     }
 
     // ----------------------------------- TOOLBAR ----------------------------------------- //
@@ -437,6 +291,7 @@ public class InternalActivity   extends     ParentActivity
 
             case CONST.TABS_FRAGMENT_CODE:
                 hideToolbarBackButton();
+                setCurrentFragmentCode(CONST.TABS_FRAGMENT_CODE);
                 break;
             case CONST.CHAT_FRAGMENT_CODE:
             case CONST.USER_PROFILE_FRAGMENT_CODE:
@@ -448,7 +303,7 @@ public class InternalActivity   extends     ParentActivity
     }
 
     private void showToolbarBackButton() {
-//        Log.e("LOG", "InternalActivity: showToolbarBackButton()");
+        Log.e("LOG", "InternalActivity: showToolbarBackButton()");
 
         if(actionBar != null) {
 
@@ -458,7 +313,7 @@ public class InternalActivity   extends     ParentActivity
     }
 
     private void hideToolbarBackButton() {
-//        Log.e("LOG", "InternalActivity: hideToolbarBackButton()");
+        Log.e("LOG", "InternalActivity: hideToolbarBackButton()");
 
         if(actionBar != null) {
 

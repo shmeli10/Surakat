@@ -23,7 +23,6 @@ import com.google.firebase.iid.FirebaseInstanceId;
 
 import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
-import com.shmeli.surakat.ui.new_version.fragments.ParentFragment;
 
 /**
  * Created by Serghei Ostrovschi on 11/14/17.
@@ -94,17 +93,13 @@ public abstract class ParentActivity extends AppCompatActivity {
 
     // ------------------------------ SETTERS -------------------------------- //
 
-    public abstract void setFirstLayerFragment(int         fragmentCode); //,
-//                                               boolean     animate,
-//                                               boolean     addToBackStack);
-
     public abstract void setSecondLayerFragment(int     fragmentCode,
                                                 String  selectedUserId);
 
     public void setCurrentFragmentCode(int currentFragmentCode) {
         Log.e("LOG", "ParentActivity: setCurrentFragmentCode()");
 
-        Log.e("LOG", "ParentActivity: setCurrentFragmentCode(): currentFragmentCode= " +currentFragmentCode);
+        //Log.e("LOG", "ParentActivity: setCurrentFragmentCode(): currentFragmentCode= " +currentFragmentCode);
 
         if(currentFragmentCode > 0)
             this.currentFragmentCode = currentFragmentCode;
@@ -130,38 +125,26 @@ public abstract class ParentActivity extends AppCompatActivity {
 
     // ------------------------------ OTHER ---------------------------------- //
 
-    protected void replaceFirstLayerFragment(Fragment    fragment) { //,
-//                                             boolean     animate,
-//                                             boolean     addToBackStack) {
+    protected void replaceFirstLayerFragment(Fragment    fragment) {
+
         Log.e("LOG", "ParentActivity: replaceFirstLayerFragment()");
 
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
 
-//        if (animate) {
-//            transaction.setCustomAnimations(R.animator.slide_in,
-//                    R.animator.slide_out,
-//                    R.animator.slide_in,
-//                    R.animator.slide_out);
-//        } else {
-            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-//        }
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 
         transaction.replace(R.id.fragmentsContainer,
                             fragment,
                             fragment.getClass().getName());
 
-//        if (addToBackStack)
         transaction.addToBackStack(fragment.getClass().getName());
 
         transaction.commit();
-//        }
-//        else {
-//            Log.e("LOG", "ParentActivity: replaceFirstLayerFragment(): fragment is null");
-//        }
     }
 
     protected void addSecondLayerFragment(Fragment fragment) {
+
         Log.e("LOG", "ParentActivity: addSecondLayerFragment()");
 
         FragmentManager fragmentManager = getFragmentManager();
@@ -180,8 +163,6 @@ public abstract class ParentActivity extends AppCompatActivity {
 
         transaction.commit();
     }
-
-//    public abstract void toggleLoadingProgress(final boolean show);
 
     public boolean initCurrentUser() {
         Log.e("LOG", "ParentActivity: initCurrentUser()");

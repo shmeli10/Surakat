@@ -32,8 +32,8 @@ public class AllUsersFragment extends Fragment {
 
     private static AllUsersFragment  instance;
 
-    private View                view;
-    private RecyclerView        allUsersRecyclerVIew;
+    private View                    view;
+    private RecyclerView            allUsersRecyclerVIew;
 
     private InternalActivity        internalActivity;
     private TransferSelectedUser    transferSelectedUserListener;
@@ -110,17 +110,29 @@ public class AllUsersFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
 
-                        Log.e("LOG", "AllUsersFragment: userClickListener: selectedUserId= " +selectedUserId);
+                        //Log.e("LOG", "AllUsersFragment: userClickListener: selectedUserId= " +selectedUserId);
 
-                        if(transferSelectedUserListener != null) {
+                        //Log.e("LOG", "AllUsersFragment: userClickListener: currentFragment code= " +internalActivity.getCurrentFragmentCode());
 
-                            transferSelectedUserListener.onTransferSelectedUserSuccess( CONST.USER_PROFILE_FRAGMENT_CODE,
-                                                                                        selectedUserId,
-                                                                                        model);
+                        if( (internalActivity.getCurrentFragmentCode() > 0) &&
+                            (internalActivity.getCurrentFragmentCode() == CONST.TABS_FRAGMENT_CODE)) {
+
+                            //Log.e("LOG", "AllUsersFragment: populateFriendsList(): can react on click");
+
+                            if(transferSelectedUserListener != null) {
+
+                                transferSelectedUserListener.onTransferSelectedUserSuccess( CONST.USER_PROFILE_FRAGMENT_CODE,
+                                        selectedUserId,
+                                        model);
+                            }
+                            else {
+                                Log.e("LOG", "AllUsersFragment: userClickListener: transferSelectedUserListener is null");
+                            }
                         }
-                        else {
-                            Log.e("LOG", "AllUsersFragment: userClickListener: transferSelectedUserListener is null");
-                        }
+//                        else {
+//
+//                            Log.e("LOG", "AllUsersFragment: userClickListener: can not react on click");
+//                        }
                     }
                 });
             }

@@ -19,9 +19,10 @@ import android.widget.LinearLayout;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.iid.FirebaseInstanceId;
+
 import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
 import com.shmeli.surakat.ui.new_version.ExternalActivity;
@@ -35,17 +36,17 @@ public class SignInFragment extends ParentFragment {
 
     private static SignInFragment  instance;
 
-    private View            view;
+    private View                view;
 
-    private LinearLayout    signInContainer;
+    private LinearLayout        signInContainer;
 
-    private EditText        emailEditText;
-    private EditText        passwordEditText;
+    private EditText            emailEditText;
+    private EditText            passwordEditText;
 
-    private Button          singInButton;
-    private Button          registerButton;
+    private Button              singInButton;
+    private Button              registerButton;
 
-    private ExternalActivity externalActivity;
+    private ExternalActivity    externalActivity;
 
     public SignInFragment() {
         // Required empty public constructor
@@ -123,7 +124,7 @@ public class SignInFragment extends ParentFragment {
         @Override
         public void onClick(View v) {
 
-//            Log.e("LOG", "SignInFragment: signInClickListener: onClick()");
+            //Log.e("LOG", "SignInFragment: signInClickListener: onClick()");
 
             startSignIn();
         }
@@ -133,7 +134,7 @@ public class SignInFragment extends ParentFragment {
         @Override
         public void onClick(View v) {
 
-//            Log.e("LOG", "SignInFragment: registerClickListener: onClick()");
+            //Log.e("LOG", "SignInFragment: registerClickListener: onClick()");
 
             moveToRegisterFragment();
         }
@@ -145,7 +146,7 @@ public class SignInFragment extends ParentFragment {
         @Override
         public void onComplete(@NonNull Task<AuthResult> task) {
 
-//            Log.e("LOG", "SignInFragment: onSignInCompleteListener: onComplete(): task.isSuccessful(): " +task.isSuccessful());
+            //Log.e("LOG", "SignInFragment: onSignInCompleteListener: onComplete(): task.isSuccessful(): " +task.isSuccessful());
 
             if(task.isSuccessful()) {
 
@@ -153,12 +154,12 @@ public class SignInFragment extends ParentFragment {
 
                 // user initialized successfully
                 if(externalActivity.initCurrentUser()) {
-//                    Log.e("LOG", "SignInFragment: signInCompleteListener: user initialized successfully");
+                    //Log.e("LOG", "SignInFragment: signInCompleteListener: user initialized successfully");
 
                     // user exists in DB
                     if(externalActivity.currentUserExistsInFBDB()) {
                     //if(!externalActivity.currentUserExistsInFBDB()) {   // ONLY FOR TEST
-//                        Log.e("LOG", "SignInFragment: signInCompleteListener: user exists in DB");
+                        //Log.e("LOG", "SignInFragment: signInCompleteListener: user exists in DB");
 
                         setDeviceToken();
 
@@ -198,14 +199,12 @@ public class SignInFragment extends ParentFragment {
         @Override
         public void onComplete(@NonNull Task<Void> task) {
 
-//            Log.e("LOG", "SignInFragment: setDeviceTokenCompleteListener: task.isSuccessful(): " +task.isSuccessful());
+            //Log.e("LOG", "SignInFragment: setDeviceTokenCompleteListener: task.isSuccessful(): " +task.isSuccessful());
 
             if(task.isSuccessful()) {
-
                 Log.e("LOG", "LoginActivity: setDeviceTokenCompleteListener: send notifications");
             }
             else {
-
                 Log.e("LOG", "LoginActivity: setDeviceTokenCompleteListener: do not send notifications");
             }
         }
@@ -216,8 +215,10 @@ public class SignInFragment extends ParentFragment {
     private void moveToRegisterFragment() {
         Log.e("LOG", "SignInFragment: moveToRegisterFragment()");
 
-        externalActivity.setSecondLayerFragment(CONST.REGISTER_FRAGMENT_CODE,
-                                                null);
+        if(canReactOnClick()) {
+            externalActivity.setSecondLayerFragment(CONST.REGISTER_FRAGMENT_CODE,
+                    null);
+        }
     }
 
 /*    private void moveToFillAccountFragment() {
@@ -231,27 +232,29 @@ public class SignInFragment extends ParentFragment {
     private void startSignIn() {
         Log.e("LOG", "SignInFragment: startSignIn()");
 
-        String email    = emailEditText.getText().toString();
-        String password = passwordEditText.getText().toString();
+        if(canReactOnClick()) {
 
-        if( TextUtils.isEmpty(email)    ||
-            TextUtils.isEmpty(password)) {
+            String email = emailEditText.getText().toString();
+            String password = passwordEditText.getText().toString();
 
-            externalActivity.showSnackBar(  signInContainer,
-                                            R.string.error_empty_field,
-                                            Snackbar.LENGTH_LONG);
-        }
-        else {
+            if (TextUtils.isEmpty(email) ||
+                TextUtils.isEmpty(password)) {
 
-            externalActivity.showProgressDialog(getResources().getString(R.string.message_checking_sign_in),
-                                                getResources().getString(R.string.message_check_account_wait));
+                externalActivity.showSnackBar(  signInContainer,
+                                                R.string.error_empty_field,
+                                                Snackbar.LENGTH_LONG);
+            } else {
 
-//            Log.e("LOG", "SignInFragment: startSignIn(): FBAuth is null: " +(externalActivity.getFBAuth() == null));
+                externalActivity.showProgressDialog(getResources().getString(R.string.message_checking_sign_in),
+                        getResources().getString(R.string.message_check_account_wait));
 
-            if(externalActivity.getFBAuth() != null) {
+                //Log.e("LOG", "SignInFragment: startSignIn(): FBAuth is null: " +(externalActivity.getFBAuth() == null));
 
-                externalActivity.getFBAuth().signInWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(signInCompleteListener);
+                if (externalActivity.getFBAuth() != null) {
+
+                    externalActivity.getFBAuth().signInWithEmailAndPassword(email, password)
+                            .addOnCompleteListener(signInCompleteListener);
+                }
             }
         }
     }
@@ -269,6 +272,23 @@ public class SignInFragment extends ParentFragment {
         }
         else {
             Log.e("LOG", "SignInFragment: setDeviceToken(): error: deviceToken is empty or null");
+        }
+    }
+
+    private boolean canReactOnClick() {
+
+        Log.e("LOG", "SignInFragment: canReactOnClick()");
+
+        //Log.e("LOG", "SignInFragment: canReactOnClick(): currentFragment code= " +externalActivity.getCurrentFragmentCode());
+
+        if( (externalActivity.getCurrentFragmentCode() > 0) &&
+            (externalActivity.getCurrentFragmentCode() == CONST.SIGN_IN_FRAGMENT_CODE)) {
+            //Log.e("LOG", "SignInFragment: canReactOnClick(): can react on click");
+            return true;
+        }
+        else {
+            //Log.e("LOG", "SignInFragment: canReactOnClick(): can not react on click");
+            return false;
         }
     }
 }

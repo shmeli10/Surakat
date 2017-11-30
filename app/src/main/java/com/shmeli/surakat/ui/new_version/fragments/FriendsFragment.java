@@ -2,21 +2,29 @@ package com.shmeli.surakat.ui.new_version.fragments;
 
 
 import android.app.AlertDialog;
+
 import android.content.DialogInterface;
+
 import android.os.Bundle;
+
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+
 import android.text.TextUtils;
+
 import android.util.Log;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+
 import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
 import com.shmeli.surakat.holders.UserViewHolder;
@@ -99,9 +107,9 @@ public class FriendsFragment extends Fragment {
                                                                                                                     UserViewHolder.class,
                                                                                                                     internalActivity.getCurrentUserFriendsFBDatabaseRef()) {
             @Override
-            protected void populateViewHolder(final UserViewHolder    viewHolder,
-                                              final User        model,
-                                              int               position) {
+            protected void populateViewHolder(final UserViewHolder  viewHolder,
+                                              final User            model,
+                                              int                   position) {
 
                 final String selectedUserId = getRef(position).getKey();
 
@@ -170,63 +178,75 @@ public class FriendsFragment extends Fragment {
                             @Override
                             public void onClick(View v) {
 
-                                Log.e("LOG", "FriendsFragment: populateFriendsList(): selectedUserId= " +selectedUserId);
+                                //Log.e("LOG", "FriendsFragment: populateFriendsList(): selectedUserId= " +selectedUserId);
 
-                                String openProfileText      = getResources().getString(R.string.text_open_profile);
-                                String sendMessageText      = getResources().getString(R.string.text_send_message);
-                                String selectOptionsText    = getResources().getString(R.string.text_select_options);
+                                //Log.e("LOG", "FriendsFragment: populateFriendsList(): currentFragment code= " +internalActivity.getCurrentFragmentCode());
 
-                                int alertDialogDividerColorResId        = getResources().getColor(R.color.colorAccent);
+                                if( (internalActivity.getCurrentFragmentCode() > 0) &&
+                                    (internalActivity.getCurrentFragmentCode() == CONST.TABS_FRAGMENT_CODE)) {
 
-                                CharSequence[] optionsArr               = new CharSequence[] {  openProfileText,
-                                        sendMessageText};
+                                    //Log.e("LOG", "FriendsFragment: populateFriendsList(): can react on click");
 
-                                AlertDialog.Builder alertDialogBuilder  = new AlertDialog.Builder(  getContext(),
-                                        R.style.Theme_Sphinx_Dialog_Alert);
+                                    String openProfileText      = getResources().getString(R.string.text_open_profile);
+                                    String sendMessageText      = getResources().getString(R.string.text_send_message);
+                                    String selectOptionsText    = getResources().getString(R.string.text_select_options);
 
-                                alertDialogBuilder.setTitle(selectOptionsText);
+                                    int alertDialogDividerColorResId        = getResources().getColor(R.color.colorAccent);
 
-                                alertDialogBuilder.setItems(optionsArr,
-                                        new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog,
-                                                                int             which) {
+                                    CharSequence[] optionsArr               = new CharSequence[] {  openProfileText,
+                                            sendMessageText};
 
-                                                switch(which) {
+                                    AlertDialog.Builder alertDialogBuilder  = new AlertDialog.Builder(  getContext(),
+                                            R.style.Theme_Sphinx_Dialog_Alert);
 
-                                                    case CONST.OPEN_PROFILE_TYPE:
-                                                        if(transferSelectedUserListener != null) {
+                                    alertDialogBuilder.setTitle(selectOptionsText);
 
-                                                            transferSelectedUserListener.onTransferSelectedUserSuccess( CONST.USER_PROFILE_FRAGMENT_CODE,
-                                                                                                                        selectedUserId,
-                                                                                                                        model);
-                                                        }
-                                                        else {
-                                                            Log.e("LOG", "FriendsFragment: populateFriendsList(): transferSelectedUserListener is null");
-                                                        }
-                                                        break;
-                                                    case CONST.SEND_MESSAGE_TYPE:
-                                                        // moveToChatActivity();
-                                                        transferSelectedUserListener.onTransferSelectedUserSuccess( CONST.CHAT_FRAGMENT_CODE,
-                                                                                                                    selectedUserId,
-                                                                                                                    model);
-                                                        break;
+                                    alertDialogBuilder.setItems(optionsArr,
+                                            new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog,
+                                                                    int             which) {
+
+                                                    switch(which) {
+
+                                                        case CONST.OPEN_PROFILE_TYPE:
+                                                            if(transferSelectedUserListener != null) {
+
+                                                                transferSelectedUserListener.onTransferSelectedUserSuccess( CONST.USER_PROFILE_FRAGMENT_CODE,
+                                                                        selectedUserId,
+                                                                        model);
+                                                            }
+                                                            else {
+                                                                Log.e("LOG", "FriendsFragment: populateFriendsList(): transferSelectedUserListener is null");
+                                                            }
+                                                            break;
+                                                        case CONST.SEND_MESSAGE_TYPE:
+                                                            // moveToChatActivity();
+                                                            transferSelectedUserListener.onTransferSelectedUserSuccess( CONST.CHAT_FRAGMENT_CODE,
+                                                                    selectedUserId,
+                                                                    model);
+                                                            break;
+                                                    }
                                                 }
-                                            }
-                                        });
+                                            });
 
-                                AlertDialog alertDialog = alertDialogBuilder.create();
-                                alertDialog.show();
+                                    AlertDialog alertDialog = alertDialogBuilder.create();
+                                    alertDialog.show();
 
-                                // Set title divider color
-                                int titleDividerId = getResources().getIdentifier(  "titleDivider",
-                                                                                    "id",
-                                                                                    "android");
+                                    // Set title divider color
+                                    int titleDividerId = getResources().getIdentifier(  "titleDivider",
+                                                                                        "id",
+                                                                                        "android");
 
-                                View titleDivider = alertDialog.findViewById(titleDividerId);
+                                    View titleDivider = alertDialog.findViewById(titleDividerId);
 
-                                if (titleDivider != null)
-                                    titleDivider.setBackgroundColor(alertDialogDividerColorResId);
+                                    if (titleDivider != null)
+                                        titleDivider.setBackgroundColor(alertDialogDividerColorResId);
+                                }
+//                                else {
+//
+//                                    Log.e("LOG", "FriendsFragment: populateFriendsList(): can not react on click");
+//                                }
                             }
                         });
 
@@ -237,9 +257,6 @@ public class FriendsFragment extends Fragment {
 
                     }
                 });
-
-
-//                viewHolder.itemView.setOnClickListener();
             }
         };
 
