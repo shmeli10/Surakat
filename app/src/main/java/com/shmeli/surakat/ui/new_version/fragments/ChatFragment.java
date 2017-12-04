@@ -425,9 +425,17 @@ public class ChatFragment extends ParentFragment {
 
             loadMoreItemPosition++;
 
-            if(loadedMessagesSum < getAllMessagesCount())
-                loadedMessagesSum++;
+            // show divider only if it is not visible
+            if(chatTopDividerView.getVisibility() == View.INVISIBLE) {
+                chatTopDividerView.setVisibility(View.VISIBLE);
+            }
 
+            // increase count of loaded messages only if it is not bigger than sum of all messages
+            if(loadedMessagesSum < getAllMessagesCount()) {
+                loadedMessagesSum++;
+            }
+
+            // if this is a message which key will be as start load new portion of messages, then save it is key
             if(loadMoreItemPosition == 1) {
                 lastLoadedMessageKey = dataSnapshot.getKey();
             }

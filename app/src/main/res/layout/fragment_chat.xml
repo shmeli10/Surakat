@@ -66,7 +66,7 @@
         style="@style/HLine"
         android:layout_marginTop="@dimen/spacing_1x"
         android:background="@color/white"
-        android:visibility="gone"/>
+        android:visibility="invisible"/>
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/chatSwipeRefreshLayout"
