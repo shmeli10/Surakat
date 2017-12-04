@@ -31,11 +31,11 @@
         android:padding="@dimen/spacing_3x"
         android:ems="10"
         android:inputType="textEmailAddress"
-        android:textColor="@color/colorPrimaryDark"
+        android:textColor="@color/white"
         android:textSize="@dimen/text_size_1.5x"
-        android:textColorHint="@color/colorPrimary"
+        android:textColorHint="@color/white"
         android:hint="@string/hint_email"
-        android:background="@drawable/input_background"/>
+        android:background="@drawable/input_outline"/>
 
     <EditText
         android:id="@+id/passwordEditText"
@@ -44,11 +44,11 @@
         android:padding="@dimen/spacing_3x"
         android:ems="10"
         android:inputType="textPassword"
-        android:textColor="@color/colorPrimaryDark"
+        android:textColor="@color/white"
         android:textSize="@dimen/text_size_1.5x"
-        android:textColorHint="@color/colorPrimary"
+        android:textColorHint="@color/white"
         android:hint="@string/hint_password"
-        android:background="@drawable/input_background"/>
+        android:background="@drawable/input_outline"/>
 
     <Button
         android:id="@+id/signInButton"
