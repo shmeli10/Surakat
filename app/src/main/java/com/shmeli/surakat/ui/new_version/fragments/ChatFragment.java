@@ -70,10 +70,15 @@ public class ChatFragment extends ParentFragment {
     private String                  senderId    = "";
     private String                  recipientId = "";
 
-    private String                  lastLoadedMessageKey = "";
+    private String                  lastLoadedMessageKey    = "";
 
     private int                     currentPageCount        = 1;
     private int                     loadMoreItemPosition    = 0;
+
+    private long                    allMessagesSum          = 0;
+    private long                    loadedMessagesSum       = 0;
+
+    private boolean                 isFragmentInitiated;
 
     private DatabaseReference       chatFBDatabaseRef;
     private DatabaseReference       messagesDatabaseRef;
@@ -154,11 +159,15 @@ public class ChatFragment extends ParentFragment {
             chatMessagesList    = UiUtils.findView( view,
                                                     R.id.chatMessagesList);
             chatMessagesList.setHasFixedSize(true);
-//            chatMessagesList.setLayoutManager(new LinearLayoutManager(getActivity()));
             chatMessagesList.setLayoutManager(linearLayoutManager);
             chatMessagesList.setAdapter(messageAdapter);
 
-            init();
+            if(!isFragmentInitiated) {
+
+                init();
+
+                isFragmentInitiated = true;
+            }
         }
         else {
             Log.e("LOG", "ChatFragment: onCreateView(): parameter selectedUserId does not exist in Bundle");
@@ -172,8 +181,6 @@ public class ChatFragment extends ParentFragment {
 
     private void init() {
         Log.e("LOG", "ChatFragment: init()");
-
-//        internalActivity = (InternalActivity) getActivity();
 
         senderId = internalActivity.getCurrentUserId();
 
@@ -250,22 +257,33 @@ public class ChatFragment extends ParentFragment {
                                     int     position,
                                     String  messageKey) {
 
-        //Log.e("LOG", "ChatFragment: addMessageInArray(): position= " +position);
-
         if( (message != null) &&
-                (position >= 0)) {
+            (position >= 0)) {
 
             messagesList.add(   position,
                                 message);
 
             messagesKeyList.add(messageKey);
-
-            //Log.e("LOG", "ChatFragment: addMessageInArray(): message added");
         }
-//        else {
-//
-//            Log.e("LOG", "ChatFragment: addMessageInArray(): message not added");
-//        }
+    }
+
+    private long getAllMessagesCount() {
+        Log.e("LOG", "ChatFragment: getAllMessagesCount()");
+
+        messagesDatabaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                if(dataSnapshot != null) {
+                    allMessagesSum = dataSnapshot.getChildrenCount();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) { }
+        });
+
+        return allMessagesSum; // result[0];
     }
 
     // ------------------------------ LOAD MESSAGES --------------------------------------- //
@@ -273,16 +291,13 @@ public class ChatFragment extends ParentFragment {
     private void loadMessages() {
         Log.e("LOG", "ChatFragment: loadMessages()");
 
-//        Log.e("LOG", "ChatFragment: loadMessages(): senderId: "     +senderId);
-//        Log.e("LOG", "ChatFragment: loadMessages(): recipientId: "  +recipientId);
-
         messagesDatabaseRef = internalActivity.getRootFBDatabaseRef().child(CONST.FIREBASE_MESSAGES_CHILD)
                                                                         .child(senderId)
                                                                         .child(recipientId);
 
         if(messagesDatabaseRef != null) {
 
-            //Log.e("LOG", "ChatFragment: loadMessages(): currentPageCount= " +currentPageCount);
+            messagesList.clear();
 
             Query loadMessageQuery = messagesDatabaseRef.limitToLast(currentPageCount * CONST.LOAD_MESSAGES_COUNT);
             loadMessageQuery.addChildEventListener(loadMessagesEventListener);
@@ -330,8 +345,6 @@ public class ChatFragment extends ParentFragment {
         @Override
         public void onClick(View v) {
 
-            Log.e("LOG", "ChatFragment: send button clicked");
-
             startSendMessage();
         }
     };
@@ -340,17 +353,18 @@ public class ChatFragment extends ParentFragment {
         @Override
         public void onRefresh() {
 
-            Log.e("LOG", "ChatFragment: swipe refreshed");
-
-            currentPageCount++;
-
-            //Log.e("LOG", "ChatFragment: swipe refreshed: currentPageCount= " +currentPageCount);
-
             loadMoreItemPosition = 0;
 
-            //Log.e("LOG", "ChatFragment: swipe refreshed: loadMoreItemPosition= " +loadMoreItemPosition);
+            if(getAllMessagesCount() > loadedMessagesSum) {
 
-            loadMoreMessages();
+                currentPageCount++;
+
+                loadMoreMessages();
+            }
+            else {
+
+                chatSwipeRefreshLayout.setRefreshing(false);
+            }
         }
     };
 
@@ -409,16 +423,13 @@ public class ChatFragment extends ParentFragment {
 
             Message message = dataSnapshot.getValue(Message.class);
 
-            //Log.e("LOG", "ChatFragment: loadMessagesEventListener: onChildAdded(): message: " +message.getMessageText());
-
             loadMoreItemPosition++;
 
-            //Log.e("LOG", "ChatFragment: loadMessagesEventListener: onChildAdded(): loadMoreItemPosition= " +loadMoreItemPosition);
+            if(loadedMessagesSum < getAllMessagesCount())
+                loadedMessagesSum++;
 
             if(loadMoreItemPosition == 1) {
                 lastLoadedMessageKey = dataSnapshot.getKey();
-
-                //Log.e("LOG", "ChatFragment: loadMessagesEventListener: onChildAdded(): save lastLoadedMessageKey");
             }
 
             addMessageInArray(  message,
@@ -433,24 +444,16 @@ public class ChatFragment extends ParentFragment {
         }
 
         @Override
-        public void onChildChanged(com.google.firebase.database.DataSnapshot dataSnapshot, String s) {
-
-        }
+        public void onChildChanged(com.google.firebase.database.DataSnapshot dataSnapshot, String s) {}
 
         @Override
-        public void onChildRemoved(com.google.firebase.database.DataSnapshot dataSnapshot) {
-
-        }
+        public void onChildRemoved(com.google.firebase.database.DataSnapshot dataSnapshot) {}
 
         @Override
-        public void onChildMoved(com.google.firebase.database.DataSnapshot dataSnapshot, String s) {
-
-        }
+        public void onChildMoved(com.google.firebase.database.DataSnapshot dataSnapshot, String s) {}
 
         @Override
-        public void onCancelled(DatabaseError databaseError) {
-
-        }
+        public void onCancelled(DatabaseError databaseError) {}
     };
 
     ChildEventListener loadMoreMessagesEventListener = new ChildEventListener() {
@@ -460,8 +463,6 @@ public class ChatFragment extends ParentFragment {
                                  String         s) {
 
             Message message = dataSnapshot.getValue(Message.class);
-
-            //Log.e("LOG", "ChatFragment: loadMoreMessagesEventListener: onChildAdded(): message: " +message.getMessageText());
 
             String messageKey = dataSnapshot.getKey();
 
@@ -473,10 +474,11 @@ public class ChatFragment extends ParentFragment {
                                     messageKey);
             }
 
+            if(loadedMessagesSum < getAllMessagesCount())
+                loadedMessagesSum++;
+
             if(loadMoreItemPosition == 1) {
                 lastLoadedMessageKey = dataSnapshot.getKey();
-
-                //Log.e("LOG", "ChatFragment: loadMoreMessagesEventListener: onChildAdded(): save lastLoadedMessageKey");
             }
 
             messageAdapter.notifyDataSetChanged();
@@ -507,5 +509,4 @@ public class ChatFragment extends ParentFragment {
 
         }
     };
-
 }
