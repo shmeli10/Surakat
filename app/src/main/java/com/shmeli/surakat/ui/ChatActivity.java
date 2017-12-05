@@ -162,8 +162,7 @@ public class ChatActivity extends AppCompatActivity {
         sendButton                      = UiUtils.findView(this, R.id.sendButton);
         sendButton.setOnClickListener(sendClickListener);
 
-        messageAdapter                  = new MessageAdapter(   getApplicationContext(),
-                                                                messagesList);
+        messageAdapter                  = null; //new MessageAdapter(   getApplicationContext(),messagesList);
 
         messagesRecyclerView            = UiUtils.findView(this, R.id.messagesRecyclerView);
         messagesRecyclerView.setHasFixedSize(true);

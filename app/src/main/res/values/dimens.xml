@@ -17,7 +17,7 @@
 
     <dimen name="logo_size">125dp</dimen>
 
-    <dimen name="message_row_corner_radius">30dp</dimen>
+    <dimen name="message_row_corner_radius">5dp</dimen>
 
     <dimen name="avatar_big_size">170dp</dimen>
     <dimen name="avatar_small_size">64dp</dimen>

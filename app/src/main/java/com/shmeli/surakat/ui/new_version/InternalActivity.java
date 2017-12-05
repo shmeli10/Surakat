@@ -177,15 +177,8 @@ public class InternalActivity   extends     ParentActivity
             //Log.e("LOG", "InternalActivity: onTransferSelectedUserSuccess(): selectedUserKey: " + selectedUserKey);
 
             setSecondLayerFragment( targetFragmentCode,
-                                    selectedUserKey);
-        }
-
-        if(selectedUser != null) {
-
-            if(!TextUtils.isEmpty(selectedUser.getUserName()))
-                Log.e("LOG", "InternalActivity: onTransferSelectedUserSuccess(): selectedUser name: " + selectedUser.getUserName());
-            else
-                Log.e("LOG", "InternalActivity: onTransferSelectedUserSuccess(): selectedUser name is empty or null");
+                                    selectedUserKey,
+                                    selectedUser);
         }
     }
 
@@ -229,7 +222,8 @@ public class InternalActivity   extends     ParentActivity
 
     @Override
     public void setSecondLayerFragment(int      fragmentCode,
-                                       String   selectedUserId) {
+                                       String   selectedUserId,
+                                       User     selectedUser) {
         Log.e("LOG", "InternalActivity: setSecondLayerFragment()");
 
         ParentFragment fragment = null;
@@ -237,7 +231,8 @@ public class InternalActivity   extends     ParentActivity
         switch(fragmentCode) {
 
             case CONST.CHAT_FRAGMENT_CODE:
-                fragment = ChatFragment.newInstance(selectedUserId);
+                fragment = ChatFragment.newInstance(selectedUserId,
+                                                    selectedUser);
                 fragment.setFragmentTitleResId(R.string.text_chat);
                 break;
             case CONST.USER_PROFILE_FRAGMENT_CODE:

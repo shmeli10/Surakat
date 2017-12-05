@@ -28,7 +28,7 @@
     <string name="hint_name">Type Name...</string>
     <string name="hint_password">Type Password...</string>
     <string name="hint_status">Type Status...</string>
-    <string name="hint_type_message">Type a museressage here...</string>
+    <string name="hint_type_message">Type a message...</string>
 
     <string name="message_creating_account">Creating account...</string>
     <string name="message_create_account_wait">Please wait while we create your account</string>

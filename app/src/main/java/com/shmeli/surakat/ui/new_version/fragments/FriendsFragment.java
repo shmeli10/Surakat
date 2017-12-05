@@ -118,56 +118,63 @@ public class FriendsFragment extends Fragment {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
-                        boolean erroneousRow = false;
+                        final User selectedUser = new User();
 
+                        String selectedUserDeviceToken  = "";
+                        String selectedUserImageUrl     = "";
                         String selectedUserName         = "";
                         String selectedUserStatus       = "";
                         String selectedUserThumbImage   = "";
 
+                        boolean selectedUserIsOnline    = false;
+
+                        if(dataSnapshot.hasChild(CONST.USER_DEVICE_TOKEN)) {
+                            selectedUserDeviceToken = dataSnapshot.child(CONST.USER_DEVICE_TOKEN).getValue().toString();
+
+                            if (!TextUtils.isEmpty(selectedUserDeviceToken)) {
+                                selectedUser.setUserDeviceToken(selectedUserDeviceToken);
+                            }
+                        }
+
+                        if(dataSnapshot.hasChild(CONST.USER_IMAGE)) {
+                            selectedUserImageUrl = dataSnapshot.child(CONST.USER_IMAGE).getValue().toString();
+
+                            if (!TextUtils.isEmpty(selectedUserImageUrl)) {
+                                selectedUser.setUserImageUrl(selectedUserImageUrl);
+                            }
+                        }
+
+                        if(dataSnapshot.hasChild(CONST.USER_IS_ONLINE)) {
+                            String isOnlineValue = dataSnapshot.child(CONST.USER_IS_ONLINE).getValue().toString();
+
+                            if (!TextUtils.isEmpty(isOnlineValue)) {
+                                selectedUserIsOnline = Boolean.parseBoolean(isOnlineValue);
+                                selectedUser.setUserIsOnline(selectedUserIsOnline);
+                            }
+                        }
+
                         if(dataSnapshot.hasChild(CONST.USER_NAME)) {
                             selectedUserName = dataSnapshot.child(CONST.USER_NAME).getValue().toString();
 
-                            if(TextUtils.isEmpty(selectedUserName))
-                                erroneousRow = true;
-                        }
-                        else {
-                            erroneousRow = true;
-                        }
-
-                        if(!erroneousRow) {
-
-                            if(dataSnapshot.hasChild(CONST.USER_STATUS)) {
-                                selectedUserStatus = dataSnapshot.child(CONST.USER_STATUS).getValue().toString();
-
-                                if(TextUtils.isEmpty(selectedUserStatus))
-                                    erroneousRow = true;
-                            }
-                            else {
-                                erroneousRow = true;
+                            if(!TextUtils.isEmpty(selectedUserName)) {
+                                selectedUser.setUserName(selectedUserName);
                             }
                         }
 
-                        if(!erroneousRow) {
+                        if(dataSnapshot.hasChild(CONST.USER_STATUS)) {
+                            selectedUserStatus = dataSnapshot.child(CONST.USER_STATUS).getValue().toString();
 
-                            if(dataSnapshot.hasChild(CONST.USER_THUMB_IMAGE)) {
-                                selectedUserThumbImage = dataSnapshot.child(CONST.USER_THUMB_IMAGE).getValue().toString();
-
-                                if(TextUtils.isEmpty(selectedUserThumbImage))
-                                    erroneousRow = true;
-                            }
-                            else {
-                                erroneousRow = true;
+                            if(!TextUtils.isEmpty(selectedUserStatus)) {
+                                selectedUser.setUserStatus(selectedUserStatus);
                             }
                         }
 
-                        if(!erroneousRow) {
+                        if(dataSnapshot.hasChild(CONST.USER_THUMB_IMAGE)) {
+                            selectedUserThumbImage = dataSnapshot.child(CONST.USER_THUMB_IMAGE).getValue().toString();
 
-                            User selectedUser = new User();
-                            selectedUser.setUserName(selectedUserName);
-                            selectedUser.setUserStatus(selectedUserStatus);
-                            selectedUser.setUserThumbImageUrl(selectedUserThumbImage);
-
-
+                            if(!TextUtils.isEmpty(selectedUserThumbImage)) {
+                                selectedUser.setUserThumbImageUrl(selectedUserThumbImage);
+                            }
                         }
 
                         viewHolder.setName(selectedUserName);
@@ -214,17 +221,17 @@ public class FriendsFragment extends Fragment {
 
                                                                 transferSelectedUserListener.onTransferSelectedUserSuccess( CONST.USER_PROFILE_FRAGMENT_CODE,
                                                                         selectedUserId,
-                                                                        model);
+                                                                        selectedUser);
                                                             }
                                                             else {
                                                                 Log.e("LOG", "FriendsFragment: populateFriendsList(): transferSelectedUserListener is null");
                                                             }
                                                             break;
                                                         case CONST.SEND_MESSAGE_TYPE:
-                                                            // moveToChatActivity();
+
                                                             transferSelectedUserListener.onTransferSelectedUserSuccess( CONST.CHAT_FRAGMENT_CODE,
                                                                     selectedUserId,
-                                                                    model);
+                                                                    selectedUser);
                                                             break;
                                                     }
                                                 }
@@ -243,10 +250,6 @@ public class FriendsFragment extends Fragment {
                                     if (titleDivider != null)
                                         titleDivider.setBackgroundColor(alertDialogDividerColorResId);
                                 }
-//                                else {
-//
-//                                    Log.e("LOG", "FriendsFragment: populateFriendsList(): can not react on click");
-//                                }
                             }
                         });
 

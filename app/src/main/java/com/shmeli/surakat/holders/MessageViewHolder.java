@@ -2,18 +2,20 @@ package com.shmeli.surakat.holders;
 
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+
+import android.text.TextUtils;
+
+import android.util.TypedValue;
+
 import android.view.View;
+import android.view.ViewGroup;
+
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.shmeli.surakat.R;
-import com.shmeli.surakat.data.CONST;
 import com.shmeli.surakat.utils.UiUtils;
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.NetworkPolicy;
-import com.squareup.picasso.Picasso;
-
-import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Created by Serghei Ostrovschi on 11/8/17.
@@ -23,8 +25,10 @@ public class MessageViewHolder extends RecyclerView.ViewHolder {
 
     public View             itemView;
 
+    private RelativeLayout  messageContainer;
+
+    public TextView         messageAuthorName;
     public TextView         messageText;
-    public CircleImageView  messageAuthorAvatar;
 
     private String imageUrl = "";
 
@@ -33,49 +37,50 @@ public class MessageViewHolder extends RecyclerView.ViewHolder {
 
         this.itemView       = itemView;
 
-        messageText         = UiUtils.findView(itemView, R.id.messageRowMessageTextView);
-        messageAuthorAvatar = UiUtils.findView(itemView, R.id.messageRowAvatar);
+        messageContainer    = UiUtils.findView(itemView,    R.id.messageContainer);
+
+        messageAuthorName   = UiUtils.findView(itemView,    R.id.messageAuthorName);
+        messageText         = UiUtils.findView(itemView,    R.id.messageRowMessageTextView);
+    }
+
+    public void setMessageAuthorName(String authorName) {
+        //Log.e("LOG", "MessageViewHolder: setMessageAuthorName(): authorName= " +authorName);
+
+        if(!TextUtils.isEmpty(authorName)) {
+            messageAuthorName.setText(authorName);
+            messageAuthorName.setVisibility(View.VISIBLE);
+        }
+        else {
+            messageAuthorName.setVisibility(View.GONE);
+        }
     }
 
     public void setMessageText(String text) {
-        Log.e("LOG", "MessageViewHolder: setMessageText(): text= " +text);
+        //Log.e("LOG", "MessageViewHolder: setMessageText(): text= " +text);
         messageText.setText(text);
     }
 
-    public void setAvatar(String imageUrl) {
+    public void setMargin(int   marginLeft,
+                          int   marginRight) {
 
-        this.imageUrl = imageUrl;
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(   ViewGroup.LayoutParams.MATCH_PARENT,
+                                                                        ViewGroup.LayoutParams.WRAP_CONTENT);
+        lp.setMargins(  getPixelsFromDp(marginLeft),
+                        0,
+                        getPixelsFromDp(marginRight),
+                        0);
 
-        if(!imageUrl.equals(CONST.DEFAULT_VALUE)) {
-
-            Picasso.with(itemView.getContext())
-                    .load(imageUrl)
-                    .networkPolicy(NetworkPolicy.OFFLINE)
-                    .placeholder(R.drawable.default_avatar)
-                    .into(  messageAuthorAvatar,
-                            loadImageCallback);
-        }
-
-        /*Picasso.with(itemView.getContext())
-                .load(imageUrl)
-                .placeholder(R.drawable.default_avatar)
-                .into(userAvatar);*/
-
+        messageContainer.setLayoutParams(lp);
     }
 
-    Callback loadImageCallback = new Callback() {
-        @Override
-        public void onSuccess() {
-
-        }
-
-        @Override
-        public void onError() {
-
-            Picasso.with(itemView.getContext())
-                    .load(imageUrl)
-                    .placeholder(R.drawable.default_avatar)
-                    .into(messageAuthorAvatar);
-        }
-    };
+    /**
+     * Convert dp to pixels
+     * @param dp to convert
+     * @return value of passed dp in pixels
+     */
+    private int getPixelsFromDp(int dp) {
+        return (int) TypedValue.applyDimension( TypedValue.COMPLEX_UNIT_DIP,
+                                                dp,
+                                                itemView.getContext().getResources().getDisplayMetrics());
+    }
 }

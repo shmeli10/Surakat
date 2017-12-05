@@ -33,6 +33,7 @@ import com.shmeli.surakat.R;
 import com.shmeli.surakat.adapters.MessageAdapter;
 import com.shmeli.surakat.data.CONST;
 import com.shmeli.surakat.model.Message;
+import com.shmeli.surakat.model.User;
 import com.shmeli.surakat.ui.new_version.InternalActivity;
 import com.shmeli.surakat.utils.UiUtils;
 
@@ -67,8 +68,9 @@ public class ChatFragment extends ParentFragment {
     private List<String>            messagesKeyList = new ArrayList<>();
     private MessageAdapter          messageAdapter;
 
-    private String                  senderId    = "";
-    private String                  recipientId = "";
+    private String                  senderId                = "";
+    private String                  recipientId             = "";
+    private String                  recipientName           = "";
 
     private String                  lastLoadedMessageKey    = "";
 
@@ -93,18 +95,25 @@ public class ChatFragment extends ParentFragment {
      *
      * @return A new instance of fragment ChatFragment.
      */
-    public static ChatFragment newInstance(String selectedUserId) {
+    public static ChatFragment newInstance(String   selectedUserId,
+                                           User     selectedUser) {
         Bundle args = new Bundle();
 
         if(instance == null) {
             instance = new ChatFragment();
         }
 
-        Log.e("LOG", "ChatFragment: newInstance(): selectedUserId= " +selectedUserId);
+        //Log.e("LOG", "ChatFragment: newInstance(): selectedUserId= " +selectedUserId);
 
         if(!TextUtils.isEmpty(selectedUserId)) {
             args.putString( CONST.USER_ID,
                             selectedUserId);
+        }
+
+        if( (selectedUser != null) &&
+            (!TextUtils.isEmpty(selectedUser.getUserName()))) {
+            args.putString( CONST.USER_NAME,
+                            selectedUser.getUserName());
         }
 
         instance.setArguments(args);
@@ -129,8 +138,10 @@ public class ChatFragment extends ParentFragment {
 
             this.recipientId = getArguments().getString(CONST.USER_ID);
 
-//            chatContainer       = UiUtils.findView( view,
-//                                                    R.id.chatContainer);
+            if(getArguments().containsKey(CONST.USER_NAME)) {
+
+                this.recipientName = getArguments().getString(CONST.USER_NAME);
+            }
 
             chatMessageText     = UiUtils.findView( view,
                                                     R.id.chatMessageText);
@@ -152,7 +163,8 @@ public class ChatFragment extends ParentFragment {
             chatSwipeRefreshLayout.setOnRefreshListener(swipeRefreshListener);
 
             messageAdapter      = new MessageAdapter(   getActivity(),
-                                                        messagesList);
+                                                        messagesList,
+                                                        recipientName);
 
             linearLayoutManager = new LinearLayoutManager(getActivity());
 

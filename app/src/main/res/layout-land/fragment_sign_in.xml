@@ -38,6 +38,7 @@
         android:gravity="center_horizontal"
         android:padding="@dimen/spacing_2x">
 
+
         <EditText
             android:id="@+id/emailEditText"
             style="@style/MW"
@@ -45,11 +46,11 @@
             android:padding="@dimen/spacing_3x"
             android:ems="10"
             android:inputType="textEmailAddress"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="@color/white"
             android:textSize="@dimen/text_size_1.5x"
-            android:textColorHint="@color/colorPrimary"
+            android:textColorHint="@color/white"
             android:hint="@string/hint_email"
-            android:background="@drawable/input_background"/>
+            android:background="@drawable/input_outline"/>
 
         <EditText
             android:id="@+id/passwordEditText"
@@ -58,11 +59,11 @@
             android:padding="@dimen/spacing_3x"
             android:ems="10"
             android:inputType="textPassword"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="@color/white"
             android:textSize="@dimen/text_size_1.5x"
-            android:textColorHint="@color/colorPrimary"
+            android:textColorHint="@color/white"
             android:hint="@string/hint_password"
-            android:background="@drawable/input_background"/>
+            android:background="@drawable/input_outline"/>
 
         <Button
             android:id="@+id/signInButton"
@@ -83,10 +84,5 @@
             android:text="@string/text_create_an_account"/>
 
     </LinearLayout>
-
-    <!--<TextView-->
-        <!--style="@style/WW"-->
-        <!--android:text="fragment_sign_in LandScape"-->
-        <!--android:layout_gravity="center"/>-->
 
 </LinearLayout>

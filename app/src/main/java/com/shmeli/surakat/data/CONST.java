@@ -94,6 +94,10 @@ public class CONST {
 
     //////////////////////////////////////////////////////////////////////////////
 
+    public static final int MESSAGE_MARGIN_PX                   = 25;
+
+    //////////////////////////////////////////////////////////////////////////////
+
 //    public static final String CHAT_FRAGMENT_NAME               = "CHAT_FRAGMENT";
 //    public static final String REGISTER_FRAGMENT_NAME           = "REGISTER_FRAGMENT";
 //    public static final String SIGN_IN_FRAGMENT_NAME            = "SIGN_IN_FRAGMENT";

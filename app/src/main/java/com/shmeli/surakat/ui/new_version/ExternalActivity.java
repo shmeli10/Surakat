@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
 
+import com.shmeli.surakat.model.User;
 import com.shmeli.surakat.ui.new_version.fragments.ParentFragment;
 import com.shmeli.surakat.ui.new_version.fragments.RegisterFragment;
 import com.shmeli.surakat.ui.new_version.fragments.SignInFragment;
@@ -172,7 +173,8 @@ public class ExternalActivity   extends     ParentActivity
 
     @Override
     public void setSecondLayerFragment(int      fragmentCode,
-                                       String   selectedUserId) {
+                                       String   selectedUserId,
+                                       User     selectedUser) {
         Log.e("LOG", "ExternalActivity: setSecondLayerFragment()");
 
         ParentFragment fragment = null;

@@ -23,6 +23,7 @@ import com.google.firebase.iid.FirebaseInstanceId;
 
 import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
+import com.shmeli.surakat.model.User;
 
 /**
  * Created by Serghei Ostrovschi on 11/14/17.
@@ -94,10 +95,11 @@ public abstract class ParentActivity extends AppCompatActivity {
     // ------------------------------ SETTERS -------------------------------- //
 
     public abstract void setSecondLayerFragment(int     fragmentCode,
-                                                String  selectedUserId);
+                                                String  selectedUserId,
+                                                User    selectedUser);
 
     public void setCurrentFragmentCode(int currentFragmentCode) {
-        Log.e("LOG", "ParentActivity: setCurrentFragmentCode()");
+        //Log.e("LOG", "ParentActivity: setCurrentFragmentCode()");
 
         //Log.e("LOG", "ParentActivity: setCurrentFragmentCode(): currentFragmentCode= " +currentFragmentCode);
 

@@ -217,7 +217,8 @@ public class SignInFragment extends ParentFragment {
 
         if(canReactOnClick()) {
             externalActivity.setSecondLayerFragment(CONST.REGISTER_FRAGMENT_CODE,
-                    null);
+                                                    null,
+                                                    null);
         }
     }
 
