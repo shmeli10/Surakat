@@ -37,8 +37,6 @@ import com.shmeli.surakat.ui.settings.SettingsActivity;
 
 import com.shmeli.surakat.utils.UiUtils;
 
-import java.util.ArrayList;
-
 
 public class MainActivity extends AppCompatActivity {
 

@@ -1,7 +1,9 @@
 package com.shmeli.surakat.ui.new_version;
 
+import android.app.AlertDialog;
 import android.app.FragmentManager;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 
 import android.os.Bundle;
@@ -12,7 +14,9 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 
+import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import com.shmeli.surakat.R;
@@ -23,6 +27,7 @@ import com.shmeli.surakat.ui.new_version.fragments.ChatFragment;
 import com.shmeli.surakat.ui.new_version.fragments.ParentFragment;
 import com.shmeli.surakat.ui.new_version.fragments.TabsFragment;
 import com.shmeli.surakat.ui.new_version.fragments.UserProfileFragment;
+import com.shmeli.surakat.ui.settings.SettingsActivity;
 import com.shmeli.surakat.utils.UiUtils;
 
 import java.text.SimpleDateFormat;
@@ -60,6 +65,34 @@ public class InternalActivity   extends     ParentActivity
         actionBar       = getSupportActionBar();
 
         init();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(  R.menu.menu,
+                menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Log.e("LOG", "MainActivity: onOptionsItemSelected()");
+
+        switch(item.getItemId()) {
+
+            case android.R.id.home:
+                onBackPressed();
+                break;
+            case R.id.menu_signout:
+                showAlertDialog();
+                break;
+            case R.id.menu_settings:
+                moveToSettings();
+                break;
+        }
+
+        return true;
     }
 
     // ----------------------------------- OTHER ----------------------------------------- //
@@ -134,6 +167,72 @@ public class InternalActivity   extends     ParentActivity
         else {
 
             Log.e("LOG", "InternalActivity: init(): initCurrentUser error");
+
+            moveToExternalActivity();
+        }
+    }
+
+    public String getCurrentDate() {
+
+        SimpleDateFormat simpleDateFormat   = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        String currentDate                  = simpleDateFormat.format(new Date());
+
+        return currentDate;
+    }
+
+    private void showAlertDialog() {
+
+        int alertDialogMessageResId = R.string.text_logout_confirm;
+        int alertDialogHeaderResId  = R.string.text_logout_header;
+
+        int alertDialogDividerColorResId = getResources().getColor(R.color.colorAccent);
+
+        int noTextResId     = R.string.text_no;
+        int yesTextResId    = R.string.text_yes;
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(   InternalActivity.this,
+                                                                            R.style.Theme_Sphinx_Dialog_Alert);
+        alertDialogBuilder.setMessage(alertDialogMessageResId)
+                .setCancelable(false)
+                .setPositiveButton(yesTextResId, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        logout();
+                    }
+                })
+                .setNegativeButton(noTextResId, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        dialog.cancel();
+                    }
+                });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.setTitle(alertDialogHeaderResId);
+        alertDialog.show();
+
+        // Set title divider color
+        int titleDividerId = getResources().getIdentifier(  "titleDivider",
+                                                            "id",
+                                                            "android");
+        View titleDivider = alertDialog.findViewById(titleDividerId);
+
+        if (titleDivider != null)
+            titleDivider.setBackgroundColor(alertDialogDividerColorResId);
+    }
+
+    private void logout() {
+        Log.e("LOG", "InternalActivity: logout()");
+
+        if(getFBAuth() != null) {
+            getFBAuth().signOut();
+
+            moveToExternalActivity();
+        }
+        else {
+            Log.e("LOG", "InternalActivity: logout(): Error: getFBAuth() returns null");
         }
     }
 
@@ -148,12 +247,12 @@ public class InternalActivity   extends     ParentActivity
         finish();
     }
 
-    public String getCurrentDate() {
+    private void moveToSettings() {
+        Log.e("LOG", "InternalActivity: moveToSettings()");
 
-        SimpleDateFormat simpleDateFormat   = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-        String currentDate                  = simpleDateFormat.format(new Date());
-
-        return currentDate;
+//        Intent settingsIntent = new Intent( InternalActivity.this,
+//                                            SettingsActivity.class);
+//        startActivity(settingsIntent);
     }
 
     // ----------------------------------- FRAGMENTS ----------------------------------------- //
@@ -208,16 +307,6 @@ public class InternalActivity   extends     ParentActivity
 
             finish();
         }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        if(item.getItemId() == android.R.id.home) {
-            onBackPressed();
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @Override

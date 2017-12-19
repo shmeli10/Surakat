@@ -64,7 +64,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageViewHolder>{
                                  int                position) {
 
         int whiteColorResId     = context.getResources().getColor(R.color.white);
-        int primaryColorResId   = context.getResources().getColor(R.color.colorPrimary);
+        int darkTextColorResId  = context.getResources().getColor(R.color.colorPrimaryDark);
 
         Message message = messagesList.get(position);
 
@@ -77,7 +77,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageViewHolder>{
             viewHolder.setMessageAuthorName("");
 
             viewHolder.messageText.setBackgroundResource(R.drawable.message_row_sender_background);
-            viewHolder.messageText.setTextColor(primaryColorResId);
+            viewHolder.messageText.setTextColor(darkTextColorResId);
 
             viewHolder.setMargin(   0,
                                     CONST.MESSAGE_MARGIN_PX);

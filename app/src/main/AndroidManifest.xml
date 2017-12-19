@@ -52,15 +52,14 @@
         <activity
             android:name=".ui.settings.StatusActivity"
             android:parentActivityName=".ui.settings.SettingsActivity" />
-
-        <activity android:name=".ui.new_version.ExternalActivity">
+        <activity android:name=".ui.new_version.InternalActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.new_version.InternalActivity"/>
+        <activity android:name=".ui.new_version.ExternalActivity"/>
 
     </application>
 
