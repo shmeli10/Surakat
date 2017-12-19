@@ -106,9 +106,10 @@ public class CONST {
 
     public static final int CHAT_FRAGMENT_CODE                  = 1000;
     public static final int REGISTER_FRAGMENT_CODE              = 1001;
-    public static final int SIGN_IN_FRAGMENT_CODE               = 1002;
-    public static final int TABS_FRAGMENT_CODE                  = 1003;
-    public static final int USER_PROFILE_FRAGMENT_CODE          = 1004;
+    public static final int SETTINGS_FRAGMENT_CODE              = 1002;
+    public static final int SIGN_IN_FRAGMENT_CODE               = 1003;
+    public static final int TABS_FRAGMENT_CODE                  = 1004;
+    public static final int USER_PROFILE_FRAGMENT_CODE          = 1005;
 
 //    public static final int FILL_ACCOUNT_FRAGMENT               = 1002;
 

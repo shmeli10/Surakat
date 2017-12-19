@@ -25,6 +25,7 @@ import com.shmeli.surakat.interfaces.TransferSelectedUser;
 import com.shmeli.surakat.model.User;
 import com.shmeli.surakat.ui.new_version.fragments.ChatFragment;
 import com.shmeli.surakat.ui.new_version.fragments.ParentFragment;
+import com.shmeli.surakat.ui.new_version.fragments.SettingsFragment;
 import com.shmeli.surakat.ui.new_version.fragments.TabsFragment;
 import com.shmeli.surakat.ui.new_version.fragments.UserProfileFragment;
 import com.shmeli.surakat.ui.settings.SettingsActivity;
@@ -100,7 +101,9 @@ public class InternalActivity   extends     ParentActivity
     private void init() {
         Log.e("LOG", "InternalActivity: init()");
 
-        if(initCurrentUser()) {
+        //if(initCurrentUser()) {
+        if(initCurrentUser() &&
+           currentUserExistsInFBDB()) {
 
             int toolbarTitleResId = 0;
 
@@ -224,7 +227,7 @@ public class InternalActivity   extends     ParentActivity
     }
 
     private void logout() {
-        Log.e("LOG", "InternalActivity: logout()");
+        //Log.e("LOG", "InternalActivity: logout()");
 
         if(getFBAuth() != null) {
             getFBAuth().signOut();
@@ -237,7 +240,7 @@ public class InternalActivity   extends     ParentActivity
     }
 
     public void moveToExternalActivity() {
-        Log.e("LOG", "InternalActivity: moveToExternalActivity()");
+        //Log.e("LOG", "InternalActivity: moveToExternalActivity()");
 
         Intent internalActivityIntent = new Intent( InternalActivity.this,
                                                     ExternalActivity.class);
@@ -248,11 +251,11 @@ public class InternalActivity   extends     ParentActivity
     }
 
     private void moveToSettings() {
-        Log.e("LOG", "InternalActivity: moveToSettings()");
+        //Log.e("LOG", "InternalActivity: moveToSettings()");
 
-//        Intent settingsIntent = new Intent( InternalActivity.this,
-//                                            SettingsActivity.class);
-//        startActivity(settingsIntent);
+        setSecondLayerFragment( CONST.SETTINGS_FRAGMENT_CODE,
+                                null,
+                                null);
     }
 
     // ----------------------------------- FRAGMENTS ----------------------------------------- //
@@ -324,6 +327,10 @@ public class InternalActivity   extends     ParentActivity
                                                     selectedUser);
                 fragment.setFragmentTitleResId(R.string.text_chat);
                 break;
+            case CONST.SETTINGS_FRAGMENT_CODE:
+                fragment = SettingsFragment.newInstance();
+                fragment.setFragmentTitleResId(R.string.text_settings);
+                break;
             case CONST.USER_PROFILE_FRAGMENT_CODE:
                 fragment = UserProfileFragment.newInstance(selectedUserId);
                 fragment.setFragmentTitleResId(R.string.text_profile);
@@ -378,6 +385,7 @@ public class InternalActivity   extends     ParentActivity
                 setCurrentFragmentCode(CONST.TABS_FRAGMENT_CODE);
                 break;
             case CONST.CHAT_FRAGMENT_CODE:
+            case CONST.SETTINGS_FRAGMENT_CODE:
             case CONST.USER_PROFILE_FRAGMENT_CODE:
                 showToolbarBackButton();
                 break;
