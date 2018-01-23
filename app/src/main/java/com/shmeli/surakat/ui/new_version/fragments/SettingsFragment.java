@@ -8,6 +8,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -102,6 +104,19 @@ public class SettingsFragment extends ParentFragment {
         super.onDetach();
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu            menu,
+                                    MenuInflater    inflater) {
+        //Log.e("LOG", "SettingsFragment: onCreateOptionsMenu()");
+
+        // hide and disable menu_settings in app bar
+        menu.getItem(0).setVisible(false);
+        menu.getItem(0).setEnabled(false);
+
+        super.onCreateOptionsMenu(  menu,
+                                    inflater);
+    }
+
     // ----------------------------------- INIT ----------------------------------------- //
 
     private void init() {
@@ -139,6 +154,9 @@ public class SettingsFragment extends ParentFragment {
         else {
             Log.e("LOG", "SettingsFragment: init(): currentUserFBDatabaseRef is null");
         }
+
+        // without this line, onCreateOptionsMenu() will not be invoked
+        setHasOptionsMenu(true);
     }
 
     // ------------------------------ VALUE EVENT LISTENERS ----------------------------------- //

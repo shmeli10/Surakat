@@ -28,7 +28,6 @@ import com.shmeli.surakat.ui.new_version.fragments.ParentFragment;
 import com.shmeli.surakat.ui.new_version.fragments.SettingsFragment;
 import com.shmeli.surakat.ui.new_version.fragments.TabsFragment;
 import com.shmeli.surakat.ui.new_version.fragments.UserProfileFragment;
-import com.shmeli.surakat.ui.settings.SettingsActivity;
 import com.shmeli.surakat.utils.UiUtils;
 
 import java.text.SimpleDateFormat;
@@ -70,15 +69,17 @@ public class InternalActivity   extends     ParentActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(  R.menu.menu,
-                menu);
+        //Log.e("LOG", "InternalActivity: onCreateOptionsMenu()");
 
-        return true;
+        getMenuInflater().inflate(  R.menu.menu,
+                                    menu);
+
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Log.e("LOG", "MainActivity: onOptionsItemSelected()");
+        //Log.e("LOG", "InternalActivity: onOptionsItemSelected()");
 
         switch(item.getItemId()) {
 
@@ -93,7 +94,7 @@ public class InternalActivity   extends     ParentActivity
                 break;
         }
 
-        return true;
+        return super.onOptionsItemSelected(item);
     }
 
     // ----------------------------------- OTHER ----------------------------------------- //
@@ -101,7 +102,6 @@ public class InternalActivity   extends     ParentActivity
     private void init() {
         Log.e("LOG", "InternalActivity: init()");
 
-        //if(initCurrentUser()) {
         if(initCurrentUser() &&
            currentUserExistsInFBDB()) {
 
