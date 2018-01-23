@@ -21,6 +21,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.iid.FirebaseInstanceId;
 
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
 import com.shmeli.surakat.model.User;
@@ -41,6 +43,8 @@ public abstract class ParentActivity extends AppCompatActivity {
     private DatabaseReference friendsFBDatabaseRef;
     private DatabaseReference rootFBDatabaseRef;
     private DatabaseReference usersFBDatabaseRef;
+
+    private StorageReference  imagesFBStorageRef;
 
     private FirebaseAuth fbAuth;
 
@@ -86,10 +90,20 @@ public abstract class ParentActivity extends AppCompatActivity {
 
     public FirebaseAuth getFBAuth() {
 
-        if(fbAuth == null)
+        if(fbAuth == null) {
             fbAuth = FirebaseAuth.getInstance();
+        }
 
         return fbAuth;
+    }
+
+    public StorageReference getImagesFBStorageRef() {
+
+        if(imagesFBStorageRef == null) {
+            imagesFBStorageRef = FirebaseStorage.getInstance().getReference().child("images");
+        }
+
+        return imagesFBStorageRef;
     }
 
     // ------------------------------ SETTERS -------------------------------- //

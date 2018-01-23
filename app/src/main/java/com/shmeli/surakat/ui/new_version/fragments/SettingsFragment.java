@@ -2,8 +2,12 @@ package com.shmeli.surakat.ui.new_version.fragments;
 
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -17,10 +21,14 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
 import com.shmeli.surakat.ui.new_version.InternalActivity;
@@ -29,8 +37,15 @@ import com.shmeli.surakat.utils.UiUtils;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
+import com.theartofdev.edmodo.cropper.CropImage;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import id.zelory.compressor.Compressor;
 
 /**
  * Created by Serghei Ostrovschi on 12/19/17.
@@ -38,6 +53,19 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class SettingsFragment extends ParentFragment {
 
     private static SettingsFragment  instance;
+
+    private static final int    aspectRatioX = 1;
+    private static final int    aspectRatioY = 1;
+
+    private static final int    minCropWindowWidth  = 500;
+    private static final int    minCropWindowHeight = 500;
+
+    private static final int    imageMaxWidth           = 200;
+    private static final int    imageMaxHeight          = 200;
+    private static final int    imageQuality            = 75;
+    private static final int    imageCompressQuality    = 100;
+
+    private static final int    GALLERY_PICK = 1;
 
     private View                view;
 
@@ -53,7 +81,14 @@ public class SettingsFragment extends ParentFragment {
 
     private DatabaseReference   currentUserFBDatabaseRef;
 
-    private String              currentUserImageUrl = "";
+    private Uri                 croppedImageUri;
+    private StringBuilder       croppedImageIdSB = new StringBuilder("");
+
+    private String              uploadedImageUrl = "";
+    private String              uploadedThumbUrl = "";
+
+    private String              currentUserImageUrl     = "";
+    private String              changeImageChooserTitle = "";
 
     private InternalActivity    internalActivity;
 
@@ -117,6 +152,65 @@ public class SettingsFragment extends ParentFragment {
                                     inflater);
     }
 
+    @Override
+    public void onActivityResult(   int     requestCode,
+                                    int     resultCode,
+                                    Intent  data) {
+        super.onActivityResult( requestCode,
+                                resultCode,
+                                data);
+
+        Log.e("LOG", "SettingsFragment: onActivityResult(): (0)requestCode= " +requestCode);
+        Log.e("LOG", "SettingsFragment: onActivityResult(): \nrequestCode is GALLERY_PICK: " +(requestCode == GALLERY_PICK)+ " \nresultCode is internalActivity.RESULT_OK: " +(resultCode == internalActivity.RESULT_OK));
+
+        if( requestCode == GALLERY_PICK &&
+            resultCode == internalActivity.RESULT_OK) {
+
+            Uri imageUri = data.getData();
+
+            CropImage.activity(imageUri)
+                    .setAspectRatio(aspectRatioX,
+                                    aspectRatioY)
+                    .setMinCropWindowSize(  minCropWindowWidth,
+                                            minCropWindowHeight)
+                    .start(internalActivity);
+        }
+
+        Log.e("LOG", "SettingsFragment: onActivityResult(): (1)requestCode= " +requestCode);
+        Log.e("LOG", "SettingsFragment: onActivityResult(): \nrequestCode is CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE: " +(requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE));
+
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+
+            if (resultCode == internalActivity.RESULT_OK) {
+
+                internalActivity.showProgressDialog(getResources().getString(R.string.message_uploading_image),
+                                                    getResources().getString(R.string.message_uploading_image_wait));
+
+//                progressDialog = new ProgressDialog(internalActivity);
+//                progressDialog.setTitle(getResources().getString(R.string.message_uploading_image));
+//                progressDialog.setMessage(getResources().getString(R.string.message_uploading_image_wait));
+//                progressDialog.setCanceledOnTouchOutside(false);
+//                progressDialog.show();
+
+                croppedImageUri = result.getUri();
+
+                croppedImageIdSB.append(internalActivity.getCurrentUserId());
+                croppedImageIdSB.append(".jpg");
+
+                StorageReference filePath = internalActivity.getImagesFBStorageRef().child(croppedImageIdSB.toString()); // fbStorageReference.child("images").child(croppedImageIdSB.toString());
+
+                filePath.putFile(croppedImageUri).addOnCompleteListener(uploadImageOnCompleteListener);
+
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                //Exception error = result.getError();
+
+                Log.e("LOG", "SettingsFragment: onActivityResult(): Crop Image error: " +result.getError().getMessage().toString());
+            }
+        }
+    }
+
     // ----------------------------------- INIT ----------------------------------------- //
 
     private void init() {
@@ -157,6 +251,8 @@ public class SettingsFragment extends ParentFragment {
 
         // without this line, onCreateOptionsMenu() will not be invoked
         setHasOptionsMenu(true);
+
+        changeImageChooserTitle = getActivity().getResources().getString(R.string.text_select_image);
     }
 
     // ------------------------------ VALUE EVENT LISTENERS ----------------------------------- //
@@ -205,7 +301,77 @@ public class SettingsFragment extends ParentFragment {
         public void onCancelled(DatabaseError databaseError) { }
     };
 
+    // ------------------------------ ON COMPLETE LISTENERS ----------------------------------- //
 
+    OnCompleteListener uploadImageOnCompleteListener = new OnCompleteListener<UploadTask.TaskSnapshot>() {
+        @Override
+        public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> imageTask) {
+
+            Log.e("LOG", "SettingsFragment: uploadImageOnCompleteListener(): imageTask.isSuccessful(): " +imageTask.isSuccessful());
+
+            if(imageTask.isSuccessful()) {
+
+                uploadedImageUrl = imageTask.getResult().getDownloadUrl().toString();
+
+                uploadThumb();
+
+                Log.e("LOG", "SettingsFragment: uploadImageOnCompleteListener: upload image success: url: " +uploadedImageUrl);
+            }
+            else {
+
+                Log.e("LOG", "SettingsFragment: uploadImageOnCompleteListener: upload image error");
+            }
+        }
+    };
+
+    OnCompleteListener uploadThumbOnCompleteListener = new OnCompleteListener<UploadTask.TaskSnapshot>() {
+        @Override
+        public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> thumbTask) {
+
+            Log.e("LOG", "SettingsFragment: uploadThumbOnCompleteListener(): thumbTask.isSuccessful(): " +thumbTask.isSuccessful());
+
+            if(thumbTask.isSuccessful()) {
+
+                uploadedThumbUrl = thumbTask.getResult().getDownloadUrl().toString();
+                Log.e("LOG", "SettingsFragment: uploadThumbOnCompleteListener: upload thumb success: uploadedThumbUrl: " +uploadedThumbUrl);
+
+                Map uploadMap = new HashMap<>();
+                uploadMap.put(CONST.USER_IMAGE,         uploadedImageUrl);
+                uploadMap.put(CONST.USER_THUMB_IMAGE,   uploadedThumbUrl);
+
+                internalActivity.getUsersFBDatabaseRef().updateChildren(uploadMap).addOnCompleteListener(saveImageUrlCompleteListener);
+
+//                userFBDatabaseRef.updateChildren(uploadMap).addOnCompleteListener(saveImageUrlCompleteListener);
+                //userFBDatabaseRef.child(CONST.USER_IMAGE).setValue(uploadedImageUrl).addOnCompleteListener(saveImageUrlCompleteListener);
+                //userFBDatabaseRef.child("userImage").setValue(uploadedImageUrl).addOnCompleteListener(saveImageUrlCompleteListener);
+            }
+            else {
+
+                Log.e("LOG", "SettingsFragment: uploadThumbOnCompleteListener: upload thumb error");
+            }
+        }
+    };
+
+    OnCompleteListener saveImageUrlCompleteListener = new OnCompleteListener() {
+        @Override
+        public void onComplete(@NonNull Task task) {
+
+            Log.e("LOG", "SettingsFragment: saveImageUrlCompleteListener(): task.isSuccessful(): " +task.isSuccessful());
+
+            if(task.isSuccessful()) {
+
+                internalActivity.dismissProgressDialog();
+                //progressDialog.dismiss();
+
+                Log.e("LOG", "SettingsFragment: saveImageUrlCompleteListener: save image url success");
+                //progressDialog.hide();
+            }
+//            else {
+//                Log.e("LOG", "SettingsFragment: saveImageUrlCompleteListener: save image url error");
+//                progressDialog.dismiss();
+//            }
+        }
+    };
 
     // ------------------------------ BUTTON CLICK LISTENER ------------------------------------- //
 
@@ -214,6 +380,14 @@ public class SettingsFragment extends ParentFragment {
         public void onClick(View v) {
 
             Log.e("LOG", "SettingsFragment: changeImageButton Click ");
+
+            Intent galleryIntent = new Intent();
+            galleryIntent.setType("image/*");
+            galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+
+            startActivityForResult( Intent.createChooser(   galleryIntent,
+                                                            changeImageChooserTitle.toUpperCase()),
+                                    GALLERY_PICK);
         }
     };
 
@@ -226,6 +400,30 @@ public class SettingsFragment extends ParentFragment {
     };
 
     // ----------------------------------- OTHER ----------------------------------------------//
+
+    private void uploadThumb() {
+        Log.e("LOG", "SettingsFragment: uploadThumb()");
+
+        File thumbFile = new File(croppedImageUri.getPath());
+
+        Bitmap thumbBitmap = new Compressor(internalActivity)
+                .setMaxWidth(imageMaxWidth)
+                .setMaxHeight(imageMaxHeight)
+                .setQuality(imageQuality)
+                .compressToBitmap(thumbFile);
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        thumbBitmap.compress(   Bitmap.CompressFormat.JPEG,
+                                imageCompressQuality,
+                                byteArrayOutputStream);
+
+        byte[] thumbDataArray = byteArrayOutputStream.toByteArray();
+
+        StorageReference thumbFilePath = internalActivity.getImagesFBStorageRef().child("thumbs").child(croppedImageIdSB.toString()); //fbStorageReference.child("images").child("thumbs").child(croppedImageIdSB.toString());
+
+        UploadTask uploadTask = thumbFilePath.putBytes(thumbDataArray);
+        uploadTask.addOnCompleteListener(uploadThumbOnCompleteListener);
+    }
 
     private Callback loadImageCallback = new Callback() {
         @Override

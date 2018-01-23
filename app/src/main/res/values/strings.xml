@@ -67,6 +67,7 @@
     <string name="text_open_profile">Open profile</string>
     <string name="text_profile">Profile</string>
     <string name="text_saving_changes">Saving changes</string>
+    <string name="text_select_image">Select image</string>
     <string name="text_select_options">Select options</string>
     <string name="text_send_friend_request">Send friend request</string>
     <string name="text_send_message">Send message</string>
