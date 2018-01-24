@@ -1,7 +1,6 @@
 package com.shmeli.surakat.ui.new_version.fragments;
 
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -129,15 +128,15 @@ public class SettingsFragment extends ParentFragment {
         return view;
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-    }
+//    @Override
+//    public void onAttach(Context context) {
+//        super.onAttach(context);
+//    }
+//
+//    @Override
+//    public void onDetach() {
+//        super.onDetach();
+//    }
 
     @Override
     public void onCreateOptionsMenu(Menu            menu,
@@ -328,7 +327,6 @@ public class SettingsFragment extends ParentFragment {
                 uploadMap.put(CONST.USER_IMAGE,         uploadedImageUrl);
                 uploadMap.put(CONST.USER_THUMB_IMAGE,   uploadedThumbUrl);
 
-                //internalActivity.getCurrentUserFBDatabaseRef().updateChildren(uploadMap).addOnCompleteListener(saveImageUrlCompleteListener);
                 currentUserFBDatabaseRef.updateChildren(uploadMap).addOnCompleteListener(saveImageUrlCompleteListener);
             }
             else {
@@ -378,7 +376,11 @@ public class SettingsFragment extends ParentFragment {
         @Override
         public void onClick(View v) {
 
-            Log.e("LOG", "SettingsFragment: changeStatusButton Click ");
+            //Log.e("LOG", "SettingsFragment: changeStatusButton Click ");
+
+            internalActivity.setSecondLayerFragment(CONST.USER_STATUS_FRAGMENT_CODE,
+                                                    null,
+                                                    null);
         }
     };
 

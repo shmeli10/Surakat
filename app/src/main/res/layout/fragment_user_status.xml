@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/userStatusContainer"
+    style="@style/MM"
+    android:padding="@dimen/spacing_2x"
+    android:background="@color/colorPrimary">
+
+    <TextView
+        android:id="@+id/userStatusFragmentNameTextView"
+        style="@style/MW"
+        android:layout_marginTop="@dimen/spacing_6x"
+        android:layout_alignParentTop="true"
+        android:padding="@dimen/spacing_3x"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size_1.5x"
+        android:background="@drawable/input_outline"/>
+
+    <!--<EditText-->
+        <!--android:id="@+id/userStatusFragmentNameEditText"-->
+        <!--style="@style/MW"-->
+        <!--android:layout_marginTop="@dimen/spacing_6x"-->
+        <!--android:layout_alignParentTop="true"-->
+        <!--android:padding="@dimen/spacing_3x"-->
+        <!--android:ems="10"-->
+        <!--android:inputType="text"-->
+        <!--android:textColor="@color/white"-->
+        <!--android:textSize="@dimen/text_size_1.5x"-->
+        <!--android:textColorHint="@color/white"-->
+        <!--android:hint="@string/hint_name"-->
+        <!--android:background="@drawable/input_outline"/>-->
+
+    <EditText
+        android:id="@+id/userStatusFragmentStatusEditText"
+        style="@style/MW"
+        android:layout_below="@+id/userStatusFragmentNameTextView"
+        android:layout_marginTop="@dimen/spacing_2x"
+        android:padding="@dimen/spacing_3x"
+        android:ems="10"
+        android:inputType="text"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size_1.5x"
+        android:textColorHint="@color/white"
+        android:hint="@string/hint_status"
+        android:background="@drawable/input_outline"/>
+
+    <Button
+        android:id="@+id/userStatusFragmentSetButton"
+        style="@style/MW"
+        android:layout_below="@+id/userStatusFragmentStatusEditText"
+        android:layout_marginTop="@dimen/spacing_2x"
+        android:background="@drawable/button_green"
+        android:textColor="@color/colorPrimary"
+        android:textSize="@dimen/text_size_1.5x"
+        android:text="@string/button_set"/>
+
+</RelativeLayout>

@@ -28,6 +28,7 @@ import com.shmeli.surakat.ui.new_version.fragments.ParentFragment;
 import com.shmeli.surakat.ui.new_version.fragments.SettingsFragment;
 import com.shmeli.surakat.ui.new_version.fragments.TabsFragment;
 import com.shmeli.surakat.ui.new_version.fragments.UserProfileFragment;
+import com.shmeli.surakat.ui.new_version.fragments.UserStatusFragment;
 import com.shmeli.surakat.utils.UiUtils;
 
 import java.text.SimpleDateFormat;
@@ -335,6 +336,10 @@ public class InternalActivity   extends     ParentActivity
                 fragment = UserProfileFragment.newInstance(selectedUserId);
                 fragment.setFragmentTitleResId(R.string.text_profile);
                 break;
+            case CONST.USER_STATUS_FRAGMENT_CODE:
+                fragment = UserStatusFragment.newInstance();
+                fragment.setFragmentTitleResId(R.string.text_set_status);
+                break;
             default:
                 Log.e("LOG", "InternalActivity: setSecondLayerFragment(): undefined fragment code: " +fragmentCode);
         }
@@ -387,6 +392,7 @@ public class InternalActivity   extends     ParentActivity
             case CONST.CHAT_FRAGMENT_CODE:
             case CONST.SETTINGS_FRAGMENT_CODE:
             case CONST.USER_PROFILE_FRAGMENT_CODE:
+            case CONST.USER_STATUS_FRAGMENT_CODE:
                 showToolbarBackButton();
                 break;
             default:
