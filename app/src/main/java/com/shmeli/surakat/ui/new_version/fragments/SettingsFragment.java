@@ -160,9 +160,6 @@ public class SettingsFragment extends ParentFragment {
                                 resultCode,
                                 data);
 
-        Log.e("LOG", "SettingsFragment: onActivityResult(): (0)requestCode= " +requestCode);
-        Log.e("LOG", "SettingsFragment: onActivityResult(): \nrequestCode is GALLERY_PICK: " +(requestCode == GALLERY_PICK)+ " \nresultCode is internalActivity.RESULT_OK: " +(resultCode == internalActivity.RESULT_OK));
-
         if( requestCode == GALLERY_PICK &&
             resultCode == internalActivity.RESULT_OK) {
 
@@ -173,11 +170,9 @@ public class SettingsFragment extends ParentFragment {
                                     aspectRatioY)
                     .setMinCropWindowSize(  minCropWindowWidth,
                                             minCropWindowHeight)
-                    .start(internalActivity);
+                    .start( internalActivity,
+                            this);
         }
-
-        Log.e("LOG", "SettingsFragment: onActivityResult(): (1)requestCode= " +requestCode);
-        Log.e("LOG", "SettingsFragment: onActivityResult(): \nrequestCode is CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE: " +(requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE));
 
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
 
@@ -187,12 +182,6 @@ public class SettingsFragment extends ParentFragment {
 
                 internalActivity.showProgressDialog(getResources().getString(R.string.message_uploading_image),
                                                     getResources().getString(R.string.message_uploading_image_wait));
-
-//                progressDialog = new ProgressDialog(internalActivity);
-//                progressDialog.setTitle(getResources().getString(R.string.message_uploading_image));
-//                progressDialog.setMessage(getResources().getString(R.string.message_uploading_image_wait));
-//                progressDialog.setCanceledOnTouchOutside(false);
-//                progressDialog.show();
 
                 croppedImageUri = result.getUri();
 
@@ -307,7 +296,7 @@ public class SettingsFragment extends ParentFragment {
         @Override
         public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> imageTask) {
 
-            Log.e("LOG", "SettingsFragment: uploadImageOnCompleteListener(): imageTask.isSuccessful(): " +imageTask.isSuccessful());
+            //Log.e("LOG", "SettingsFragment: uploadImageOnCompleteListener(): imageTask.isSuccessful(): " +imageTask.isSuccessful());
 
             if(imageTask.isSuccessful()) {
 
@@ -315,7 +304,7 @@ public class SettingsFragment extends ParentFragment {
 
                 uploadThumb();
 
-                Log.e("LOG", "SettingsFragment: uploadImageOnCompleteListener: upload image success: url: " +uploadedImageUrl);
+                //Log.e("LOG", "SettingsFragment: uploadImageOnCompleteListener: upload image success: url: " +uploadedImageUrl);
             }
             else {
 
@@ -328,22 +317,19 @@ public class SettingsFragment extends ParentFragment {
         @Override
         public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> thumbTask) {
 
-            Log.e("LOG", "SettingsFragment: uploadThumbOnCompleteListener(): thumbTask.isSuccessful(): " +thumbTask.isSuccessful());
+            //Log.e("LOG", "SettingsFragment: uploadThumbOnCompleteListener(): thumbTask.isSuccessful(): " +thumbTask.isSuccessful());
 
             if(thumbTask.isSuccessful()) {
 
                 uploadedThumbUrl = thumbTask.getResult().getDownloadUrl().toString();
-                Log.e("LOG", "SettingsFragment: uploadThumbOnCompleteListener: upload thumb success: uploadedThumbUrl: " +uploadedThumbUrl);
+                //Log.e("LOG", "SettingsFragment: uploadThumbOnCompleteListener: upload thumb success: uploadedThumbUrl: " +uploadedThumbUrl);
 
                 Map uploadMap = new HashMap<>();
                 uploadMap.put(CONST.USER_IMAGE,         uploadedImageUrl);
                 uploadMap.put(CONST.USER_THUMB_IMAGE,   uploadedThumbUrl);
 
-                internalActivity.getUsersFBDatabaseRef().updateChildren(uploadMap).addOnCompleteListener(saveImageUrlCompleteListener);
-
-//                userFBDatabaseRef.updateChildren(uploadMap).addOnCompleteListener(saveImageUrlCompleteListener);
-                //userFBDatabaseRef.child(CONST.USER_IMAGE).setValue(uploadedImageUrl).addOnCompleteListener(saveImageUrlCompleteListener);
-                //userFBDatabaseRef.child("userImage").setValue(uploadedImageUrl).addOnCompleteListener(saveImageUrlCompleteListener);
+                //internalActivity.getCurrentUserFBDatabaseRef().updateChildren(uploadMap).addOnCompleteListener(saveImageUrlCompleteListener);
+                currentUserFBDatabaseRef.updateChildren(uploadMap).addOnCompleteListener(saveImageUrlCompleteListener);
             }
             else {
 
@@ -356,20 +342,17 @@ public class SettingsFragment extends ParentFragment {
         @Override
         public void onComplete(@NonNull Task task) {
 
-            Log.e("LOG", "SettingsFragment: saveImageUrlCompleteListener(): task.isSuccessful(): " +task.isSuccessful());
+            //Log.e("LOG", "SettingsFragment: saveImageUrlCompleteListener(): task.isSuccessful(): " +task.isSuccessful());
 
             if(task.isSuccessful()) {
 
                 internalActivity.dismissProgressDialog();
-                //progressDialog.dismiss();
 
-                Log.e("LOG", "SettingsFragment: saveImageUrlCompleteListener: save image url success");
-                //progressDialog.hide();
+                //Log.e("LOG", "SettingsFragment: saveImageUrlCompleteListener: save image url success");
             }
-//            else {
-//                Log.e("LOG", "SettingsFragment: saveImageUrlCompleteListener: save image url error");
-//                progressDialog.dismiss();
-//            }
+            else {
+                Log.e("LOG", "SettingsFragment: saveImageUrlCompleteListener: save image url error");
+            }
         }
     };
 
@@ -379,7 +362,7 @@ public class SettingsFragment extends ParentFragment {
         @Override
         public void onClick(View v) {
 
-            Log.e("LOG", "SettingsFragment: changeImageButton Click ");
+            //Log.e("LOG", "SettingsFragment: changeImageButton Click ");
 
             Intent galleryIntent = new Intent();
             galleryIntent.setType("image/*");
@@ -402,7 +385,7 @@ public class SettingsFragment extends ParentFragment {
     // ----------------------------------- OTHER ----------------------------------------------//
 
     private void uploadThumb() {
-        Log.e("LOG", "SettingsFragment: uploadThumb()");
+        //Log.e("LOG", "SettingsFragment: uploadThumb()");
 
         File thumbFile = new File(croppedImageUri.getPath());
 
@@ -419,7 +402,7 @@ public class SettingsFragment extends ParentFragment {
 
         byte[] thumbDataArray = byteArrayOutputStream.toByteArray();
 
-        StorageReference thumbFilePath = internalActivity.getImagesFBStorageRef().child("thumbs").child(croppedImageIdSB.toString()); //fbStorageReference.child("images").child("thumbs").child(croppedImageIdSB.toString());
+        StorageReference thumbFilePath = internalActivity.getImagesFBStorageRef().child("thumbs").child(croppedImageIdSB.toString());
 
         UploadTask uploadTask = thumbFilePath.putBytes(thumbDataArray);
         uploadTask.addOnCompleteListener(uploadThumbOnCompleteListener);
@@ -427,9 +410,7 @@ public class SettingsFragment extends ParentFragment {
 
     private Callback loadImageCallback = new Callback() {
         @Override
-        public void onSuccess() {
-
-        }
+        public void onSuccess() { }
 
         @Override
         public void onError() {

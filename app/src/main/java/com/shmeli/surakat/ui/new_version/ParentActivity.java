@@ -294,7 +294,8 @@ public abstract class ParentActivity extends AppCompatActivity {
 
         if(!TextUtils.isEmpty(currentUserId)) {
 
-            currentUserFBDatabaseRef    = usersFBDatabaseRef.child(currentUserId);
+            currentUserFBDatabaseRef = usersFBDatabaseRef.child(currentUserId);
+            currentUserFBDatabaseRef.keepSynced(true);
 
             return (currentUserFBDatabaseRef != null);
         }
