@@ -263,12 +263,18 @@ public class SettingsFragment extends ParentFragment {
 
                     nameTextView.setText(currentUserName);
                 }
+                else {
+                    nameTextView.setText("");
+                }
 
                 Log.e("LOG", "UserProfileFragment: currentUserStatus: " +currentUserStatus);
                 if( (!TextUtils.isEmpty(currentUserStatus)) &&
                     (!currentUserStatus.equals(CONST.DEFAULT_VALUE))) {
 
                     statusTextView.setText(currentUserStatus);
+                }
+                else {
+                    statusTextView.setText("");
                 }
 
                 if (!currentUserImageUrl.equals(CONST.DEFAULT_VALUE)) {

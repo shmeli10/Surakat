@@ -73,6 +73,7 @@ public class CONST {
     public static final String SENT_REQUEST_TEXT                = "sent";
     public static final String RECEIVED_REQUEST_TEXT            = "received";
 
+    public static final int USER_STATUS_MAX_LENGTH              = 50;
     public static final int PUBLICATION_MAX_LENGTH              = 400;
 
     public static final int IS_A_FRIEND_STATE                   = 3;

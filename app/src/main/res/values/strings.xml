@@ -42,6 +42,7 @@
     <string name="message_uploading_image">Uploading image...</string>
     <string name="message_uploading_image_wait">Please wait while we upload and process the image</string>
 
+    <string name="success_saving_changes">Changes successfully saved</string>
 
     <string name="text_accept_friend_request">Accept friend request</string>
     <string name="text_all_users">All users</string>

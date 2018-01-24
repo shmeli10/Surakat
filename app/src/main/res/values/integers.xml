@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <item type="integer" name="status_length">50</item>
     <item type="integer" name="message_length">400</item>
     <item type="integer" name="main_page_view_pager_tabs_count">2</item>
 </resources>
