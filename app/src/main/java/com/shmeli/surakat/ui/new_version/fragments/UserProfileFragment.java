@@ -12,6 +12,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -160,6 +162,19 @@ public class UserProfileFragment extends ParentFragment {
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu,
+                                    MenuInflater inflater) {
+        //Log.e("LOG", "UserProfileFragment: onCreateOptionsMenu()");
+
+        // hide and disable menu_settings in app bar
+        menu.getItem(0).setVisible(false);
+        menu.getItem(0).setEnabled(false);
+
+        super.onCreateOptionsMenu(  menu,
+                                    inflater);
+    }
+
+    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
     }
@@ -204,6 +219,9 @@ public class UserProfileFragment extends ParentFragment {
         notificationsFBDatabaseRef  = internalActivity.getRootFBDatabaseRef()
                                                         .child(CONST.FIREBASE_NOTIFICATIONS_CHILD)
                                                         .child(selectedUserId);
+
+        // without this line, onCreateOptionsMenu() will not be invoked
+        setHasOptionsMenu(true);
     }
 
     // ------------------------------ VALUE EVENT LISTENERS ----------------------------------- //

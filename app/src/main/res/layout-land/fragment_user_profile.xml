@@ -48,7 +48,7 @@
                 style="@style/MM"
                 android:layout_weight="50"
                 android:gravity="right"
-                android:textSize="@dimen/text_size_2.0x"
+                android:textSize="@dimen/text_size_1.5x"
                 android:textColor="@color/white"
                 android:text="@string/text_total_friends"/>
 
@@ -57,7 +57,7 @@
                 style="@style/MM"
                 android:layout_weight="50"
                 android:layout_marginLeft="@dimen/spacing_1x"
-                android:textSize="@dimen/text_size_2.0x"
+                android:textSize="@dimen/text_size_1.5x"
                 android:textColor="@color/white"/>
 
         </LinearLayout>

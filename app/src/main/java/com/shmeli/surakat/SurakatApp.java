@@ -26,14 +26,14 @@ import com.squareup.picasso.Picasso;
 
 public class SurakatApp extends Application {
 
-    private FirebaseAuth        fbAuth;
+/*    private FirebaseAuth        fbAuth;
     private DatabaseReference   rootFBDatabaseRef;
     private DatabaseReference   usersFBDatabaseRef;
-    private DatabaseReference   currentUserFBDatabaseRef;
+    private DatabaseReference   currentUserFBDatabaseRef;*/
 
     //private FirebaseUser        fbUser;
 
-    private String              currentUserId = "";
+//    private String              currentUserId = "";
 
     @Override
     public void onCreate() {
@@ -54,7 +54,7 @@ public class SurakatApp extends Application {
 
             Picasso.setSingletonInstance(built);
 
-            fbAuth = FirebaseAuth.getInstance();
+/*            fbAuth = FirebaseAuth.getInstance();
 
             if(fbAuth.getCurrentUser() != null) {
 
@@ -70,7 +70,7 @@ public class SurakatApp extends Application {
                 }
                 else
                     Log.e("LOG", "SurakatApp: onCreate(): get current user id error");
-            }
+            }*/
 
 //            fbUser = FirebaseAuth.getInstance().getCurrentUser();
 //
@@ -103,13 +103,13 @@ public class SurakatApp extends Application {
         }
     }
 
-    public String getCurrentUserId() {
-        return currentUserId;
-    }
+//    public String getCurrentUserId() {
+//        return currentUserId;
+//    }
 
     // ------------------------------ LISTENERS ----------------------------------------- //
 
-    ValueEventListener currentUserDataListener = new ValueEventListener() {
+/*    ValueEventListener currentUserDataListener = new ValueEventListener() {
         @Override
         public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
 
@@ -124,7 +124,6 @@ public class SurakatApp extends Application {
 
         @Override
         public void onCancelled(DatabaseError databaseError) { }
-    };
-
+    };*/
 
 }
