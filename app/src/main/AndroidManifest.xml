@@ -19,19 +19,33 @@
         <!-- </intent-filter> -->
         <!-- </service> -->
 
-        <activity
-            android:name=".ui.ChatActivity"
-            android:parentActivityName=".ui.MainActivity" />
+        <activity android:name=".ui.new_version.ExternalActivity"/>
+        <activity android:name=".ui.new_version.InternalActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <!--<intent-filter>-->
+                <!--<action android:name="com.shmeli.surakat.surakatChat_TARGET_NOTIFICATION" />-->
+
+                <!--<category android:name="android.intent.category.DEFAULT" />-->
+            <!--</intent-filter>-->
+        </activity>
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />
+
+        <!--<activity
+            android:name=".ui.ChatActivity"
+            android:parentActivityName=".ui.MainActivity" />
         <activity android:name=".ui.LoginActivity" />
         <activity android:name=".ui.MainActivity">
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
+            &lt;!&ndash;<intent-filter>&ndash;&gt;
+                &lt;!&ndash;<action android:name="android.intent.action.MAIN" />&ndash;&gt;
 
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
+                &lt;!&ndash;<category android:name="android.intent.category.LAUNCHER" />&ndash;&gt;
+            &lt;!&ndash;</intent-filter>&ndash;&gt;
         </activity>
         <activity
             android:name=".ui.ProfileActivity"
@@ -51,15 +65,7 @@
             android:parentActivityName=".ui.MainActivity" />
         <activity
             android:name=".ui.settings.StatusActivity"
-            android:parentActivityName=".ui.settings.SettingsActivity" />
-        <activity android:name=".ui.new_version.InternalActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".ui.new_version.ExternalActivity"/>
+            android:parentActivityName=".ui.settings.SettingsActivity" />-->
 
     </application>
 

@@ -150,6 +150,7 @@ public class FriendsFragment extends Fragment {
                             if (!TextUtils.isEmpty(isOnlineValue)) {
                                 selectedUserIsOnline = Boolean.parseBoolean(isOnlineValue);
                                 selectedUser.setUserIsOnline(selectedUserIsOnline);
+                                //viewHolder.setOnlineStatus(selectedUserIsOnline);
                             }
                         }
 

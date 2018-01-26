@@ -19,6 +19,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ServerValue;
+import com.google.firebase.database.ValueEventListener;
 import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
 import com.shmeli.surakat.interfaces.TransferSelectedUser;
@@ -98,6 +101,21 @@ public class InternalActivity   extends     ParentActivity
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        //getCurrentUserFBDatabaseRef().child(CONST.USER_IS_ONLINE).setValue(true);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        //getCurrentUserFBDatabaseRef().child(CONST.USER_IS_ONLINE).setValue(false);
+        //getCurrentUserFBDatabaseRef().child(CONST.USER_LAST_SEEN).setValue(ServerValue.TIMESTAMP);
+    }
+
     // ----------------------------------- OTHER ----------------------------------------- //
 
     private void init() {
@@ -167,6 +185,8 @@ public class InternalActivity   extends     ParentActivity
             else {
                 Log.e("LOG", "InternalActivity: init(): toolbarTitleResId has incorrect value= " +toolbarTitleResId);
             }
+
+            getCurrentUserFBDatabaseRef().addListenerForSingleValueEvent(currentUserDataChangeListener);
         }
         else {
 
@@ -419,4 +439,23 @@ public class InternalActivity   extends     ParentActivity
             actionBar.setDisplayShowHomeEnabled(false);
         }
     }
+
+    // ------------------------------ LISTENERS ----------------------------------------- //
+
+    ValueEventListener currentUserDataChangeListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
+
+            Log.e("LOG", "InternalActivity: currentUserDataChangeListener: onDataChange()");
+
+/*            if(dataSnapshot != null) {
+
+                currentUserFBDatabaseRef.child(CONST.USER_IS_ONLINE).onDisconnect().setValue(false);
+                currentUserFBDatabaseRef.child(CONST.USER_LAST_SEEN).setValue(ServerValue.TIMESTAMP);
+            }*/
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) { }
+    };
 }

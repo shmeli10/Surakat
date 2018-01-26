@@ -34,7 +34,7 @@
             style="@style/MW"
             android:layout_marginTop="@dimen/spacing_2x"
             android:gravity="center"
-            android:textSize="@dimen/text_size_2.0x"
+            android:textSize="@dimen/text_size_1.5x"
             android:textColor="@color/white" />
 
         <LinearLayout
