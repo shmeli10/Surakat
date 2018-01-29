@@ -75,7 +75,8 @@ public class AllUsersFragment extends Fragment {
             transferSelectedUserListener = (TransferSelectedUser) internalActivity;
         }
 
-        allUsersRecyclerVIew = UiUtils.findView(view, R.id.allUsersRecyclerVIew);
+        allUsersRecyclerVIew = UiUtils.findView(view,
+                                                R.id.allUsersRecyclerVIew);
         allUsersRecyclerVIew.setHasFixedSize(true);
         allUsersRecyclerVIew.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -90,6 +91,7 @@ public class AllUsersFragment extends Fragment {
     }
 
     private void populateAllUsersList() {
+        Log.e("LOG", "AllUsersFragment: populateAllUsersList()");
 
         FirebaseRecyclerAdapter<User, UserViewHolder> fbAdapter = new FirebaseRecyclerAdapter<User, UserViewHolder>(User.class,
                                                                                                                     R.layout.user_row,
@@ -103,6 +105,7 @@ public class AllUsersFragment extends Fragment {
                 viewHolder.setName(model.getUserName());
                 viewHolder.setStatus(model.getUserStatus());
                 viewHolder.setAvatar(model.getUserThumbImageUrl());
+                viewHolder.setOnlineStatus(model.getUserIsOnline());
 
                 final String selectedUserId = getRef(position).getKey();
 

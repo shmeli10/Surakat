@@ -1,5 +1,7 @@
 package com.shmeli.surakat.model;
 
+import android.text.TextUtils;
+
 /**
  * Created by Serghei Ostrovschi on 10/5/17.
  */
@@ -7,7 +9,7 @@ package com.shmeli.surakat.model;
 public class User {
 
     // private int userId;
-    //private String userId;
+    private String userId;
 
     private String userImageUrl;
     private String userName;
@@ -16,6 +18,8 @@ public class User {
     private String userThumbImageUrl;
 
     private Boolean userIsOnline;
+
+    private long userLastSeen;
 
     //private String userEmail;
 
@@ -29,7 +33,8 @@ public class User {
                 String userDeviceToken,
                 String userStatus,
                 String userThumbImageUrl,
-                Boolean userIsOnline) {
+                Boolean userIsOnline,
+                long userLastSeen) {
 
         this.userImageUrl       = userImageUrl;
         this.userName           = userName;
@@ -37,12 +42,17 @@ public class User {
 
         this.userStatus         = userStatus;
         this.userThumbImageUrl  = userThumbImageUrl;
+        this.userLastSeen       = userLastSeen;
 
         this.userIsOnline       = userIsOnline;
-
     }
 
     // ------------------------ GETTERS ----------------------------- //
+
+
+    public String getUserId() {
+        return userId;
+    }
 
     public String getUserImageUrl() {
         return userImageUrl;
@@ -65,10 +75,27 @@ public class User {
     }
 
     public Boolean getUserIsOnline() {
+        if(userIsOnline == null)
+            return false;
+
         return userIsOnline;
     }
 
+    public long getUserLastSeen() {
+        return userLastSeen;
+    }
+
     // ------------------------ SETTERS ----------------------------- //
+
+    public void setUserId(String userId) {
+
+        if(TextUtils.isEmpty(userId)) {
+            userId = "";
+        }
+        else {
+            this.userId = userId;
+        }
+    }
 
     public void setUserImageUrl(String userImageUrl) {
         this.userImageUrl = userImageUrl;
@@ -86,12 +113,20 @@ public class User {
         this.userStatus = userStatus;
     }
 
+    public void setUserLastSeen(long userLastSeen) {
+        this.userLastSeen = userLastSeen;
+    }
+
     public void setUserThumbImageUrl(String userThumbImageUrl) {
         this.userThumbImageUrl = userThumbImageUrl;
     }
 
     public void setUserIsOnline(Boolean userIsOnline) {
-        this.userIsOnline = userIsOnline;
+
+        if(userIsOnline != null)
+            this.userIsOnline = userIsOnline;
+        else
+            this.userIsOnline = false;
     }
 
     //    public User(int     userId,

@@ -102,18 +102,35 @@ public class InternalActivity   extends     ParentActivity
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+
+        Log.e("LOG", "InternalActivity: onStart()");
+
+        changeUserOnlineStatus(true);
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
 
-        //getCurrentUserFBDatabaseRef().child(CONST.USER_IS_ONLINE).setValue(true);
+        Log.e("LOG", "InternalActivity: onResume()");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
 
-        //getCurrentUserFBDatabaseRef().child(CONST.USER_IS_ONLINE).setValue(false);
-        //getCurrentUserFBDatabaseRef().child(CONST.USER_LAST_SEEN).setValue(ServerValue.TIMESTAMP);
+        Log.e("LOG", "InternalActivity: onStop()");
+
+        changeUserOnlineStatus(false);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        Log.e("LOG", "InternalActivity: onDestroy()");
     }
 
     // ----------------------------------- OTHER ----------------------------------------- //
@@ -186,7 +203,7 @@ public class InternalActivity   extends     ParentActivity
                 Log.e("LOG", "InternalActivity: init(): toolbarTitleResId has incorrect value= " +toolbarTitleResId);
             }
 
-            getCurrentUserFBDatabaseRef().addListenerForSingleValueEvent(currentUserDataChangeListener);
+            //getCurrentUserFBDatabaseRef().addListenerForSingleValueEvent(currentUserDataChangeListener);
         }
         else {
 
@@ -251,6 +268,9 @@ public class InternalActivity   extends     ParentActivity
         //Log.e("LOG", "InternalActivity: logout()");
 
         if(getFBAuth() != null) {
+
+            changeUserOnlineStatus(false);
+
             getFBAuth().signOut();
 
             moveToExternalActivity();
@@ -277,6 +297,19 @@ public class InternalActivity   extends     ParentActivity
         setSecondLayerFragment( CONST.SETTINGS_FRAGMENT_CODE,
                                 null,
                                 null);
+    }
+
+    private void changeUserOnlineStatus(boolean userIsOnline) {
+
+        Log.e("LOG", "InternalActivity: changeUserOnlineStatus(): to: " +userIsOnline);
+
+        if(userIsOnline) {
+            getCurrentUserFBDatabaseRef().child(CONST.USER_IS_ONLINE).setValue(true);
+        }
+        else {
+            getCurrentUserFBDatabaseRef().child(CONST.USER_IS_ONLINE).setValue(false);
+            getCurrentUserFBDatabaseRef().child(CONST.USER_LAST_SEEN).setValue(ServerValue.TIMESTAMP);
+        }
     }
 
     // ----------------------------------- FRAGMENTS ----------------------------------------- //
@@ -446,7 +479,7 @@ public class InternalActivity   extends     ParentActivity
         @Override
         public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
 
-            Log.e("LOG", "InternalActivity: currentUserDataChangeListener: onDataChange()");
+            //Log.e("LOG", "InternalActivity: currentUserDataChangeListener: onDataChange()");
 
 /*            if(dataSnapshot != null) {
 

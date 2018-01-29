@@ -123,21 +123,21 @@ public abstract class ParentActivity extends AppCompatActivity {
 
     public abstract void setToolbarTitle(final int titleResId);
 
-    public void setCurrentUserIsOnline(boolean isOnline) {
-
-        if(currentUserFBDatabaseRef != null) {
-
-            // user is offline
-            if (!isOnline) {
-                currentUserFBDatabaseRef.child(CONST.USER_LAST_SEEN).setValue(ServerValue.TIMESTAMP);
-            }
-
-            currentUserFBDatabaseRef.child(CONST.USER_IS_ONLINE).setValue(isOnline);
-        }
-        else {
-            Log.e("LOG", "ParentActivity; setUserIsOnline(): currentUserFBDatabaseRef is null");
-        }
-    }
+//    public void setCurrentUserIsOnline(boolean isOnline) {
+//
+//        if(currentUserFBDatabaseRef != null) {
+//
+//            // user is offline
+//            if (!isOnline) {
+//                currentUserFBDatabaseRef.child(CONST.USER_LAST_SEEN).setValue(ServerValue.TIMESTAMP);
+//            }
+//
+//            currentUserFBDatabaseRef.child(CONST.USER_IS_ONLINE).setValue(isOnline);
+//        }
+//        else {
+//            Log.e("LOG", "ParentActivity; setUserIsOnline(): currentUserFBDatabaseRef is null");
+//        }
+//    }
 
     // ------------------------------ OTHER ---------------------------------- //
 

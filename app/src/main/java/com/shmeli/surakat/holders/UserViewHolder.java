@@ -63,16 +63,22 @@ public class UserViewHolder extends RecyclerView.ViewHolder {
 
     public void setAvatar(String imageUrl) {
 
-        this.imageUrl = imageUrl;
+        if(imageUrl != null) {
 
-        if(!imageUrl.equals(CONST.DEFAULT_VALUE)) {
+            this.imageUrl = imageUrl;
 
-            Picasso.with(itemView.getContext())
-                    .load(imageUrl)
-                    .networkPolicy(NetworkPolicy.OFFLINE)
-                    .placeholder(R.drawable.default_avatar)
-                    .into(  userAvatar,
-                            loadImageCallback);
+            if (!imageUrl.equals(CONST.DEFAULT_VALUE)) {
+
+                Picasso.with(itemView.getContext())
+                        .load(imageUrl)
+                        .networkPolicy(NetworkPolicy.OFFLINE)
+                        .placeholder(R.drawable.default_avatar)
+                        .into(userAvatar,
+                                loadImageCallback);
+            }
+        }
+        else {
+            this.imageUrl = "";
         }
 
         /*Picasso.with(itemView.getContext())
