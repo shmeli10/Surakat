@@ -5,6 +5,7 @@ import android.content.Context;
 
 import android.os.Bundle;
 
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 
 import android.text.TextUtils;
@@ -22,6 +23,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -589,6 +591,8 @@ public class UserProfileFragment extends ParentFragment {
 
     private void sendUnFriendRequest(){
 
+        // ------------------------ Delete from root/Friends -------------------------------- //
+
         StringBuilder friendRequest = new StringBuilder("");
         friendRequest.append(CONST.FIREBASE_FRIENDS_CHILD);
         friendRequest.append("/");
@@ -615,7 +619,44 @@ public class UserProfileFragment extends ParentFragment {
                                                                 unFriendRequestCompletionListener);
     }
 
+    private void sendDeleteUserFromFriendsListRequest() {
+
+        //Log.e("LOG", "UserProfileFragment: sendDeleteUserFromFriendsListRequest()");
+
+        // ------------------------ Delete from root/Users/{currentUserId}/Friends ----------- //
+
+        internalActivity.getUsersFBDatabaseRef()
+                        .child(internalActivity.getCurrentUserId())
+                        .child(CONST.FIREBASE_FRIENDS_CHILD)
+                        .child(selectedUserId)
+                        .removeValue()
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception exc) {
+                                Log.e("LOG", "UserProfileFragment: sendDeleteUserFromFriendsListRequest(): error(0): " +exc.getMessage());
+
+                                Log.e("LOG", "UserProfileFragment: sendDeleteUserFromFriendsListRequest(): for \ncurrentUserId: " + internalActivity.getCurrentUserId() + "\nselectedUserId:" +selectedUserId);
+                            }
+                        });
+
+        internalActivity.getUsersFBDatabaseRef()
+                        .child(selectedUserId)
+                        .child(CONST.FIREBASE_FRIENDS_CHILD)
+                        .child(internalActivity.getCurrentUserId())
+                        .removeValue()
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception exc) {
+                                Log.e("LOG", "UserProfileFragment: sendDeleteUserFromFriendsListRequest(): error(1): " +exc.getMessage());
+
+                                Log.e("LOG", "UserProfileFragment: sendDeleteUserFromFriendsListRequest(): for \nselectedUserId:" + selectedUserId + "\ncurrentUserId: " + internalActivity.getCurrentUserId());
+                            }
+                        });
+    }
+
     private void acceptFriendRequest() {
+
+        // ------------------------ Add to root/Friends -------------------------------- //
 
         final StringBuilder friendRequest = new StringBuilder("");
         friendRequest.append(CONST.FIREBASE_FRIENDS_CHILD);
@@ -702,6 +743,41 @@ public class UserProfileFragment extends ParentFragment {
             @Override
             public void onCancelled(DatabaseError databaseError) { }
         });
+    }
+
+    private void sendAddUserToFriendsListRequest() {
+
+        //Log.e("LOG", "UserProfileFragment: sendAddUserToFriendsListRequest()");
+
+        // ------------------------ Add to root/Users/{currentUserId}/Friends ----------- //
+
+        internalActivity.getUsersFBDatabaseRef()
+                        .child(internalActivity.getCurrentUserId())
+                        .child(CONST.FIREBASE_FRIENDS_CHILD)
+                        .child(selectedUserId)
+                        .setValue(true)
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception exc) {
+                                Log.e("LOG", "UserProfileFragment: sendAddUserToFriendsListRequest(): error(0): " +exc.getMessage());
+
+                                Log.e("LOG", "UserProfileFragment: sendAddUserToFriendsListRequest(): for \ncurrentUserId: " + internalActivity.getCurrentUserId() + "\nselectedUserId:" +selectedUserId);
+                            }
+                        });
+
+        internalActivity.getUsersFBDatabaseRef()
+                        .child(selectedUserId)
+                        .child(CONST.FIREBASE_FRIENDS_CHILD)
+                        .child(internalActivity.getCurrentUserId())
+                        .setValue(true)
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception exc) {
+                                Log.e("LOG", "UserProfileFragment: sendAddUserToFriendsListRequest(): error(1): " +exc.getMessage());
+
+                                Log.e("LOG", "UserProfileFragment: sendAddUserToFriendsListRequest(): for \nselectedUserId:" + selectedUserId + "\ncurrentUserId: " + internalActivity.getCurrentUserId());
+                            }
+                        });
     }
 
     private void declineFriendRequest() {
@@ -809,6 +885,8 @@ public class UserProfileFragment extends ParentFragment {
 
                 hideDeclineButton();
 
+                sendDeleteUserFromFriendsListRequest();
+
                 friendsFBDatabaseRef.child(selectedUserId)
                         .addListenerForSingleValueEvent(selectedUserFriendsListValueListener);
             }
@@ -846,6 +924,8 @@ public class UserProfileFragment extends ParentFragment {
                 showSendRequestButton(R.string.text_unfriend_request);
 
                 hideDeclineButton();
+
+                sendAddUserToFriendsListRequest();
 
                 friendsFBDatabaseRef.child(selectedUserId)
                         .addListenerForSingleValueEvent(selectedUserFriendsListValueListener);

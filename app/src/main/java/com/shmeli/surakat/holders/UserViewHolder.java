@@ -50,6 +50,9 @@ public class UserViewHolder extends RecyclerView.ViewHolder {
 
             userNameTextView.setText(userName);
         }
+        else {
+            userNameTextView.setText("");
+        }
     }
 
     public void setStatus(String userStatus) {
@@ -58,6 +61,10 @@ public class UserViewHolder extends RecyclerView.ViewHolder {
             (!userStatus.equals(CONST.DEFAULT_VALUE))) {
 
             userStatusTextView.setText(userStatus);
+        }
+        else {
+
+            userStatusTextView.setText("");
         }
     }
 
