@@ -123,6 +123,12 @@ public abstract class ParentActivity extends AppCompatActivity {
 
     public abstract void setToolbarTitle(final int titleResId);
 
+    public abstract void setToolbarInfo(final int infoHeadResId,
+                                        final int infoBodyResId);
+
+    public abstract void setToolbarInfo(final int infoHeadResId,
+                                        final String infoBodyText);
+
 //    public void setCurrentUserIsOnline(boolean isOnline) {
 //
 //        if(currentUserFBDatabaseRef != null) {

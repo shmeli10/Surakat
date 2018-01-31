@@ -66,6 +66,7 @@
     <string name="text_minutes_ago">minutes ago</string>
     <string name="text_no">No</string>
     <string name="text_open_profile">Open profile</string>
+    <string name="text_online">Online: </string>
     <string name="text_profile">Profile</string>
     <string name="text_saving_changes">Saving changes</string>
     <string name="text_select_image">Select image</string>

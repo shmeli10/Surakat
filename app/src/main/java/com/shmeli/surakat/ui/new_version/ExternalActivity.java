@@ -225,6 +225,13 @@ public class ExternalActivity   extends     ParentActivity
         }
     }
 
+    @Override
+    public void setToolbarInfo(int infoHeadResId,
+                               int infoBodyResId) { }
+
+    @Override
+    public void setToolbarInfo(int infoHeadResId, String infoBodyText) { }
+
     private void showOrHideToolbarBackButton(int fragmentCode) {
         Log.e("LOG", "ExternalActivity: showOrHideToolbarBackButton()");
 

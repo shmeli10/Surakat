@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.firebase.database.DatabaseError;
@@ -50,7 +51,10 @@ public class InternalActivity   extends     ParentActivity
     private ActionBar       actionBar;
     private Toolbar         toolbar;
 
+    private LinearLayout    toolbarInfoContainer;
     private TextView        toolbarTitleTextView;
+    private TextView        toolbarInfoHeadTextView;
+    private TextView        toolbarInfoBodyTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +69,15 @@ public class InternalActivity   extends     ParentActivity
 
         toolbarTitleTextView = UiUtils.findView(toolbar,
                                                 R.id.appToolbarTitleTextView);
+
+        toolbarInfoContainer = UiUtils.findView(    toolbar,
+                                                    R.id.appToolbarInfoContainer);
+
+        toolbarInfoHeadTextView = UiUtils.findView( toolbar,
+                                                    R.id.appToolbarInfoHeadTextView);
+
+        toolbarInfoBodyTextView = UiUtils.findView( toolbar,
+                                                    R.id.appToolbarInfoBodyTextView);
 
         actionBar       = getSupportActionBar();
 
@@ -430,6 +443,67 @@ public class InternalActivity   extends     ParentActivity
 
         if(titleResId > 0) {
             toolbarTitleTextView.setText(titleResId);
+        }
+    }
+
+    @Override
+    public void setToolbarInfo(int infoHeadResId,
+                               int infoBodyResId) {
+        Log.e("LOG", "InternalActivity: setToolbarInfo()");
+
+        if(infoHeadResId <= 0 && infoBodyResId <= 0) {
+            toolbarInfoContainer.setVisibility(View.GONE);
+        }
+        else {
+            toolbarInfoContainer.setVisibility(View.VISIBLE);
+
+            if(infoHeadResId <= 0) {
+                toolbarInfoHeadTextView.setText("");
+                toolbarInfoHeadTextView.setVisibility(View.GONE);
+            }
+            else {
+                toolbarInfoHeadTextView.setText(infoHeadResId);
+                toolbarInfoHeadTextView.setVisibility(View.VISIBLE);
+            }
+
+            if(infoBodyResId <= 0) {
+                toolbarInfoBodyTextView.setText("");
+                toolbarInfoBodyTextView.setVisibility(View.GONE);
+            }
+            else {
+                toolbarInfoBodyTextView.setText(infoBodyResId);
+                toolbarInfoBodyTextView.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    @Override
+    public void setToolbarInfo(int infoHeadResId, String infoBodyText) {
+        Log.e("LOG", "InternalActivity: setToolbarInfo()");
+
+        if(infoHeadResId <= 0 && TextUtils.isEmpty(infoBodyText)) {
+            toolbarInfoContainer.setVisibility(View.GONE);
+        }
+        else {
+            toolbarInfoContainer.setVisibility(View.VISIBLE);
+
+            if(infoHeadResId <= 0) {
+                toolbarInfoHeadTextView.setText("");
+                toolbarInfoHeadTextView.setVisibility(View.GONE);
+            }
+            else {
+                toolbarInfoHeadTextView.setText(infoHeadResId);
+                toolbarInfoHeadTextView.setVisibility(View.VISIBLE);
+            }
+
+            if(TextUtils.isEmpty(infoBodyText)) {
+                toolbarInfoBodyTextView.setText("");
+                toolbarInfoBodyTextView.setVisibility(View.GONE);
+            }
+            else {
+                toolbarInfoBodyTextView.setText(infoBodyText);
+                toolbarInfoBodyTextView.setVisibility(View.VISIBLE);
+            }
         }
     }
 

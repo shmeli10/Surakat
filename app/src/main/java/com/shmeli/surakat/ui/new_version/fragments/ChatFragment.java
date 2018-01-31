@@ -180,6 +180,9 @@ public class ChatFragment extends ParentFragment {
 
                 isFragmentInitiated = true;
             }
+
+            // show info when user was online
+            internalActivity.setToolbarInfo(R.string.text_online, "1234567890");
         }
         else {
             Log.e("LOG", "ChatFragment: onCreateView(): parameter selectedUserId does not exist in Bundle");
@@ -187,6 +190,16 @@ public class ChatFragment extends ParentFragment {
 
         // Inflate the layout for this fragment
         return view;
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        Log.e("LOG", "ChatFragment: onStop()");
+
+        // hide info container
+        internalActivity.setToolbarInfo(0, 0);
     }
 
     // ----------------------------------- INIT ----------------------------------------- //

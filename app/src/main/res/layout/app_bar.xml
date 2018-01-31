@@ -7,22 +7,7 @@
     android:background="@color/colorPrimaryDark"
     android:theme="@style/Base.ThemeOverlay.AppCompat.Dark.ActionBar">
 
-    <!--<FrameLayout-->
-        <!--android:id="@+id/appToolbarBackButton"-->
-        <!--style="@style/WM"-->
-        <!--android:layout_alignParentLeft="true"-->
-        <!--android:layout_alignParentStart="true"-->
-        <!--android:layout_centerVertical="true"-->
-        <!--android:padding="@dimen/spacing_2x"-->
-        <!--android:layout_marginRight="@dimen/spacing_2x"-->
-        <!--android:clickable="true">-->
-
-        <!--<ImageButton-->
-            <!--style="@style/ActionButton"-->
-            <!--android:src="@drawable/arrow_back_icon"/>-->
-
-    <!--</FrameLayout>-->
-    <TextView
+<!--    <TextView
         android:id="@+id/appToolbarTitleTextView"
         style="@style/MW"
         android:gravity="center"
@@ -30,6 +15,48 @@
         android:layout_marginRight="@dimen/spacing_1x"
         android:textSize="@dimen/text_size_2.5x"
         android:textColor="@color/white"
-        android:layout_gravity="center"/>
+        android:layout_gravity="center"
+        android:text="Title"/>-->
+
+    <LinearLayout
+        android:id="@+id/appToolbarTextContainer"
+        style="@style/MW"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/appToolbarTitleTextView"
+            style="@style/MW"
+            android:gravity="center"
+            android:paddingRight="@dimen/spacing_6x"
+            android:layout_marginRight="@dimen/spacing_1x"
+            android:textSize="@dimen/text_size_2.5x"
+            android:textColor="@color/white"
+            android:text="Title"/>
+
+        <LinearLayout
+            android:id="@+id/appToolbarInfoContainer"
+            style="@style/MW"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/appToolbarInfoHeadTextView"
+                style="@style/WW"
+                android:layout_marginRight="@dimen/spacing_1x"
+                android:textSize="@dimen/text_size_1.5x"
+                android:textColor="@color/white"
+                android:text="В сети: "/>
+
+            <TextView
+                android:id="@+id/appToolbarInfoBodyTextView"
+                style="@style/MW"
+                android:layout_marginRight="@dimen/spacing_1x"
+                android:textSize="@dimen/text_size_1.5x"
+                android:textColor="@color/white"
+                android:text="вчера в 18:30 "/>
+
+        </LinearLayout>
+
+    </LinearLayout>
 
 </android.support.v7.widget.Toolbar>
