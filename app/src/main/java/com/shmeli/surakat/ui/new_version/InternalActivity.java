@@ -390,8 +390,7 @@ public class InternalActivity   extends     ParentActivity
         switch(fragmentCode) {
 
             case CONST.CHAT_FRAGMENT_CODE:
-                fragment = ChatFragment.newInstance(selectedUserId,
-                                                    selectedUser);
+                fragment = ChatFragment.newInstance(selectedUserId);
                 fragment.setFragmentTitleResId(R.string.text_chat);
                 break;
             case CONST.SETTINGS_FRAGMENT_CODE:

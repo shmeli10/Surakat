@@ -44,16 +44,14 @@
                 style="@style/WW"
                 android:layout_marginRight="@dimen/spacing_1x"
                 android:textSize="@dimen/text_size_1.5x"
-                android:textColor="@color/white"
-                android:text="В сети: "/>
+                android:textColor="@color/white"/>
 
             <TextView
                 android:id="@+id/appToolbarInfoBodyTextView"
                 style="@style/MW"
                 android:layout_marginRight="@dimen/spacing_1x"
                 android:textSize="@dimen/text_size_1.5x"
-                android:textColor="@color/white"
-                android:text="вчера в 18:30 "/>
+                android:textColor="@color/white"/>
 
         </LinearLayout>
 

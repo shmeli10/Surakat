@@ -35,6 +35,7 @@ import com.shmeli.surakat.data.CONST;
 import com.shmeli.surakat.model.Message;
 import com.shmeli.surakat.model.User;
 import com.shmeli.surakat.ui.new_version.InternalActivity;
+import com.shmeli.surakat.utils.GetTimeAgo;
 import com.shmeli.surakat.utils.UiUtils;
 
 import java.util.ArrayList;
@@ -52,7 +53,6 @@ public class ChatFragment extends ParentFragment {
 
     private View                    view;
 
-//    private LinearLayout            chatContainer;
     private EditText                chatMessageText;
     private TextView                chatMessageLeftCharsBodyText;
     private View                    chatTopDividerView;
@@ -74,6 +74,8 @@ public class ChatFragment extends ParentFragment {
 
     private String                  lastLoadedMessageKey    = "";
 
+    private StringBuilder           newHintSB = new StringBuilder("");
+
     private int                     currentPageCount        = 1;
     private int                     loadMoreItemPosition    = 0;
 
@@ -84,6 +86,7 @@ public class ChatFragment extends ParentFragment {
 
     private DatabaseReference       chatFBDatabaseRef;
     private DatabaseReference       messagesDatabaseRef;
+    private DatabaseReference       selectedUserFBDatabaseRef;
 
     public ChatFragment() {
         // Required empty public constructor
@@ -95,25 +98,16 @@ public class ChatFragment extends ParentFragment {
      *
      * @return A new instance of fragment ChatFragment.
      */
-    public static ChatFragment newInstance(String   selectedUserId,
-                                           User     selectedUser) {
+    public static ChatFragment newInstance(String selectedUserId) {
         Bundle args = new Bundle();
 
         if(instance == null) {
             instance = new ChatFragment();
         }
 
-        //Log.e("LOG", "ChatFragment: newInstance(): selectedUserId= " +selectedUserId);
-
         if(!TextUtils.isEmpty(selectedUserId)) {
             args.putString( CONST.USER_ID,
                             selectedUserId);
-        }
-
-        if( (selectedUser != null) &&
-            (!TextUtils.isEmpty(selectedUser.getUserName()))) {
-            args.putString( CONST.USER_NAME,
-                            selectedUser.getUserName());
         }
 
         instance.setArguments(args);
@@ -136,12 +130,7 @@ public class ChatFragment extends ParentFragment {
 
         if(getArguments().containsKey(CONST.USER_ID)) {
 
-            this.recipientId = getArguments().getString(CONST.USER_ID);
-
-            if(getArguments().containsKey(CONST.USER_NAME)) {
-
-                this.recipientName = getArguments().getString(CONST.USER_NAME);
-            }
+            this.recipientId    = getArguments().getString(CONST.USER_ID);
 
             chatMessageText     = UiUtils.findView( view,
                                                     R.id.chatMessageText);
@@ -180,12 +169,9 @@ public class ChatFragment extends ParentFragment {
 
                 isFragmentInitiated = true;
             }
-
-            // show info when user was online
-            internalActivity.setToolbarInfo(R.string.text_online, "1234567890");
         }
         else {
-            Log.e("LOG", "ChatFragment: onCreateView(): parameter selectedUserId does not exist in Bundle");
+            Log.e("LOG", "ChatFragment: onCreateView(): error: parameter selectedUserId does not exist in Bundle");
         }
 
         // Inflate the layout for this fragment
@@ -196,10 +182,12 @@ public class ChatFragment extends ParentFragment {
     public void onStop() {
         super.onStop();
 
-        Log.e("LOG", "ChatFragment: onStop()");
+        //Log.e("LOG", "ChatFragment: onStop()");
 
         // hide info container
         internalActivity.setToolbarInfo(0, 0);
+
+        selectedUserFBDatabaseRef.addValueEventListener(null);
     }
 
     // ----------------------------------- INIT ----------------------------------------- //
@@ -212,6 +200,18 @@ public class ChatFragment extends ParentFragment {
         if( (!TextUtils.isEmpty(senderId)) &&
             (!TextUtils.isEmpty(recipientId))) {
 
+            selectedUserFBDatabaseRef   = internalActivity.getRootFBDatabaseRef()
+                                                            .child(CONST.FIREBASE_USERS_CHILD)
+                                                            .child(recipientId);
+
+            if(selectedUserFBDatabaseRef != null) {
+                selectedUserFBDatabaseRef.keepSynced(true);
+                selectedUserFBDatabaseRef.addValueEventListener(selectedUserDataListener);
+            }
+            else {
+                Log.e("LOG", "ChatFragment: init(): error: selectedUserFBDatabaseRef is null");
+            }
+
             chatFBDatabaseRef = internalActivity.getRootFBDatabaseRef().child(CONST.FIREBASE_CHAT_CHILD)
                                                                         .child(senderId);
             chatFBDatabaseRef.addValueEventListener(chatDataListener);
@@ -219,6 +219,55 @@ public class ChatFragment extends ParentFragment {
             loadMessages();
         }
     }
+
+    // ------------------------------ VALUE EVENT LISTENERS ----------------------------------- //
+
+    ValueEventListener selectedUserDataListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+
+            //Log.e("LOG", "ChatFragment: selectedUserDataListener: onDataChange()");
+
+            if(dataSnapshot != null) {
+
+                String selectedUserName         = dataSnapshot.child(CONST.USER_NAME).getValue().toString();
+
+                long selectedUserLastSeen       = (long) dataSnapshot.child(CONST.USER_LAST_SEEN).getValue();
+
+                boolean selectedUserIsOnline    = (boolean) dataSnapshot.child(CONST.USER_IS_ONLINE).getValue();
+
+
+                if( (!TextUtils.isEmpty(selectedUserName)) &&
+                    (!selectedUserName.equals(CONST.DEFAULT_VALUE))) {
+
+                    recipientName = selectedUserName;
+
+                    if(chatMessageText.length() <= 0) {
+                        setRecipientNameAtHint();
+                    }
+                }
+
+                StringBuilder onlineValueSB = new StringBuilder("");
+
+                if(selectedUserIsOnline) {
+                    onlineValueSB.append(getString(R.string.text_now));
+                }
+                else {
+                    onlineValueSB.append(GetTimeAgo.newInstance().getTimeAgo(   selectedUserLastSeen,
+                                                                                getActivity()));
+                }
+
+                internalActivity.setToolbarInfo(R.string.text_online,
+                                                onlineValueSB.toString());
+            }
+            else {
+                Log.e("LOG", "UserProfileFragment: selectedUserDataListener: error: dataSnapshot is null");
+            }
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) { }
+    };
 
     // ------------------------------ OTHER ----------------------------------------------- //
 
@@ -293,7 +342,7 @@ public class ChatFragment extends ParentFragment {
     }
 
     private long getAllMessagesCount() {
-        Log.e("LOG", "ChatFragment: getAllMessagesCount()");
+        //Log.e("LOG", "ChatFragment: getAllMessagesCount()");
 
         messagesDatabaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -308,7 +357,27 @@ public class ChatFragment extends ParentFragment {
             public void onCancelled(DatabaseError databaseError) { }
         });
 
-        return allMessagesSum; // result[0];
+        return allMessagesSum;
+    }
+
+    private void setRecipientNameAtHint() {
+        //Log.e("LOG", "ChatFragment: setRecipientNameAtHint()");
+
+        if(!TextUtils.isEmpty(recipientName) &&
+            newHintSB.length() == 0) {
+
+            String currentHint = chatMessageText.getHint().toString();
+
+            int threeDotsPosition = currentHint.indexOf("...");
+
+            newHintSB = new StringBuilder("");
+            newHintSB.append(currentHint.substring(0, threeDotsPosition));
+            newHintSB.append(" to ");
+            newHintSB.append(recipientName);
+            newHintSB.append(currentHint.substring(threeDotsPosition, currentHint.length()));
+        }
+
+        chatMessageText.setHint(newHintSB.toString());
     }
 
     // ------------------------------ LOAD MESSAGES --------------------------------------- //
@@ -328,7 +397,7 @@ public class ChatFragment extends ParentFragment {
             loadMessageQuery.addChildEventListener(loadMessagesEventListener);
         }
         else
-            Log.e("LOG", "ChatFragment: loadMessages(): messagesDatabaseRef is null");
+            Log.e("LOG", "ChatFragment: loadMessages(): error: messagesDatabaseRef is null");
     }
 
     private void loadMoreMessages() {
@@ -360,6 +429,10 @@ public class ChatFragment extends ParentFragment {
 
             // set available amount of characters
             chatMessageLeftCharsBodyText.setText(String.valueOf(CONST.PUBLICATION_MAX_LENGTH - chatMessageText.length()));
+
+            if(chatMessageText.length() <= 0) {
+                setRecipientNameAtHint();
+            }
         }
 
         @Override

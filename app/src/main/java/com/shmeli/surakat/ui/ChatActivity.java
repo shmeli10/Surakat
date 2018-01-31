@@ -977,8 +977,9 @@ public class ChatActivity extends AppCompatActivity {
 
                         long lastTime = Long.parseLong(userLastSeenTimeInMillis);
 
-                        recipientLastSeen = getTimeAgo.getTimeAgo(  lastTime,
-                                                                    getApplicationContext());
+                        recipientLastSeen = "";
+//                                getTimeAgo.getTimeAgo(  lastTime,
+//                                                                    getApplicationContext());
 
                         Log.e("LOG", "ChatActivity: recipientDataListener.onDataChange(): recipientLastSeen= " +recipientLastSeen);
 
