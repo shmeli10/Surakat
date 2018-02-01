@@ -1,6 +1,7 @@
 package com.shmeli.surakat.ui.new_version.fragments;
 
 
+import android.content.Context;
 import android.os.Bundle;
 
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -33,7 +34,6 @@ import com.shmeli.surakat.R;
 import com.shmeli.surakat.adapters.MessageAdapter;
 import com.shmeli.surakat.data.CONST;
 import com.shmeli.surakat.model.Message;
-import com.shmeli.surakat.model.User;
 import com.shmeli.surakat.ui.new_version.InternalActivity;
 import com.shmeli.surakat.utils.GetTimeAgo;
 import com.shmeli.surakat.utils.UiUtils;
@@ -120,7 +120,7 @@ public class ChatFragment extends ParentFragment {
                              ViewGroup      container,
                              Bundle         savedInstanceState) {
 
-        Log.e("LOG", "ChatFragment: onCreateView()");
+        //Log.e("LOG", "ChatFragment: onCreateView()");
 
         view = inflater.inflate(R.layout.fragment_chat,
                                 container,
@@ -130,35 +130,35 @@ public class ChatFragment extends ParentFragment {
 
         if(getArguments().containsKey(CONST.USER_ID)) {
 
-            this.recipientId    = getArguments().getString(CONST.USER_ID);
+            this.recipientId            = getArguments().getString(CONST.USER_ID);
 
-            chatMessageText     = UiUtils.findView( view,
-                                                    R.id.chatMessageText);
+            chatMessageText             = UiUtils.findView( view,
+                                                            R.id.chatMessageText);
             chatMessageText.addTextChangedListener(onTextChangedListener);
 
             chatMessageLeftCharsBodyText = UiUtils.findView(view,
                                                             R.id.chatMessageLeftCharsBody);
             chatMessageLeftCharsBodyText.setText(String.valueOf(CONST.PUBLICATION_MAX_LENGTH));
 
-            chatTopDividerView  = UiUtils.findView( view,
-                                                    R.id.chatTopDividerView);
+            chatTopDividerView          = UiUtils.findView( view,
+                                                            R.id.chatTopDividerView);
 
-            chatSendButton      = UiUtils.findView( view,
-                                                    R.id.chatSendButton);
+            chatSendButton              = UiUtils.findView( view,
+                                                            R.id.chatSendButton);
             chatSendButton.setOnClickListener(sendClickListener);
 
-            chatSwipeRefreshLayout  = UiUtils.findView( view,
-                                                        R.id.chatSwipeRefreshLayout);
+            chatSwipeRefreshLayout      = UiUtils.findView( view,
+                                                            R.id.chatSwipeRefreshLayout);
             chatSwipeRefreshLayout.setOnRefreshListener(swipeRefreshListener);
 
-            messageAdapter      = new MessageAdapter(   getActivity(),
-                                                        messagesList,
-                                                        recipientName);
+            messageAdapter              = new MessageAdapter(   getActivity(),
+                                                                messagesList,
+                                                                recipientName);
 
-            linearLayoutManager = new LinearLayoutManager(getActivity());
+            linearLayoutManager         = new LinearLayoutManager(getActivity());
 
-            chatMessagesList    = UiUtils.findView( view,
-                                                    R.id.chatMessagesList);
+            chatMessagesList            = UiUtils.findView( view,
+                                                            R.id.chatMessagesList);
             chatMessagesList.setHasFixedSize(true);
             chatMessagesList.setLayoutManager(linearLayoutManager);
             chatMessagesList.setAdapter(messageAdapter);
@@ -169,6 +169,8 @@ public class ChatFragment extends ParentFragment {
 
                 isFragmentInitiated = true;
             }
+
+            setSelectedUserFBDatabaseRef();
         }
         else {
             Log.e("LOG", "ChatFragment: onCreateView(): error: parameter selectedUserId does not exist in Bundle");
@@ -181,36 +183,37 @@ public class ChatFragment extends ParentFragment {
     @Override
     public void onStop() {
         super.onStop();
-
         //Log.e("LOG", "ChatFragment: onStop()");
 
         // hide info container
         internalActivity.setToolbarInfo(0, 0);
-
-        selectedUserFBDatabaseRef.addValueEventListener(null);
     }
 
     // ----------------------------------- INIT ----------------------------------------- //
 
+    private void setSelectedUserFBDatabaseRef() {
+        //Log.e("LOG", "ChatFragment: setSelectedUserFBDatabaseRef()");
+
+        selectedUserFBDatabaseRef = internalActivity.getRootFBDatabaseRef()
+                                                    .child(CONST.FIREBASE_USERS_CHILD)
+                                                    .child(recipientId);
+
+        if(selectedUserFBDatabaseRef != null) {
+            selectedUserFBDatabaseRef.keepSynced(true);
+            selectedUserFBDatabaseRef.addValueEventListener(selectedUserDataListener);
+        }
+        else {
+            Log.e("LOG", "ChatFragment: setSelectedUserFBDatabaseRef(): error: selectedUserFBDatabaseRef is null");
+        }
+    }
+
     private void init() {
-        Log.e("LOG", "ChatFragment: init()");
+        //Log.e("LOG", "ChatFragment: init()");
 
         senderId = internalActivity.getCurrentUserId();
 
         if( (!TextUtils.isEmpty(senderId)) &&
             (!TextUtils.isEmpty(recipientId))) {
-
-            selectedUserFBDatabaseRef   = internalActivity.getRootFBDatabaseRef()
-                                                            .child(CONST.FIREBASE_USERS_CHILD)
-                                                            .child(recipientId);
-
-            if(selectedUserFBDatabaseRef != null) {
-                selectedUserFBDatabaseRef.keepSynced(true);
-                selectedUserFBDatabaseRef.addValueEventListener(selectedUserDataListener);
-            }
-            else {
-                Log.e("LOG", "ChatFragment: init(): error: selectedUserFBDatabaseRef is null");
-            }
 
             chatFBDatabaseRef = internalActivity.getRootFBDatabaseRef().child(CONST.FIREBASE_CHAT_CHILD)
                                                                         .child(senderId);
@@ -225,17 +228,17 @@ public class ChatFragment extends ParentFragment {
     ValueEventListener selectedUserDataListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-
             //Log.e("LOG", "ChatFragment: selectedUserDataListener: onDataChange()");
 
-            if(dataSnapshot != null) {
+            // if data exists and fragment is attached to activity
+            if( dataSnapshot != null &&
+                isAdded()) {
 
                 String selectedUserName         = dataSnapshot.child(CONST.USER_NAME).getValue().toString();
 
                 long selectedUserLastSeen       = (long) dataSnapshot.child(CONST.USER_LAST_SEEN).getValue();
 
                 boolean selectedUserIsOnline    = (boolean) dataSnapshot.child(CONST.USER_IS_ONLINE).getValue();
-
 
                 if( (!TextUtils.isEmpty(selectedUserName)) &&
                     (!selectedUserName.equals(CONST.DEFAULT_VALUE))) {
@@ -261,7 +264,7 @@ public class ChatFragment extends ParentFragment {
                                                 onlineValueSB.toString());
             }
             else {
-                Log.e("LOG", "UserProfileFragment: selectedUserDataListener: error: dataSnapshot is null");
+                Log.e("LOG", "ChatFragment: selectedUserDataListener: error: dataSnapshot is null");
             }
         }
 
@@ -383,14 +386,13 @@ public class ChatFragment extends ParentFragment {
     // ------------------------------ LOAD MESSAGES --------------------------------------- //
 
     private void loadMessages() {
-        Log.e("LOG", "ChatFragment: loadMessages()");
+        //Log.e("LOG", "ChatFragment: loadMessages()");
 
         messagesDatabaseRef = internalActivity.getRootFBDatabaseRef().child(CONST.FIREBASE_MESSAGES_CHILD)
                                                                         .child(senderId)
                                                                         .child(recipientId);
 
         if(messagesDatabaseRef != null) {
-
             messagesList.clear();
 
             Query loadMessageQuery = messagesDatabaseRef.limitToLast(currentPageCount * CONST.LOAD_MESSAGES_COUNT);

@@ -20,19 +20,20 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ServerValue;
-import com.google.firebase.database.ValueEventListener;
+
 import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
 import com.shmeli.surakat.interfaces.TransferSelectedUser;
 import com.shmeli.surakat.model.User;
+
 import com.shmeli.surakat.ui.new_version.fragments.ChatFragment;
 import com.shmeli.surakat.ui.new_version.fragments.ParentFragment;
 import com.shmeli.surakat.ui.new_version.fragments.SettingsFragment;
 import com.shmeli.surakat.ui.new_version.fragments.TabsFragment;
 import com.shmeli.surakat.ui.new_version.fragments.UserProfileFragment;
 import com.shmeli.surakat.ui.new_version.fragments.UserStatusFragment;
+
 import com.shmeli.surakat.utils.UiUtils;
 
 import java.text.SimpleDateFormat;
@@ -61,7 +62,7 @@ public class InternalActivity   extends     ParentActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_internal);
 
-        Log.e("LOG", "InternalActivity: onCreate()");
+        //Log.e("LOG", "InternalActivity: onCreate()");
 
         toolbar         = UiUtils.findView( this,
                                             R.id.internalActivityToolbar);
@@ -117,8 +118,7 @@ public class InternalActivity   extends     ParentActivity
     @Override
     protected void onStart() {
         super.onStart();
-
-        Log.e("LOG", "InternalActivity: onStart()");
+        //Log.e("LOG", "InternalActivity: onStart()");
 
         changeUserOnlineStatus(true);
     }
@@ -126,15 +126,13 @@ public class InternalActivity   extends     ParentActivity
     @Override
     protected void onResume() {
         super.onResume();
-
-        Log.e("LOG", "InternalActivity: onResume()");
+        //Log.e("LOG", "InternalActivity: onResume()");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-
-        Log.e("LOG", "InternalActivity: onStop()");
+        //Log.e("LOG", "InternalActivity: onStop()");
 
         changeUserOnlineStatus(false);
     }
@@ -142,30 +140,25 @@ public class InternalActivity   extends     ParentActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-        Log.e("LOG", "InternalActivity: onDestroy()");
+        //Log.e("LOG", "InternalActivity: onDestroy()");
     }
 
     // ----------------------------------- OTHER ----------------------------------------- //
 
     private void init() {
-        Log.e("LOG", "InternalActivity: init()");
+        //Log.e("LOG", "InternalActivity: init()");
 
         if(initCurrentUser() &&
            currentUserExistsInFBDB()) {
 
             int toolbarTitleResId = 0;
 
-            Log.e("LOG", "InternalActivity: init(): initCurrentUser success");
+            //Log.e("LOG", "InternalActivity: init(): initCurrentUser success");
 
             FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.addOnBackStackChangedListener(this);
 
-            //Log.e("LOG", "InternalActivity: init(): tabsFragment name: " +(TabsFragment.newInstance().getClass().getName()));
-
             tabsFragment = (TabsFragment) fragmentManager.findFragmentByTag(TabsFragment.newInstance().getClass().getName()); //CONST.TABS_FRAGMENT_NAME);
-
-            //Log.e("LOG", "InternalActivity: init(): tabsFragment is null: " +(tabsFragment == null));
 
             // first start of app and need to create the tabsFragment
             if (tabsFragment == null) {
@@ -213,10 +206,8 @@ public class InternalActivity   extends     ParentActivity
             }
             // if resource identifier for toolbar title is incorrect
             else {
-                Log.e("LOG", "InternalActivity: init(): toolbarTitleResId has incorrect value= " +toolbarTitleResId);
+                Log.e("LOG", "InternalActivity: init(): error: toolbarTitleResId has incorrect value= " +toolbarTitleResId);
             }
-
-            //getCurrentUserFBDatabaseRef().addListenerForSingleValueEvent(currentUserDataChangeListener);
         }
         else {
 
@@ -313,8 +304,7 @@ public class InternalActivity   extends     ParentActivity
     }
 
     private void changeUserOnlineStatus(boolean userIsOnline) {
-
-        Log.e("LOG", "InternalActivity: changeUserOnlineStatus(): to: " +userIsOnline);
+        //Log.e("LOG", "InternalActivity: changeUserOnlineStatus(): to: " +userIsOnline);
 
         if(userIsOnline) {
             getCurrentUserFBDatabaseRef().child(CONST.USER_IS_ONLINE).setValue(true);
@@ -336,13 +326,11 @@ public class InternalActivity   extends     ParentActivity
         //Log.e("LOG", "InternalActivity: onTransferSelectedUserSuccess(): targetFragmentCode: " +targetFragmentCode);
 
         if(targetFragmentCode <= 0) {
-            Log.e("LOG", "InternalActivity: onTransferSelectedUserSuccess(): incorrect targetFragmentCode: " +targetFragmentCode);
-
+            Log.e("LOG", "InternalActivity: onTransferSelectedUserSuccess(): error: incorrect targetFragmentCode: " +targetFragmentCode);
             return;
         }
 
         if(!TextUtils.isEmpty(selectedUserKey)) {
-
             //Log.e("LOG", "InternalActivity: onTransferSelectedUserSuccess(): selectedUserKey: " + selectedUserKey);
 
             setSecondLayerFragment( targetFragmentCode,
@@ -358,23 +346,19 @@ public class InternalActivity   extends     ParentActivity
 
     @Override
     public void onBackStackChanged() {
-        Log.e("LOG", "InternalActivity: onBackStackChanged()");
+        //Log.e("LOG", "InternalActivity: onBackStackChanged()");
 
         FragmentManager fragmentManager = getFragmentManager();
 
         int backStackSize = fragmentManager.getBackStackEntryCount();
 
-        //Log.e("LOG", "InternalActivity: onBackStackChanged(): backStackSize= " +backStackSize);
-
         if(backStackSize > 0) {
-
             ParentFragment fragment = (ParentFragment) fragmentManager.findFragmentByTag(fragmentManager.getBackStackEntryAt(backStackSize - 1).getName());
             setToolbarTitle(fragment.getFragmentTitleResId());
 
             showOrHideToolbarBackButton(fragment.getFragmentCode());
         }
         else {
-
             finish();
         }
     }
@@ -383,7 +367,7 @@ public class InternalActivity   extends     ParentActivity
     public void setSecondLayerFragment(int      fragmentCode,
                                        String   selectedUserId,
                                        User     selectedUser) {
-        Log.e("LOG", "InternalActivity: setSecondLayerFragment()");
+        //Log.e("LOG", "InternalActivity: setSecondLayerFragment()");
 
         ParentFragment fragment = null;
 
@@ -418,16 +402,20 @@ public class InternalActivity   extends     ParentActivity
             addSecondLayerFragment(fragment);
         }
         else {
-            Log.e("LOG", "InternalActivity: setSecondLayerFragment(): fragment is null");
+            Log.e("LOG", "InternalActivity: setSecondLayerFragment(): error: fragment is null");
         }
     }
 
     @Override
     public void onBackPressed() {
-        Log.e("LOG", "InternalActivity: onBackPressed()");
+        //Log.e("LOG", "InternalActivity: onBackPressed()");
 
-        if (getFragmentManager().getBackStackEntryCount() > 0) {
-            getFragmentManager().popBackStack();
+        FragmentManager fragmentManager = getFragmentManager();
+
+        int backStackSize = fragmentManager.getBackStackEntryCount();
+
+        if (backStackSize > 0) {
+            fragmentManager.popBackStack();
         }
         else {
             super.onBackPressed();
@@ -438,7 +426,7 @@ public class InternalActivity   extends     ParentActivity
 
     @Override
     public void setToolbarTitle(int titleResId) {
-        Log.e("LOG", "InternalActivity: setToolbarTitle()");
+        //Log.e("LOG", "InternalActivity: setToolbarTitle()");
 
         if(titleResId > 0) {
             toolbarTitleTextView.setText(titleResId);
@@ -448,7 +436,7 @@ public class InternalActivity   extends     ParentActivity
     @Override
     public void setToolbarInfo(int infoHeadResId,
                                int infoBodyResId) {
-        Log.e("LOG", "InternalActivity: setToolbarInfo()");
+        //Log.e("LOG", "InternalActivity: setToolbarInfo()");
 
         if(infoHeadResId <= 0 && infoBodyResId <= 0) {
             toolbarInfoContainer.setVisibility(View.GONE);
@@ -478,7 +466,7 @@ public class InternalActivity   extends     ParentActivity
 
     @Override
     public void setToolbarInfo(int infoHeadResId, String infoBodyText) {
-        Log.e("LOG", "InternalActivity: setToolbarInfo()");
+        //Log.e("LOG", "InternalActivity: setToolbarInfo()");
 
         if(infoHeadResId <= 0 && TextUtils.isEmpty(infoBodyText)) {
             toolbarInfoContainer.setVisibility(View.GONE);
@@ -507,7 +495,7 @@ public class InternalActivity   extends     ParentActivity
     }
 
     private void showOrHideToolbarBackButton(int fragmentCode) {
-        Log.e("LOG", "InternalActivity: showOrHideToolbarBackButton()");
+        //Log.e("LOG", "InternalActivity: showOrHideToolbarBackButton()");
 
         switch (fragmentCode) {
 
@@ -527,7 +515,7 @@ public class InternalActivity   extends     ParentActivity
     }
 
     private void showToolbarBackButton() {
-        Log.e("LOG", "InternalActivity: showToolbarBackButton()");
+        //Log.e("LOG", "InternalActivity: showToolbarBackButton()");
 
         if(actionBar != null) {
 
@@ -537,7 +525,7 @@ public class InternalActivity   extends     ParentActivity
     }
 
     private void hideToolbarBackButton() {
-        Log.e("LOG", "InternalActivity: hideToolbarBackButton()");
+        //Log.e("LOG", "InternalActivity: hideToolbarBackButton()");
 
         if(actionBar != null) {
 
@@ -545,23 +533,4 @@ public class InternalActivity   extends     ParentActivity
             actionBar.setDisplayShowHomeEnabled(false);
         }
     }
-
-    // ------------------------------ LISTENERS ----------------------------------------- //
-
-    ValueEventListener currentUserDataChangeListener = new ValueEventListener() {
-        @Override
-        public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
-
-            //Log.e("LOG", "InternalActivity: currentUserDataChangeListener: onDataChange()");
-
-/*            if(dataSnapshot != null) {
-
-                currentUserFBDatabaseRef.child(CONST.USER_IS_ONLINE).onDisconnect().setValue(false);
-                currentUserFBDatabaseRef.child(CONST.USER_LAST_SEEN).setValue(ServerValue.TIMESTAMP);
-            }*/
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) { }
-    };
 }
