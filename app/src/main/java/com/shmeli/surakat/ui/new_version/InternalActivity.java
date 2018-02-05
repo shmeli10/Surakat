@@ -20,20 +20,26 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ServerValue;
 
+import com.google.firebase.database.ValueEventListener;
 import com.shmeli.surakat.R;
 import com.shmeli.surakat.data.CONST;
 import com.shmeli.surakat.interfaces.TransferSelectedUser;
 import com.shmeli.surakat.model.User;
 
 import com.shmeli.surakat.ui.new_version.fragments.ChatFragment;
+import com.shmeli.surakat.ui.new_version.fragments.FragmentWithInfoInToolbar;
 import com.shmeli.surakat.ui.new_version.fragments.ParentFragment;
 import com.shmeli.surakat.ui.new_version.fragments.SettingsFragment;
 import com.shmeli.surakat.ui.new_version.fragments.TabsFragment;
 import com.shmeli.surakat.ui.new_version.fragments.UserProfileFragment;
 import com.shmeli.surakat.ui.new_version.fragments.UserStatusFragment;
 
+import com.shmeli.surakat.utils.GetTimeAgo;
 import com.shmeli.surakat.utils.UiUtils;
 
 import java.text.SimpleDateFormat;
@@ -56,6 +62,8 @@ public class InternalActivity   extends     ParentActivity
     private TextView        toolbarTitleTextView;
     private TextView        toolbarInfoHeadTextView;
     private TextView        toolbarInfoBodyTextView;
+
+    private DatabaseReference selectedUserFBDatabaseRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,8 +161,6 @@ public class InternalActivity   extends     ParentActivity
 
             int toolbarTitleResId = 0;
 
-            //Log.e("LOG", "InternalActivity: init(): initCurrentUser success");
-
             FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.addOnBackStackChangedListener(this);
 
@@ -183,7 +189,6 @@ public class InternalActivity   extends     ParentActivity
 
                 // if back stack contains not only tabsFragment
                 if(backStackSize > 1) {
-
                     //Log.e("LOG", "InternalActivity: init(): fragment name: " +fragmentManager.getBackStackEntryAt(backStackSize - 1).getName());
 
                     // get the last back stack fragments
@@ -315,6 +320,37 @@ public class InternalActivity   extends     ParentActivity
         }
     }
 
+    private void setSelectedUserFBDatabaseRef(String selectedUserId) {
+        //Log.e("LOG", "InternalActivity: setSelectedUserFBDatabaseRef()");
+
+        selectedUserFBDatabaseRef = getRootFBDatabaseRef()
+                                    .child(CONST.FIREBASE_USERS_CHILD)
+                                    .child(selectedUserId);
+
+        if(selectedUserFBDatabaseRef != null) {
+            selectedUserFBDatabaseRef.keepSynced(true);
+            selectedUserFBDatabaseRef.addValueEventListener(selectedUserDataListener);
+        }
+        else {
+            Log.e("LOG", "InternalActivity: setSelectedUserFBDatabaseRef(): error: selectedUserFBDatabaseRef is null");
+        }
+    }
+
+    public ParentFragment getCurrentFragment() {
+
+        ParentFragment fragment = null;
+
+        FragmentManager fragmentManager = getFragmentManager();
+
+        int backStackSize = fragmentManager.getBackStackEntryCount();
+
+        if(backStackSize > 0) {
+            fragment = (ParentFragment) fragmentManager.findFragmentByTag(fragmentManager.getBackStackEntryAt(backStackSize - 1).getName());
+        }
+
+        return fragment;
+    }
+
     // ----------------------------------- FRAGMENTS ----------------------------------------- //
 
     @Override
@@ -348,15 +384,29 @@ public class InternalActivity   extends     ParentActivity
     public void onBackStackChanged() {
         //Log.e("LOG", "InternalActivity: onBackStackChanged()");
 
-        FragmentManager fragmentManager = getFragmentManager();
+        ParentFragment fragment = getCurrentFragment();
 
-        int backStackSize = fragmentManager.getBackStackEntryCount();
-
-        if(backStackSize > 0) {
-            ParentFragment fragment = (ParentFragment) fragmentManager.findFragmentByTag(fragmentManager.getBackStackEntryAt(backStackSize - 1).getName());
+        if(fragment != null) {
             setToolbarTitle(fragment.getFragmentTitleResId());
 
             showOrHideToolbarBackButton(fragment.getFragmentCode());
+
+            if(fragment instanceof FragmentWithInfoInToolbar) {
+
+                FragmentWithInfoInToolbar fragmentWithInfoInToolbar = (FragmentWithInfoInToolbar) fragment;
+
+                if(!TextUtils.isEmpty(fragmentWithInfoInToolbar.getFragmentInfoBodyText())) {
+                    setToolbarInfo( fragmentWithInfoInToolbar.getFragmentInfoHeadResId(),
+                                    fragmentWithInfoInToolbar.getFragmentInfoBodyText());
+                }
+                else {
+                    setToolbarInfo( fragmentWithInfoInToolbar.getFragmentInfoHeadResId(),
+                                    fragmentWithInfoInToolbar.getFragmentInfoBodyResId());
+                }
+            }
+            else {
+                setToolbarInfo(0, 0);
+            }
         }
         else {
             finish();
@@ -368,14 +418,24 @@ public class InternalActivity   extends     ParentActivity
                                        String   selectedUserId,
                                        User     selectedUser) {
         //Log.e("LOG", "InternalActivity: setSecondLayerFragment()");
+        //Log.e("LOG", "InternalActivity: setSecondLayerFragment(): fragmentCode: " +fragmentCode);
 
         ParentFragment fragment = null;
 
         switch(fragmentCode) {
 
             case CONST.CHAT_FRAGMENT_CODE:
-                fragment = ChatFragment.newInstance(selectedUserId);
+                Log.e("LOG", "InternalActivity: setSecondLayerFragment(): selectedUserId: " +selectedUserId);
+                Log.e("LOG", "InternalActivity: setSecondLayerFragment(): selectedUserName: " +selectedUser.getUserName());
+
+//                fragment = ChatFragment.newInstance(selectedUserId,
+//                                                    selectedUser.getUserName());
+                fragment = ChatFragment.newInstance();
+                ((ChatFragment) fragment).setRecipientData( selectedUserId,
+                                                            selectedUser.getUserName());
                 fragment.setFragmentTitleResId(R.string.text_chat);
+
+                setSelectedUserFBDatabaseRef(selectedUserId);
                 break;
             case CONST.SETTINGS_FRAGMENT_CODE:
                 fragment = SettingsFragment.newInstance();
@@ -438,26 +498,23 @@ public class InternalActivity   extends     ParentActivity
                                int infoBodyResId) {
         //Log.e("LOG", "InternalActivity: setToolbarInfo()");
 
-        if(infoHeadResId <= 0 && infoBodyResId <= 0) {
+        if (infoHeadResId <= 0 && infoBodyResId <= 0) {
             toolbarInfoContainer.setVisibility(View.GONE);
-        }
-        else {
+        } else {
             toolbarInfoContainer.setVisibility(View.VISIBLE);
 
-            if(infoHeadResId <= 0) {
+            if (infoHeadResId <= 0) {
                 toolbarInfoHeadTextView.setText("");
                 toolbarInfoHeadTextView.setVisibility(View.GONE);
-            }
-            else {
+            } else {
                 toolbarInfoHeadTextView.setText(infoHeadResId);
                 toolbarInfoHeadTextView.setVisibility(View.VISIBLE);
             }
 
-            if(infoBodyResId <= 0) {
+            if (infoBodyResId <= 0) {
                 toolbarInfoBodyTextView.setText("");
                 toolbarInfoBodyTextView.setVisibility(View.GONE);
-            }
-            else {
+            } else {
                 toolbarInfoBodyTextView.setText(infoBodyResId);
                 toolbarInfoBodyTextView.setVisibility(View.VISIBLE);
             }
@@ -465,29 +522,28 @@ public class InternalActivity   extends     ParentActivity
     }
 
     @Override
-    public void setToolbarInfo(int infoHeadResId, String infoBodyText) {
+    public void setToolbarInfo(int      infoHeadResId,
+                               String   infoBodyText) {
         //Log.e("LOG", "InternalActivity: setToolbarInfo()");
 
-        if(infoHeadResId <= 0 && TextUtils.isEmpty(infoBodyText)) {
+        if (infoHeadResId <= 0 && TextUtils.isEmpty(infoBodyText)) {
             toolbarInfoContainer.setVisibility(View.GONE);
-        }
-        else {
+
+        } else {
             toolbarInfoContainer.setVisibility(View.VISIBLE);
 
-            if(infoHeadResId <= 0) {
+            if (infoHeadResId <= 0) {
                 toolbarInfoHeadTextView.setText("");
                 toolbarInfoHeadTextView.setVisibility(View.GONE);
-            }
-            else {
+            } else {
                 toolbarInfoHeadTextView.setText(infoHeadResId);
                 toolbarInfoHeadTextView.setVisibility(View.VISIBLE);
             }
 
-            if(TextUtils.isEmpty(infoBodyText)) {
+            if (TextUtils.isEmpty(infoBodyText)) {
                 toolbarInfoBodyTextView.setText("");
                 toolbarInfoBodyTextView.setVisibility(View.GONE);
-            }
-            else {
+            } else {
                 toolbarInfoBodyTextView.setText(infoBodyText);
                 toolbarInfoBodyTextView.setVisibility(View.VISIBLE);
             }
@@ -533,4 +589,51 @@ public class InternalActivity   extends     ParentActivity
             actionBar.setDisplayShowHomeEnabled(false);
         }
     }
+
+    // ------------------------------ VALUE EVENT LISTENERS ----------------------------------- //
+
+    ValueEventListener selectedUserDataListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            //Log.e("LOG", "InternalActivity: selectedUserDataListener: onDataChange()");
+
+            // if data exists
+            if(dataSnapshot != null) {
+
+                long selectedUserLastSeen       = (long) dataSnapshot.child(CONST.USER_LAST_SEEN).getValue();
+
+                boolean selectedUserIsOnline    = (boolean) dataSnapshot.child(CONST.USER_IS_ONLINE).getValue();
+
+                StringBuilder onlineValueSB = new StringBuilder("");
+
+                if(selectedUserIsOnline) {
+                    onlineValueSB.append(getString(R.string.text_now));
+                }
+                else {
+                    onlineValueSB.append(GetTimeAgo.newInstance().getTimeAgo(   selectedUserLastSeen,
+                                                                                getApplicationContext()));
+                }
+
+                ParentFragment fragment = getCurrentFragment();
+
+                if( fragment != null &&
+                    fragment instanceof FragmentWithInfoInToolbar) {
+
+                    FragmentWithInfoInToolbar fragmentWithInfoInToolbar = (FragmentWithInfoInToolbar) fragment;
+
+                    fragmentWithInfoInToolbar.setFragmentInfoHeadResId(R.string.text_online);
+                    fragmentWithInfoInToolbar.setFragmentInfoBodyText(onlineValueSB.toString());
+
+                    setToolbarInfo( R.string.text_online,
+                                    onlineValueSB.toString());
+                }
+            }
+            else {
+                Log.e("LOG", "InternalActivity: selectedUserDataListener: error: dataSnapshot is null");
+            }
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) { }
+    };
 }

@@ -11,9 +11,9 @@ import android.support.annotation.Nullable;
 
 public abstract class ParentFragment extends Fragment {
 
-    public int fragmentCode;
+    private int fragmentCode;
 
-    public int fragmentTitleResId;
+    private int fragmentTitleResId;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -40,6 +40,7 @@ public abstract class ParentFragment extends Fragment {
     }
 
     public void setFragmentTitleResId(int fragmentTitleResId) {
-        this.fragmentTitleResId = fragmentTitleResId;
+        if(fragmentTitleResId >= 0)
+            this.fragmentTitleResId = fragmentTitleResId;
     }
 }
