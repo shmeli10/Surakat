@@ -769,7 +769,7 @@ public class ChatActivity extends AppCompatActivity {
 
         if(!TextUtils.isEmpty(senderId)) {
 
-            chatFBDatabaseRef = rootFBDatabaseRef.child(CONST.FIREBASE_CHAT_CHILD).child(senderId);
+            //chatFBDatabaseRef = rootFBDatabaseRef.child(CONST.FIREBASE_CHAT_CHILD).child(senderId);
             chatFBDatabaseRef.addValueEventListener(chatDataListener);
 
             senderFBDatabaseRef = usersFBDatabaseRef.child(senderId);

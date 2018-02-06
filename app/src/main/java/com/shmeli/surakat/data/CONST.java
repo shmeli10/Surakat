@@ -8,7 +8,7 @@ public class CONST {
 
     public static final String FIREBASE_BASE_LINK               = "https://surakat-80b2e.firebaseio.com";
 
-    public static final String FIREBASE_CHAT_CHILD              = "Chat";
+    //public static final String FIREBASE_CHAT_CHILD              = "Chat";
 
     public static final String FIREBASE_FRIENDS_CHILD           = "Friends";
 

@@ -66,10 +66,20 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageViewHolder>{
         int whiteColorResId     = context.getResources().getColor(R.color.white);
         int darkTextColorResId  = context.getResources().getColor(R.color.colorPrimaryDark);
 
-        Message message = messagesList.get(position);
+        Message message         = messagesList.get(position);
 
         String currentUserId    = fbAuth.getCurrentUser().getUid();
         String messageAuthorId  = message.getMessageAuthorId();
+
+        // ----------------------------- SORT ORDER -------------------------------- //
+
+        Message previousMessage = null;
+
+        int previousMessagePosition = (position - 1);
+
+        if(previousMessagePosition >= 0) {
+            previousMessage = messagesList.get(previousMessagePosition);
+        }
 
         // current user is the author of the message
         if(messageAuthorId.equals(currentUserId)) {
@@ -85,7 +95,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageViewHolder>{
         // current user is not the author of the message
         else {
 
-            viewHolder.setMessageAuthorName(recipientName);
+            if( (previousMessage != null) &&
+                (previousMessage.getMessageAuthorId().equals(messageAuthorId))) {
+
+                viewHolder.setMessageAuthorName("");
+            }
+            else {
+                viewHolder.setMessageAuthorName(recipientName);
+            }
 
             viewHolder.messageText.setBackgroundResource(R.drawable.message_row_recipient_background);
             viewHolder.messageText.setTextColor(whiteColorResId);

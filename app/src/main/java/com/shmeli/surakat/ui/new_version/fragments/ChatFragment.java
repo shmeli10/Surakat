@@ -95,8 +95,6 @@ public class ChatFragment extends FragmentWithInfoInToolbar {
      *
      * @return A new instance of fragment ChatFragment.
      */
-//    public static ChatFragment newInstance(String selectedUserId,
-//                                           String selectedUserName) {
     public static ChatFragment newInstance() {
         Bundle args = new Bundle();
 
@@ -124,7 +122,7 @@ public class ChatFragment extends FragmentWithInfoInToolbar {
                              ViewGroup      container,
                              Bundle         savedInstanceState) {
 
-        Log.e("LOG", "ChatFragment: onCreateView()");
+        //Log.e("LOG", "ChatFragment: onCreateView()");
 
         view = inflater.inflate(R.layout.fragment_chat,
                                 container,
@@ -132,67 +130,46 @@ public class ChatFragment extends FragmentWithInfoInToolbar {
 
         internalActivity    = (InternalActivity) getActivity();
 
-//        if(getArguments().containsKey(CONST.USER_ID)) {
+        //Log.e("LOG", "ChatFragment: onCreateView(): recipientId: "      +recipientId);
+        //Log.e("LOG", "ChatFragment: onCreateView(): recipientName: "    +recipientName);
 
-//            this.recipientId            = getArguments().getString(CONST.USER_ID);
-//
-//            if( getArguments().containsKey(CONST.USER_NAME) &&
-//                (!TextUtils.isEmpty(getArguments().getString(CONST.USER_NAME)))) {
-//
-//                this.recipientName          = getArguments().getString(CONST.USER_NAME);
-//            }
+        chatMessageText             = UiUtils.findView( view,
+                                                        R.id.chatMessageText);
+        chatMessageText.addTextChangedListener(onTextChangedListener);
 
-            Log.e("LOG", "ChatFragment: onCreateView(): recipientId: "      +recipientId);
-            Log.e("LOG", "ChatFragment: onCreateView(): recipientName: "    +recipientName);
+        chatMessageLeftCharsBodyText = UiUtils.findView(view,
+                                                        R.id.chatMessageLeftCharsBody);
+        chatMessageLeftCharsBodyText.setText(String.valueOf(CONST.PUBLICATION_MAX_LENGTH));
 
-            chatMessageText             = UiUtils.findView( view,
-                                                            R.id.chatMessageText);
-            chatMessageText.addTextChangedListener(onTextChangedListener);
+        chatTopDividerView          = UiUtils.findView( view,
+                                                        R.id.chatTopDividerView);
 
-            chatMessageLeftCharsBodyText = UiUtils.findView(view,
-                                                            R.id.chatMessageLeftCharsBody);
-            chatMessageLeftCharsBodyText.setText(String.valueOf(CONST.PUBLICATION_MAX_LENGTH));
+        chatSendButton              = UiUtils.findView( view,
+                                                        R.id.chatSendButton);
+        chatSendButton.setOnClickListener(sendClickListener);
 
-            chatTopDividerView          = UiUtils.findView( view,
-                                                            R.id.chatTopDividerView);
+        chatSwipeRefreshLayout      = UiUtils.findView( view,
+                                                        R.id.chatSwipeRefreshLayout);
+        chatSwipeRefreshLayout.setOnRefreshListener(swipeRefreshListener);
 
-            chatSendButton              = UiUtils.findView( view,
-                                                            R.id.chatSendButton);
-            chatSendButton.setOnClickListener(sendClickListener);
+        messageAdapter              = new MessageAdapter(   getActivity(),
+                                                            messagesList,
+                                                            recipientName);
 
-            chatSwipeRefreshLayout      = UiUtils.findView( view,
-                                                            R.id.chatSwipeRefreshLayout);
-            chatSwipeRefreshLayout.setOnRefreshListener(swipeRefreshListener);
+        linearLayoutManager         = new LinearLayoutManager(getActivity());
 
-            messageAdapter              = new MessageAdapter(   getActivity(),
-                                                                messagesList,
-                                                                recipientName);
+        chatMessagesList            = UiUtils.findView( view,
+                                                        R.id.chatMessagesList);
+        chatMessagesList.setHasFixedSize(true);
+        chatMessagesList.setLayoutManager(linearLayoutManager);
+        chatMessagesList.setAdapter(messageAdapter);
 
-            linearLayoutManager         = new LinearLayoutManager(getActivity());
+        if(internalActivity.getCurrentFragment() instanceof FragmentWithInfoInToolbar) {
+            internalActivity.setToolbarInfo(getFragmentInfoHeadResId(),
+                                            getFragmentInfoBodyText());
+        }
 
-            chatMessagesList            = UiUtils.findView( view,
-                                                            R.id.chatMessagesList);
-            chatMessagesList.setHasFixedSize(true);
-            chatMessagesList.setLayoutManager(linearLayoutManager);
-            chatMessagesList.setAdapter(messageAdapter);
-
-            if(internalActivity.getCurrentFragment() instanceof FragmentWithInfoInToolbar) {
-                internalActivity.setToolbarInfo(getFragmentInfoHeadResId(),
-                                                getFragmentInfoBodyText());
-            }
-
-//            setRecipientNameAtHint();
-
-//            if(!isFragmentInitiated) {
-
-                init();
-
-//                isFragmentInitiated = true;
-//            }
-//        }
-//        else {
-//            Log.e("LOG", "ChatFragment: onCreateView(): error: parameter selectedUserId does not exist in Bundle");
-//        }
+        init();
 
         // Inflate the layout for this fragment
         return view;
@@ -219,11 +196,11 @@ public class ChatFragment extends FragmentWithInfoInToolbar {
         if( (!TextUtils.isEmpty(senderId)) &&
             (!TextUtils.isEmpty(recipientId))) {
 
-//            chatFBDatabaseRef = internalActivity.getRootFBDatabaseRef().child(CONST.FIREBASE_CHAT_CHILD)
-//                                                                        .child(senderId);
-//            chatFBDatabaseRef.addValueEventListener(chatDataListener);
+            if(!isFragmentInitiated) {
+                isFragmentInitiated = true;
 
-            loadMessages();
+                loadMessages();
+            }
         }
     }
 
@@ -265,11 +242,11 @@ public class ChatFragment extends FragmentWithInfoInToolbar {
             if (!TextUtils.isEmpty(pushedMessageId)) {
 
                 Map messageMap = new HashMap();
-                messageMap.put(CONST.MESSAGE_TEXT, messageText);
-                messageMap.put(CONST.MESSAGE_IS_SEEN, false);
-                messageMap.put(CONST.MESSAGE_TYPE, CONST.MESSAGE_TEXT_TYPE);
-                messageMap.put(CONST.MESSAGE_CREATE_TIME, ServerValue.TIMESTAMP);
-                messageMap.put(CONST.MESSAGE_AUTHOR_ID, senderId);
+                messageMap.put(CONST.MESSAGE_TEXT,          messageText);
+                messageMap.put(CONST.MESSAGE_IS_SEEN,       false);
+                messageMap.put(CONST.MESSAGE_TYPE,          CONST.MESSAGE_TEXT_TYPE);
+                messageMap.put(CONST.MESSAGE_CREATE_TIME,   ServerValue.TIMESTAMP);
+                messageMap.put(CONST.MESSAGE_AUTHOR_ID,     senderId);
 
                 StringBuilder mapKeySB = new StringBuilder();
                 Map messageUserMap = new HashMap();
