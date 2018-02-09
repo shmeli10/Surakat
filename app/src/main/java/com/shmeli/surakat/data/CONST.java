@@ -8,6 +8,14 @@ public class CONST {
 
     public static final String FIREBASE_BASE_LINK               = "https://surakat-80b2e.firebaseio.com";
 
+    public static final String FIREBASE_PROJECT_ID              = "surakat-80b2e";
+
+    public static final String FCM_URL                          = "https://fcm.googleapis.com/v1/projects/" +FIREBASE_PROJECT_ID+ "/";
+    public static final String SEND_MESSAGE_URL                 = "messages:send"; // " HTTP/1.1";
+
+    public static final String HTTP_SCHEME                      = "http";
+    public static final String HTTPS_SCHEME                     = "https";
+
     //public static final String FIREBASE_CHAT_CHILD              = "Chat";
 
     public static final String FIREBASE_FRIENDS_CHILD           = "Friends";
@@ -85,6 +93,10 @@ public class CONST {
     public static final int SEND_MESSAGE_TYPE                   = 1;
 
     public static final int LOAD_MESSAGES_COUNT                 = 5;
+
+    public static final int CONNECT_TIMEOUT                     = 15;
+    public static final int WRITE_TIMEOUT                       = 15;
+    public static final int READ_TIMEOUT                        = 15;
 
     //////////////////////////////////////////////////////////////////////////////
 

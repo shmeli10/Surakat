@@ -33,6 +33,7 @@ import com.shmeli.surakat.R;
 import com.shmeli.surakat.adapters.MessageAdapter;
 import com.shmeli.surakat.data.CONST;
 import com.shmeli.surakat.model.Message;
+import com.shmeli.surakat.rest.SendNotificationController;
 import com.shmeli.surakat.ui.new_version.InternalActivity;
 import com.shmeli.surakat.utils.UiUtils;
 
@@ -66,8 +67,12 @@ public class ChatFragment extends FragmentWithInfoInToolbar {
     private List<String>            messagesKeyList = new ArrayList<>();
     private MessageAdapter          messageAdapter;
 
+    private SendNotificationController sendNotificationController;
+
     private String                  senderId                = "";
+
     private String                  recipientId             = "";
+    private String                  recipientDeviceToken    = "";
     private String                  recipientName           = "";
 
     private String                  lastLoadedMessageKey    = "";
@@ -207,11 +212,19 @@ public class ChatFragment extends FragmentWithInfoInToolbar {
     // ------------------------------ SETTERS ----------------------------------------------- //
 
     public void setRecipientData(String recipientId,
+                                 String recipientDeviceToken,
                                  String recipientName) {
+
+//    public void setRecipientData(String recipientId,
+//                                 String recipientName) {
         //Log.e("LOG", "ChatFragment: setRecipientData()");
 
         if(!TextUtils.isEmpty(recipientId)) {
             this.recipientId = recipientId;
+        }
+
+        if(!TextUtils.isEmpty(recipientDeviceToken)) {
+            this.recipientDeviceToken = recipientDeviceToken;
         }
 
         if(!TextUtils.isEmpty(recipientName)) {
@@ -277,6 +290,27 @@ public class ChatFragment extends FragmentWithInfoInToolbar {
                         if (databaseError != null) {
 
                             Log.e("LOG", "ChatFragment: startSendMessage(): rootFBDatabaseRef.updateChildren.onComplete error: " + databaseError.getMessage().toString());
+                        }
+                        else {
+
+                            Log.e("LOG", "ChatFragment: startSendMessage(): message is sent");
+
+                            try {
+                                sendNotificationController = internalActivity.getSendNotificationController();
+
+                                if(sendNotificationController != null) {
+                                    sendNotificationController.sendDirectNotification(  internalActivity.getDeviceToken(),
+                                                                                        recipientDeviceToken,
+                                                                                        "Test notification title",
+                                                                                        "Test notification body");
+                                }
+                                else {
+                                    Log.e("LOG", "ChatFragment: startSendMessage(): sendNotificationController is null");
+                                }
+
+                            } catch (Exception exc) {
+                                Log.e("LOG", "ChatFragment: startSendMessage(): get sendNotificationController error: " +exc.getMessage());
+                            }
                         }
                     }
                 });

@@ -26,6 +26,8 @@ import com.squareup.picasso.Picasso;
 
 public class SurakatApp extends Application {
 
+    protected static SurakatApp instance;
+
 /*    private FirebaseAuth        fbAuth;
     private DatabaseReference   rootFBDatabaseRef;
     private DatabaseReference   usersFBDatabaseRef;
@@ -35,9 +37,15 @@ public class SurakatApp extends Application {
 
 //    private String              currentUserId = "";
 
+    public static SurakatApp getInstance() {
+        return instance;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
+
+        instance = this;
 
         Firebase.setAndroidContext(this);
 

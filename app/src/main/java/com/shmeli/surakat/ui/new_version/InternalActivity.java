@@ -31,6 +31,9 @@ import com.shmeli.surakat.data.CONST;
 import com.shmeli.surakat.interfaces.TransferSelectedUser;
 import com.shmeli.surakat.model.User;
 
+import com.shmeli.surakat.rest.RestClientEvent;
+import com.shmeli.surakat.rest.RetrofitGeneratorClass;
+import com.shmeli.surakat.rest.SendNotificationController;
 import com.shmeli.surakat.ui.new_version.fragments.ChatFragment;
 import com.shmeli.surakat.ui.new_version.fragments.FragmentWithInfoInToolbar;
 import com.shmeli.surakat.ui.new_version.fragments.ParentFragment;
@@ -44,6 +47,8 @@ import com.shmeli.surakat.utils.UiUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import retrofit2.Retrofit;
 
 /**
  * Created by Serghei Ostrovschi on 11/14/17.
@@ -62,6 +67,11 @@ public class InternalActivity   extends     ParentActivity
     private TextView        toolbarTitleTextView;
     private TextView        toolbarInfoHeadTextView;
     private TextView        toolbarInfoBodyTextView;
+
+    private Retrofit        retrofit;
+    private RestClientEvent restClientEvent;
+
+    private SendNotificationController  sendNotificationController;
 
     private DatabaseReference selectedUserFBDatabaseRef;
 
@@ -213,6 +223,28 @@ public class InternalActivity   extends     ParentActivity
             else {
                 Log.e("LOG", "InternalActivity: init(): error: toolbarTitleResId has incorrect value= " +toolbarTitleResId);
             }
+
+            try {
+                retrofit = new RetrofitGeneratorClass().getRestClient(  getApplicationContext(),
+                                                                        CONST.FCM_URL);
+
+                if(retrofit == null) {
+                    Log.e("LOG", "InternalActivity: init(): retrofit is null");
+                }
+                else {
+
+                    restClientEvent = retrofit.create(RestClientEvent.class);
+
+                    Log.e("LOG", "InternalActivity: init(): retrofit FCM url: " +retrofit.baseUrl().toString());
+
+                    if(restClientEvent == null) {
+                        Log.e("LOG", "InternalActivity: init(): restClientEvent is null");
+                    }
+                }
+
+            } catch (Exception exc) {
+                Log.e("LOG", "InternalActivity: init(): retrofit error: " +exc.getMessage());
+            }
         }
         else {
 
@@ -351,6 +383,15 @@ public class InternalActivity   extends     ParentActivity
         return fragment;
     }
 
+    public SendNotificationController getSendNotificationController() throws Exception {
+        Log.e("LOG", "InternalActivity: getSendNotificationController()");
+
+        if(sendNotificationController == null) {
+            sendNotificationController = new SendNotificationController(restClientEvent);
+        }
+        return sendNotificationController;
+    }
+
     // ----------------------------------- FRAGMENTS ----------------------------------------- //
 
     @Override
@@ -432,6 +473,7 @@ public class InternalActivity   extends     ParentActivity
 //                                                    selectedUser.getUserName());
                 fragment = ChatFragment.newInstance();
                 ((ChatFragment) fragment).setRecipientData( selectedUserId,
+                                                            selectedUser.getUserDeviceToken(),
                                                             selectedUser.getUserName());
                 fragment.setFragmentTitleResId(R.string.text_chat);
 
